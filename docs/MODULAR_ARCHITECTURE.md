@@ -701,6 +701,8 @@ flowchart LR
 - [`LAB_PRODUCT_M7_BINDING.md`](LAB_PRODUCT_M7_BINDING.md) — **Draft** plan-16 lab≠product M7 binding（lab advisory debate 禁止接到 `OrderManager`；pending Owner/PM; **not** Accepted; Merge ≠ Accepted）。Issue #10 stays OPEN.  
 - [`CHARTS_INDICATORS_DESIGN.md`](CHARTS_INDICATORS_DESIGN.md) — **Draft** ns-1 TradingView-style 圖表／指標設計頁（Desk 產品 vs Streamlit lab；pending Owner/PM; **not** Accepted; Merge ≠ Accepted；**not** Confirmed item 6）。Issue #10 stays OPEN.  
 - [`REFERENCE_SIGNALS_DESIGN.md`](REFERENCE_SIGNALS_DESIGN.md) — **Draft** ns-2 參考訊號設計頁（Desk 產品 vs Scan／worker／lab；pending Owner/PM; **not** Accepted; Merge ≠ Accepted；**not** Confirmed item 6；D7 schema 仍 planning）。Issue #10 stays OPEN.  
+- [`AI_SMART_TRADER_METHOD.md`](AI_SMART_TRADER_METHOD.md) — **Draft** 全日智能交易員方法（紙上閉環先行、預設完整股票池；第 1.5 階段兩日偵察只產候選、不成交；判斷員預設關閉；不開 live、不改 M8 語意；pending Owner/PM; **not** Accepted）。  
+- [`DATA_FEED_AND_SUBSCRIPTIONS.md`](DATA_FEED_AND_SUBSCRIPTIONS.md) — 資料訂閱建議（2026-10-26；預算約 HK$400。Massive 日 K 稍後再買；Benzinga 財報現在不買；免費財報日曆先用；不構成購買）。  
 - [`PAPER_VALIDATION_RUNBOOK.md`](PAPER_VALIDATION_RUNBOOK.md) — **frozen**；紙倉／晉升操作參考  
 - [`AUTO_TRADING_ROADMAP.md`](AUTO_TRADING_ROADMAP.md) — **frozen**；衝突以 ADR-003 為準  
 - [`PAID_DATA_PIT_PLAN.md`](PAID_DATA_PIT_PLAN.md) — 付費數據  
@@ -721,3 +723,7 @@ flowchart LR
 - **2026-10-23 (plan-16):** Related docs 加 Draft [`LAB_PRODUCT_M7_BINDING.md`](LAB_PRODUCT_M7_BINDING.md)（lab≠product M7）。Issue #10 stays OPEN.
 - **2026-10-23 (ns-1):** Related docs 加 Draft [`CHARTS_INDICATORS_DESIGN.md`](CHARTS_INDICATORS_DESIGN.md)（TradingView-style 圖表／指標）。Issue #10 stays OPEN.
 - **2026-10-23 (ns-2):** Related docs 加 Draft [`REFERENCE_SIGNALS_DESIGN.md`](REFERENCE_SIGNALS_DESIGN.md)（參考訊號／advisory；D7 schema 仍 planning）。Issue #10 stays OPEN.
+- **2026-10-26:** Related docs 加 Draft [`AI_SMART_TRADER_METHOD.md`](AI_SMART_TRADER_METHOD.md)（方法頁，不改 runtime）。
+- **2026-10-26:** Related docs 加 Draft [`DATA_FEED_AND_SUBSCRIPTIONS.md`](DATA_FEED_AND_SUBSCRIPTIONS.md)（公開標價建議，不購買、不改 runtime）。
+- **2026-10-26:** 同一份訂閱建議補上 Bloomberg／IBKR／期權方案比較。仍不購買、不改 runtime。
+- **2026-10-26:** 方法頁 Owner Approved（Merge ≠ runtime）。資料預算改為約 HK$400：Starter 稍後再買，Benzinga 現在不買。仍不購買、不改 runtime。

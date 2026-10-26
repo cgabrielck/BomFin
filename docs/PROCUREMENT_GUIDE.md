@@ -58,7 +58,7 @@ Phase1 Shadow/Paper  →  Phase2 可靠日K  →  Phase3 小資金實盤
 
 | 項目 | 建議 | 約略成本 | 何時買 |
 |------|------|----------|--------|
-| **美股聚合日 K** | **Polygon／Massive Stocks** | 入門／Developer 約 **$29–$79／月**（多為**延遲**；以官網為準） | 開始認真多月 shadow／paper、要穩定 OHLCV |
+| **美股聚合日 K** | **Polygon／Massive Stocks Starter** | 公開標價 **約 $29／月**（2026-10-26）。主人預算約 HK$400（約 US$51）：**稍後再買，不是方法 PR**。Benzinga 財報約 $99 **超出預算，現在不買**；日曆先用免費來源（見 [`DATA_FEED_AND_SUBSCRIPTIONS.md`](DATA_FEED_AND_SUBSCRIPTIONS.md)） | 開始認真多月 shadow／paper、要穩定 OHLCV。Developer $79 與 Advanced 約 $199 先別買 |
 | **不要先買** | Stocks **Advanced 實時 SIP**（約 **$199／月** 量級） | 貴 | 僅盤中秒級需求 + 已過紙上閘門 |
 
 說明：
@@ -83,11 +83,11 @@ PYTHONPATH=backend:. python3 scripts/build_historical_universe.py --use-polygon
 |------|------|----------|------|
 | **Alpaca Live** | 同帳戶切 `APCA_PAPER=false` + `--allow-live` | 美股常 $0 佣金；或有行情費 | **小資金 + mandate 縮額**；先人工核准 |
 | **實時股票（可選）** | Alpaca 付費行情 **或** Polygon Stocks Advanced | 約 **$99–$199／月** | **二選一**，勿重複付兩份 SIP |
-| **實時期權（可選）** | MarketData Trader 約 **$75／月**，或 Polygon Options Advanced 更貴 | 僅 actionable 期權警報 | 自動交易主線**不做期權自動下單**；可晚買 |
-| **IBKR** | **暫緩** | 帳戶＋行情 | 程式尚未接 IBKR |
+| **實時期權（可選）** | 見 [`DATA_FEED_AND_SUBSCRIPTIONS.md`](DATA_FEED_AND_SUBSCRIPTIONS.md) §9（2026-10-26）。舊列的 MarketData 約 $75 **本輪未重核** | 僅在期權工作開始之後 | 自動交易主線**現在不做期權下單**。屆時只買一份 OPRA，並優先沿 Alpaca 已寫明的紙上期權 |
+| **IBKR** | **暫緩** | 帳戶＋行情。非專業行情見同一比較 | 程式尚未接 IBKR。不是現在的研究終端；Alpaca 期權不夠時才考慮 |
 | **QuantConnect／Lean** | **暫緩** | 約 $20–$200+／月 | 嚴謹回測外掛；非現階段必買 |
 | **Postgres 託管** | **暫緩** | 約 $5–15／月 | 預設 **SQLite** 已夠個人 VPS |
-| **Bloomberg／Refinitiv** | **不要買** | 企業年費級 | 個人過殺 |
+| **Bloomberg／Refinitiv** | **不要買** | 官網不標價；次級估計見資料訂閱頁 §9 | 個人紙上桌過殺。不取代券商 |
 
 ---
 
@@ -100,9 +100,9 @@ PYTHONPATH=backend:. python3 scripts/build_historical_universe.py --use-polygon
 3. Telegram Bot（免費）→ 運維通知
 4. （研究端需要）維持現有 LLM 額度
 
-### 1–2 週內、認真封印時再買
+### 稍後、在每月約 HK$400（約 US$51）以內再買
 
-5. Polygon／Massive **股票**方案（**非** Advanced 可先試）→ `POLYGON_API_KEY`
+5. Polygon／Massive **Stocks Starter**（約 $29／月，**非** Advanced）→ `POLYGON_API_KEY`。Benzinga 財報約 $99 **現在不買**。這不是方法文件那次 PR 的購買。
 
 ### 通過紙上 ≥30 天 + Stage 2 seal 之後
 
