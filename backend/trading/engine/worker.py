@@ -70,6 +70,26 @@ ensure_backend_on_path()
 
 logger = logging.getLogger(__name__)
 
+
+def _order_status_token(order: Any) -> str:
+    """Map an order onto the session-card vocabulary. Not a seal."""
+    error = str(getattr(order, "error_message", "") or "")
+    raw = getattr(getattr(order, "status", None), "value", getattr(order, "status", ""))
+    token = str(raw or "").lower()
+    if error.startswith("Risk Gate Rejected") or (
+        token == "rejected" and "risk" in error.lower()
+    ):
+        return "risk_rejected"
+    if token == "cancelled":
+        return "canceled"
+    if token == "filled":
+        return "filled"
+    if token in ("submitted", "accepted", "partially_filled", "risk_approved"):
+        return "submitted"
+    if token == "rejected":
+        return "canceled"
+    return token or "proposed"
+
 # US Eastern timezone offset (ET = UTC-5 winter, UTC-4 summer)
 # We approximate market hours as 14:30–21:00 UTC (conservative)
 MARKET_OPEN_UTC_HOUR  = 14  # 09:30 ET = 14:30 UTC (winter)
@@ -140,15 +160,23 @@ class TradingWorker:
             try:
                 from backend.utils.constants import STOCK_UNIVERSE
                 self.ticker_universe = [s["ticker"] for s in STOCK_UNIVERSE]
+                self.universe_source = "stock_universe"
             except Exception:
+                # Five-name import fallback is a data fault, not a strategy book.
                 self.ticker_universe = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"]
+                self.universe_source = "import_fallback"
+                logger.error(
+                    "STOCK_UNIVERSE import failed — using fallback names as a data fault, not a book."
+                )
             override = getattr(self.strategy, "universe_override", None)
             if override:
                 names = [str(s).upper().strip() for s in override if str(s).strip()]
                 if names:
                     self.ticker_universe = names
+                    self.universe_source = "strategy_override"
         else:
             self.ticker_universe = ticker_universe
+            self.universe_source = "override"
 
         self._running   = False
         self._thread: Optional[threading.Thread] = None
@@ -173,6 +201,11 @@ class TradingWorker:
         self.last_skip_by_ticker: Dict[str, str] = {}
         self.last_universe_cap: int = len(self.ticker_universe)
         self.last_fetched: int = 0
+        self.last_fetched_symbols: List[str] = []
+        self.last_order_statuses: List[Dict[str, Any]] = []
+        self.last_invested_pct: Optional[float] = None
+        self.last_session_card: Optional[Dict[str, Any]] = None
+        self._cycle_orders: List[Dict[str, Any]] = []
         self.last_scan_stale: bool = False
         self.last_ohlcv_vendor: Optional[str] = None
         self.last_ohlcv_fallback: bool = False
@@ -255,6 +288,9 @@ class TradingWorker:
         summary_rows: List[Dict[str, Any]] = []
         skip_counts: Dict[str, int] = {}
         skip_by_ticker: Dict[str, str] = {}
+        self._cycle_orders = []
+        self.last_fetched_symbols = []
+        self.last_invested_pct = None
 
         def note(ticker: Optional[str], code: str) -> None:
             skip_codes.bump(skip_counts, code)
@@ -291,6 +327,7 @@ class TradingWorker:
             if df is not None and len(df) >= 30:
                 price_history[ticker] = df
         self.last_fetched = len(price_history)
+        self.last_fetched_symbols = [str(t).upper() for t in price_history]
 
         fetched_u = {str(t).upper() for t in price_history}
         fetch_u = {str(t).upper() for t in to_fetch}
@@ -310,9 +347,9 @@ class TradingWorker:
                 len(to_fetch), cap, len(self.ticker_universe),
             )
             skip_counts.setdefault("no_price", len(to_fetch) or 1)
-            self.last_skip_counts = skip_counts
-            self.last_skip_by_ticker = skip_by_ticker
-            self.last_signal_summary = [{"action": "NO_PRICE", "tried": len(to_fetch), "cap": cap}]
+            self.last_fetched_symbols = []
+            summary_rows.append({"action": "NO_PRICE", "tried": len(to_fetch), "cap": cap})
+            self._finish_strategy_cycle(summary_rows, skip_counts, skip_by_ticker)
             return
 
         # Inject SPY for Stage-2 RS / adaptive regime (strategies that support it)
@@ -405,6 +442,8 @@ class TradingWorker:
                 sell_result = self._submit_sell(
                     symbol, pos.quantity, exit_sig.exit_price, exit_sig.reason
                 )
+                if sell_result is not None:
+                    self._record_cycle_order(symbol, "sell", _order_status_token(sell_result))
                 if sell_reached_venue(sell_result):
                     self._cooldown[symbol] = now
                     mark_cooldown(symbol, when=now)
@@ -439,6 +478,7 @@ class TradingWorker:
             mark = float(px["Close"].iloc[-1]) if px is not None and len(px) else float(p.average_entry_price)
             invested_value += mark * float(p.quantity)
         exposure_ratio = invested_value / portfolio_value if portfolio_value > 0 else 0.0
+        self.last_invested_pct = round(exposure_ratio * 100, 2) if portfolio_value > 0 else None
         cadence = self._resolve_cadence()
         self.last_cadence = cadence
         cadence_ok = cadence_allows_new_entries(cadence, now, regime)
@@ -750,6 +790,55 @@ class TradingWorker:
                     note(ticker, "mandate")
                     continue
                 reserved = True
+            # Phase 1 judge slot: immediately before the only buy submitter.
+            # AI_JUDGE=0 does not call the client. A block does not resize and
+            # does not write an active intent. Qty above is unchanged.
+            from backend.trading.advisory.judge import evaluate_entry
+
+            judge_decision = evaluate_entry(
+                {
+                    "symbol": ticker,
+                    "side": "buy",
+                    "strategy_id": signal.strategy_id,
+                    "reason": signal.reason,
+                },
+                client=getattr(self, "judge_client", None),
+            )
+            if judge_decision.ignored_codes:
+                logger.info(
+                    "AI judge ignored unknown veto codes for %s: %s",
+                    ticker,
+                    ",".join(judge_decision.ignored_codes),
+                )
+            if judge_decision.conviction_tier and not judge_decision.noop:
+                logger.info(
+                    "AI judge tier=%s for %s; Phase 1 does not resize (qty=%s)",
+                    judge_decision.conviction_tier,
+                    ticker,
+                    qty,
+                )
+            if not judge_decision.allow:
+                if reserved:
+                    self.mandate_gate.release_reservation()
+                self._journal_judge_silence(ticker, judge_decision, sized_qty=qty)
+                if judge_decision.veto_codes and not judge_decision.failure:
+                    note(ticker, "judge_veto")
+                    action = "JUDGE_VETO"
+                else:
+                    note(ticker, "judge_failure")
+                    action = "JUDGE_SILENCE"
+                logger.info(
+                    "BLOCKED %s: judge %s",
+                    ticker,
+                    judge_decision.failure or ",".join(judge_decision.veto_codes),
+                )
+                summary_rows.append({
+                    "ticker": ticker,
+                    "action": action,
+                    "reason": judge_decision.failure or ",".join(judge_decision.veto_codes),
+                    "veto_codes": list(judge_decision.veto_codes),
+                })
+                continue
             result = self.signal_processor.process_signal(
                 signal_dict,
                 account_summary=account_refresh,
@@ -760,6 +849,7 @@ class TradingWorker:
                 },
                 next_bars=next_bars,
             )
+            self._record_cycle_order(ticker, "buy", _order_status_token(result))
 
             # Audit the risk / submission outcome
             if (result.error_message or "").startswith("Risk Gate Rejected"):
@@ -839,11 +929,90 @@ class TradingWorker:
                                   "qty": qty, "price": signal.entry_price,
                                   "reason": signal.reason})
 
+        self._finish_strategy_cycle(summary_rows, skip_counts, skip_by_ticker)
+
+    def _finish_strategy_cycle(
+        self,
+        summary_rows: List[Dict[str, Any]],
+        skip_counts: Dict[str, int],
+        skip_by_ticker: Dict[str, str],
+    ) -> None:
+        """Persist why_no_trade and the session card. A quiet cycle is success."""
         self.last_skip_counts = skip_counts
         self.last_skip_by_ticker = skip_by_ticker
         self.last_signal_summary = summary_rows
+        self.last_order_statuses = list(self._cycle_orders)
+        try:
+            self._publish_session_card()
+        except Exception:
+            logger.exception("session card failed")
         if skip_counts:
             logger.info("why_no_trade this cycle: %s", skip_counts)
+
+    def _publish_session_card(self) -> None:
+        from backend.trading.advisory.judge import ai_judge_enabled
+        from backend.trading.engine.session_card import build_session_card
+
+        report = None
+        try:
+            from backend.api.paper_performance import load_cached_paper_report
+
+            report = load_cached_paper_report()
+        except Exception:
+            report = None
+        self.last_session_card = build_session_card(
+            universe_source=getattr(self, "universe_source", ""),
+            universe_requested=self.ticker_universe,
+            cap=int(self.last_universe_cap),
+            cap_env=os.getenv("WORKER_UNIVERSE_CAP"),
+            fetched=self.last_fetched_symbols,
+            skip_counts=self.last_skip_counts,
+            order_statuses=self.last_order_statuses,
+            execution_mode=self.execution_mode,
+            invested_pct=self.last_invested_pct,
+            performance_report=report if isinstance(report, dict) else None,
+            ai_judge=ai_judge_enabled(),
+        )
+
+    def _record_cycle_order(self, symbol: str, side: str, status: str) -> None:
+        self._cycle_orders.append(
+            {
+                "symbol": str(symbol or "").upper(),
+                "side": str(side or "").lower(),
+                "status": str(status or "").lower(),
+            }
+        )
+
+    def _journal_judge_silence(self, ticker: str, decision: Any, *, sized_qty: int) -> None:
+        """Journal a veto or judge failure. Not an order and not an intent."""
+        from backend.utils.provenance.journal_store import append_entry
+        from backend.utils.provenance.trade_log import empty_trade_log, journal_provenance
+
+        reason = decision.failure or ",".join(decision.veto_codes) or "judge"
+        entry = empty_trade_log(symbol=ticker, status="vetoed")
+        entry.update(
+            {
+                "side": "buy",
+                "qty": 0,
+                "strategy_id": getattr(self.strategy, "strategy_id", None),
+                "veto_codes": list(decision.veto_codes),
+                "conviction_tier": decision.conviction_tier,
+                "user_visible_summary": (
+                    f"judge silence ({reason}); would_have_submitted qty={int(sized_qty)} not sent"
+                ),
+                "reason_codes": [
+                    "judge_failure" if decision.failure else "judge_veto"
+                ],
+                "provenance": journal_provenance(
+                    source="trade_journal",
+                    note="Judge decision — not a broker order and not an active intent.",
+                ),
+            }
+        )
+        try:
+            append_entry(entry)
+        except Exception:
+            logger.exception("Failed to journal judge silence for %s", ticker)
 
     # ------------------------------------------------------------------
     # Order sync  (from 1.0)
@@ -1700,6 +1869,7 @@ def main(argv: Optional[List[str]] = None) -> int:
                 "ohlcv_fallback": bool(getattr(worker, "last_ohlcv_fallback", False)),
                 "calendar": "us_equity",
                 "paper_vs_spy": None,
+                "session_card": None,
                 "pending_buys": [],
                 "skip_by_ticker": {},
             }
@@ -1707,6 +1877,8 @@ def main(argv: Optional[List[str]] = None) -> int:
                 payload["pending_buys"] = sorted(worker._pending_buy_symbols())
             except Exception:
                 payload["pending_buys"] = []
+            card = getattr(worker, "last_session_card", None)
+            payload["session_card"] = card if isinstance(card, dict) else None
             by_ticker = getattr(worker, "last_skip_by_ticker", {})
             if isinstance(by_ticker, dict):
                 payload["skip_by_ticker"] = {

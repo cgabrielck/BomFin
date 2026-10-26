@@ -37,6 +37,8 @@ LABELS_EN: Dict[str, str] = {
     "not_defensive_asset": "Not GLD (defensive_gld only rotates into gold)",
     "not_defensive_regime": "Regime is not RED/PANIC — no GLD hedge",
     "cadence_wait": "Weekly cadence: wait for US Monday rebalance (unless PANIC)",
+    "judge_veto": "Entry judge veto (no new buy)",
+    "judge_failure": "Entry judge failed closed (no new buy)",
 }
 
 LABELS_ZH: Dict[str, str] = {
@@ -73,6 +75,8 @@ LABELS_ZH: Dict[str, str] = {
     "not_defensive_asset": "不是 GLD（defensive_gld 只在紅／恐慌時買黃金）",
     "not_defensive_regime": "非 RED／PANIC 體制 — 不買 GLD 對沖",
     "cadence_wait": "週頻節奏：等到美東週一再平衡（PANIC 除外）",
+    "judge_veto": "判斷員否決（不開新倉）",
+    "judge_failure": "判斷員失敗即沉默（不開新倉）",
 }
 
 
