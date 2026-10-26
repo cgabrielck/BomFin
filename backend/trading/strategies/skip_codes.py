@@ -39,6 +39,19 @@ LABELS_EN: Dict[str, str] = {
     "cadence_wait": "Weekly cadence: wait for US Monday rebalance (unless PANIC)",
     "judge_veto": "Entry judge veto (no new buy)",
     "judge_failure": "Entry judge failed closed (no new buy)",
+    "fund_missing": "Fundamental score missing (not filled)",
+    "market_pressure": "SPY distribution-day pressure blocks fresh pivot/gap",
+    "regime_block": "SPY below SMA200 — no new leader-campaign buys",
+    "stop_too_wide": "Structural stop wider than the written cap",
+    "handle_deep": "Pivot handle deeper than 12%",
+    "volume_not_dry": "Contraction volume did not dry up",
+    "above_ma_band": "Close too far above the moving average",
+    "prior_run": "Already ran too far before the gap",
+    "price_floor": "Close below $10",
+    "sma200_flat": "SMA200 is not rising",
+    "leader_position": "Not within the 52-week leader band",
+    "market_unavailable": "SPY market state unavailable — no new buy",
+    "experimental_disabled": "Experimental strategy flag is off",
 }
 
 LABELS_ZH: Dict[str, str] = {
@@ -77,6 +90,19 @@ LABELS_ZH: Dict[str, str] = {
     "cadence_wait": "週頻節奏：等到美東週一再平衡（PANIC 除外）",
     "judge_veto": "判斷員否決（不開新倉）",
     "judge_failure": "判斷員失敗即沉默（不開新倉）",
+    "fund_missing": "沒有基本面分數（不填 50／55）",
+    "market_pressure": "SPY 分佈日受壓，不做新的樞紐或跳空",
+    "regime_block": "SPY 在 SMA200 之下，領漲戰役不開新倉",
+    "stop_too_wide": "結構停損寬過寫定上限",
+    "handle_deep": "柄深超過 12%",
+    "volume_not_dry": "整理量沒有縮小",
+    "above_ma_band": "收盤離均線太遠",
+    "prior_run": "跳空前已經漲太多",
+    "price_floor": "收盤低於 10 美元",
+    "sma200_flat": "SMA200 沒有上升",
+    "leader_position": "不在 52 週領漲區間",
+    "market_unavailable": "沒有 SPY 大市狀態，不開新倉",
+    "experimental_disabled": "實驗策略旗標關閉",
 }
 
 

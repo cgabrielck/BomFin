@@ -46,7 +46,8 @@ from backend.trading.risk.shared_state import (
 )
 from backend.trading.risk.position_sizer import cap_shares_to_notional, shares_to_buy
 from backend.trading.strategies.base import StrategyBase
-from backend.trading.strategies.registry import KNOWN_STRATEGIES, get_strategy
+from backend.trading.strategies.experimental import experimental_strategies_enabled
+from backend.trading.strategies.registry import get_strategy, strategy_choices
 from backend.trading.strategies.stage2 import size_shares_by_risk
 from backend.trading.engine.cadence import allows_new_entries as cadence_allows_new_entries
 from backend.trading.engine.cadence import resolve_cadence
@@ -125,6 +126,11 @@ class TradingWorker:
         self.manager     = manager
         self.reconciler  = reconciler
         self.strategy: StrategyBase = get_strategy(strategy_id)
+        if str(strategy_id or "").lower() == "leader_campaign" and not experimental_strategies_enabled():
+            logger.warning(
+                "leader_campaign requested but BOOMBOOM_EXPERIMENTAL_STRATEGIES is off. "
+                "No buys from this id."
+            )
         self.risk_engine = RiskEngine(risk_limits or RiskLimits())
         # Explicit TradingMandate (including permissive / {}) is a real policy.
         # A missing or unreadable config/mandate.json is not: fail closed.
@@ -323,7 +329,8 @@ class TradingWorker:
         for i, ticker in enumerate(to_fetch):
             if i and batch and i % batch == 0 and pause > 0:
                 time.sleep(pause)
-            df = self._fetch_ohlcv(ticker, period="1y")
+            hist_period = str(getattr(self.strategy, "history_period", "") or "1y")
+            df = self._fetch_ohlcv(ticker, period=hist_period)
             if df is not None and len(df) >= 30:
                 price_history[ticker] = df
         self.last_fetched = len(price_history)
@@ -355,8 +362,11 @@ class TradingWorker:
         # Inject SPY for Stage-2 RS / adaptive regime (strategies that support it)
         try:
             spy_df = self._fetch_ohlcv("SPY", period="2y")
-            if spy_df is not None and len(spy_df) > 210 and hasattr(self.strategy, "set_spy_close"):
-                self.strategy.set_spy_close(spy_df["Close"])
+            if spy_df is not None and len(spy_df) > 210:
+                if hasattr(self.strategy, "set_spy_frame"):
+                    self.strategy.set_spy_frame(spy_df)
+                elif hasattr(self.strategy, "set_spy_close"):
+                    self.strategy.set_spy_close(spy_df["Close"])
         except Exception as exc:
             logger.debug("SPY inject skipped: %s", exc)
 
@@ -428,6 +438,11 @@ class TradingWorker:
                 if symbol in self._position_meta:
                     self._position_meta[symbol]["stop_loss_price"] = trailing_stop
 
+            if hasattr(strat, "bind_position_meta"):
+                try:
+                    strat.bind_position_meta(meta if isinstance(meta, dict) else {})
+                except Exception:
+                    logger.debug("bind_position_meta skipped", exc_info=True)
             exit_sig = strat.check_exit(
                 ticker=symbol,
                 entry_price=pos.average_entry_price,
@@ -530,7 +545,11 @@ class TradingWorker:
                 continue
 
             fund_info = self._get_fundamental_score_info(ticker)
-            fund_score = float(fund_info.get("score", 50.0))
+            if getattr(self.strategy, "rejects_synthetic_fund_score", False):
+                # leader_campaign: a filled 50/55 is fund_missing, not a score.
+                fund_score = self.strategy.coerce_fund_score(fund_info)
+            else:
+                fund_score = float(fund_info.get("score", 50.0))
             if fund_info.get("stale"):
                 # Wave 1 fail-closed: Scan/signal as-of past SIGNAL max-age → no new buys
                 # for any strategy. Last real fund scores are kept (not rewritten to 50).
@@ -580,8 +599,17 @@ class TradingWorker:
                 note(ticker, code)
                 continue
 
-            # Overlay Deep Research stop / target as suggestions (RiskEngine still gates)
-            plan = self._get_deep_trade_plan(ticker)
+            if (
+                signal.strategy_id == "leader_campaign"
+                and not experimental_strategies_enabled()
+            ):
+                logger.info("BLOCKED %s: experimental leader_campaign flag is off", ticker)
+                note(ticker, "experimental_disabled")
+                continue
+
+            # Overlay Deep Research stop / target as suggestions (RiskEngine still gates).
+            # leader_campaign stops are structural. Do not replace them with a plan.
+            plan = None if signal.strategy_id == "leader_campaign" else self._get_deep_trade_plan(ticker)
             if plan:
                 stop = plan.get("stop_loss")
                 targets = plan.get("targets") or []
@@ -793,6 +821,7 @@ class TradingWorker:
             # Phase 1 judge slot: immediately before the only buy submitter.
             # AI_JUDGE=0 does not call the client. A block does not resize and
             # does not write an active intent. Qty above is unchanged.
+            # leader_campaign uses this same slot and the same process_signal.
             from backend.trading.advisory.judge import evaluate_entry
 
             judge_decision = evaluate_entry(
@@ -924,6 +953,14 @@ class TradingWorker:
                 "take_profit_price": signal.take_profit_price,
                 "strategy_id":       signal.strategy_id,
             }
+            if signal.strategy_id == "leader_campaign" and isinstance(signal.meta, dict):
+                # Evidence for the written exit. Not a writer of strategy constants.
+                for key in (
+                    "setup", "pivot", "entry_date", "r_unit", "catalyst",
+                    "bars_held", "last_bar_day", "max_r", "adx30",
+                ):
+                    if key in signal.meta:
+                        self._position_meta[ticker][key] = signal.meta[key]
             self._trailing_highs[ticker] = signal.entry_price
             summary_rows.append({"ticker": ticker, "action": "BUY",
                                   "qty": qty, "price": signal.entry_price,
@@ -1749,8 +1786,10 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     parser = argparse.ArgumentParser(description="ALPHA//DESK standalone trading worker")
     parser.add_argument("--strategy", default="breakout",
-                        choices=list(KNOWN_STRATEGIES),
-                        help="Strategy to run (default: breakout)")
+                        choices=list(strategy_choices()),
+                        help="Strategy to run (default: breakout). "
+                             "leader_campaign is listed only when "
+                             "BOOMBOOM_EXPERIMENTAL_STRATEGIES=1.")
     parser.add_argument("--mode", default="shadow", choices=["paper", "shadow"],
                         help="Execution mode: 'paper' submits to broker, 'shadow' simulates fills locally (default: shadow)")
     parser.add_argument("--interval", type=int, default=60,
