@@ -156,6 +156,8 @@ Intent→M8／H1–H3 **仍 OPEN**；圖表頁**唔**變成 Intent writer 或 M8
 
 本頁 **Draft** 只建議預設；**全部未鎖**。Accepted 之前唔寫進 runtime／Harness。
 
+**GC1 交叉：** [ADR-004](ADR-004-chart-engine.md) 為 **Owner-approved pending Accepted**（Gabriel 2026-10-27），確認既有 lightweight-charts v4.2.3；本頁與 GC1 仍 **Draft ≠ Accepted**。
+
 | ID | 問題 | 建議預設（未鎖） | 若另決會影響 |
 |----|------|------------------|--------------|
 | **GC1** | Desk 圖表庫：`lightweight-charts` vs Plotly.js vs 其他 vs 官方 TradingView widget | **先 lightweight-charts（Apache-2.0 風格可讀 K 線）**；**唔**默認官方 widget（品牌／授權／social 負擔）。Streamlit 可繼續 Plotly | 前端依賴、M4 組件、唔把 lab Plotly 直接搬 Desk |
