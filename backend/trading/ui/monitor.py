@@ -194,7 +194,7 @@ def render_header():
     st.markdown(
         """<div class="brand-kicker">TRADING ENGINE</div>
 <h1 class="app-title"><span>◼</span> Shadow/Paper Monitor</h1>
-<p class="app-subtitle">Real-time trading activity, positions, and kill-switch control</p>
+<p class="app-subtitle">Paper and shadow order mirror. Read-only.</p>
 <hr style="border:0; border-top:1px solid var(--line); margin:1.5rem 0;">""",
         unsafe_allow_html=True,
     )
@@ -202,7 +202,7 @@ def render_header():
 
 def render_kill_switch_panel():
     st.markdown('<div class="sidebar-section">Kill Switch</div>', unsafe_allow_html=True)
-    st.caption("Lab read-only. Start/stop paper, tickets, and kill live on FastAPI Desk (loopback or operator token).")
+    st.caption("Read-only mirror. Start, stop, tickets, and kill switch stay on the Desk shell.")
     if kill_switch.is_halted():
         st.markdown(
             '<span class="status-badge halted">🛑 HALTED</span>',
@@ -264,7 +264,7 @@ def main():
     
     orders = _load_orders(mode)
     if not orders:
-        st.info(f"No {mode} orders found. Start the worker with `--mode {mode}` to generate activity.")
+        st.info(f"No {mode} orders in this ledger.")
         return
     
     # Metrics row

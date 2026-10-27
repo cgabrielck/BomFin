@@ -19,11 +19,12 @@ logger = logging.getLogger(__name__)
 DISCLAIMER = (
     "Orders, risk rejects, and operator notes from the local ledger. "
     "Empty means nothing was recorded — not a live fill. "
-    "Fills appear only with a recorded fill price. Streamlit journal is lab/legacy."
+    "Fills appear only with a recorded fill price. "
+    "Streamlit journal is the Kelly portfolio experiment in data/."
 )
 DISCLAIMER_ZH = (
     "本機帳本中的訂單、風控拒絕與操作筆記。空白代表尚未入帳，不是即時成交。"
-    "只有已記錄成交價才會顯示 fill。Streamlit 日誌只是實驗室／舊介面。"
+    "只有已記錄成交價才會顯示 fill。Streamlit 日誌是 data/ 的 Kelly 組合實驗。"
 )
 
 

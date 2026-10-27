@@ -11,19 +11,20 @@ New in v2:
 from __future__ import annotations
 
 import html
-from typing import Optional
+import json
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 import streamlit as st
 
 from backend.trading.broker import BrokerAdapter
-from backend.trading.engine.desk_orders import place_lab_manual_order
-from backend.trading.engine.order_manager import OrderManager, OrderStore
-from backend.trading.engine.worker import TradingWorker
+from backend.trading.engine.order_manager import OrderStore
 from backend.trading.models import OrderStatus
+from backend.trading.performance.display import build_trust_status
 from backend.trading.reconciliation.service import ReconciliationService
-from backend.trading.risk.gates import positive_price
 from backend.trading.strategies.registry import STRATEGY_REGISTRY
 from backend.i18n import t
+from backend.utils.constants import DATA_DIR
 
 
 # ---------------------------------------------------------------------------
@@ -49,26 +50,73 @@ def _dot(color: str) -> str:
     return f"<span style='display:inline-block;width:8px;height:8px;border-radius:50%;background:{color};box-shadow:0 0 6px {color};margin-right:.4rem;'></span>"
 
 
-# ---------------------------------------------------------------------------
-# Worker singleton helpers stored in Streamlit session state
-# ---------------------------------------------------------------------------
+def _read_json(path: Path) -> Optional[Dict[str, Any]]:
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    return payload if isinstance(payload, dict) else None
 
-def _get_or_create_worker(
-    broker: BrokerAdapter,
-    store: OrderStore,
-    reconciler: ReconciliationService,
-    strategy_id: str,
-) -> TradingWorker:
-    if "trading_worker" not in st.session_state or st.session_state.trading_worker is None:
-        manager = OrderManager(broker=broker, store=store)
-        st.session_state.trading_worker = TradingWorker(
-            broker=broker,
-            store=store,
-            manager=manager,
-            reconciler=reconciler,
-            strategy_id=strategy_id,
+
+def load_paper_book_status() -> Dict[str, Any]:
+    """Read the broker paper book under backend/data/, not the Kelly data/ book."""
+    root = Path(DATA_DIR)
+    paper = _read_json(root / "performance_paper.json")
+    heartbeat = _read_json(root / "worker_heartbeat.json")
+    return build_trust_status(paper, heartbeat)
+
+
+def render_paper_book_status(lang: str = "zh_tw") -> None:
+    """Seal, session card, and freshness for the backend/data paper ledger."""
+    status = load_paper_book_status()
+    fresh = status.get("freshness") or {}
+    session = status.get("session_card") or {}
+    st.markdown(f"### {t('trading.perf.title', lang)}")
+    st.caption(t("trading.perf.books", lang))
+    if fresh.get("stale"):
+        age = fresh.get("age_days")
+        age_txt = "—" if age is None else str(age)
+        st.warning(t("trading.perf.outdated", lang, days=age_txt, threshold=fresh.get("stale_after_days", 7)))
+    else:
+        st.caption(t("trading.perf.fresh", lang, generated=status.get("generated_at") or "—"))
+
+    c1, c2, c3, c4 = st.columns(4)
+    if status.get("claims_allowed"):
+        total = status.get("total_return_pct")
+        spy = status.get("spy_return_pct")
+        beats = status.get("beats_spy_net")
+        c1.metric(t("trading.perf.total_return", lang), "n/a" if total is None else f"{total:+.2f}%")
+        c2.metric(t("trading.perf.vs_spy", lang), "n/a" if spy is None else f"{spy:+.2f}%")
+        c3.metric(
+            t("trading.perf.beats_spy", lang),
+            "YES" if beats is True else ("NO" if beats is False else "n/a"),
         )
-    return st.session_state.trading_worker
+        c4.metric(t("trading.perf.annualized", lang), status.get("annualized_label") or "n/a")
+    else:
+        c1.metric(t("trading.perf.total_return", lang), "n/a")
+        c2.metric(t("trading.perf.vs_spy", lang), "n/a")
+        c3.metric(t("trading.perf.beats_spy", lang), "n/a")
+        c4.metric(t("trading.perf.annualized", lang), "n/a")
+        st.info(t("trading.perf.withheld", lang, reason=status.get("reason") or "trades/days below min"))
+
+    seal_txt = "pass" if status.get("seal_passed") else "fail"
+    st.caption(t("trading.perf.seal", lang, state=seal_txt, trades=status.get("num_trades") if status.get("num_trades") is not None else "—"))
+    if session.get("available"):
+        st.caption(
+            t(
+                "trading.perf.session",
+                lang,
+                seal=str(bool(session.get("seal"))).lower(),
+                not_a_seal=str(bool(session.get("not_a_seal"))).lower(),
+                claims=str(bool(session.get("claims_beat_spy"))).lower(),
+            )
+        )
+    else:
+        st.caption(t("trading.perf.session_missing", lang))
+    why = status.get("why_no_trade_summary") or ""
+    st.caption(t("trading.perf.why", lang, summary=why or "—"))
 
 
 # ---------------------------------------------------------------------------
@@ -90,15 +138,14 @@ def render_trading_dashboard(
         unsafe_allow_html=True,
     )
 
-    is_paper = getattr(broker, "is_paper", True)
-    banner_class = "paper" if is_paper else "live"
-    banner_text  = t("trading.mode.paper", lang) if is_paper else t("trading.mode.live", lang)
+    banner_text = t("trading.mode.browse", lang)
     st.markdown(
-        f"<div class='trading-banner {banner_class}'>"
+        f"<div class='trading-banner paper'>"
         f"<span class='banner-dot'></span>{html.escape(banner_text)}</div>",
         unsafe_allow_html=True,
     )
     st.warning(t("trading.dual_book", lang))
+    render_paper_book_status(lang)
 
     # ── Tab layout ───────────────────────────────────────────────────────────
     tab_auto, tab_manual, tab_ledger, tab_reconcile = st.tabs([
@@ -145,6 +192,7 @@ def render_trading_dashboard(
 # ---------------------------------------------------------------------------
 
 def _render_auto_tab(broker, store, reconciler, summary, lang: str) -> None:
+    del broker, store, reconciler
     st.markdown(f"### {t('trading.section.account', lang)}")
 
     # Account metrics
@@ -182,105 +230,39 @@ def _render_auto_tab(broker, store, reconciler, summary, lang: str) -> None:
 
     st.divider()
 
-    # ── Worker start/stop ────────────────────────────────────────────────
+    # Worker start stays off in this shell. Orders below are a read-only mirror.
     st.markdown(f"### ⚙️ {t('trading.section.worker', lang)}")
-
-    worker: Optional[TradingWorker] = st.session_state.get("trading_worker")
-    worker_running = worker is not None and worker.running
-
-    status_color = "#34d399" if worker_running else "#64748b"
-    status_label = t("trading.worker.running", lang) if worker_running else t("trading.worker.stopped", lang)
-    st.markdown(
-        f"<div style='display:flex;align-items:center;gap:.5rem;font-family:var(--mono);font-size:.78rem;'>"
-        f"{_dot(status_color)}<span style='color:{status_color};font-weight:700;'>{html.escape(status_label)}</span>"
-        + (f"<span style='color:var(--muted);margin-left:.5rem;'>· {html.escape(strat.display_name)}</span>" if worker_running else "")
-        + "</div>",
-        unsafe_allow_html=True,
+    st.caption(t("trading.worker.start_disabled", lang))
+    st.button(
+        t("trading.worker.start", lang),
+        type="primary",
+        disabled=True,
+        width="stretch",
+        key="worker_start_btn",
     )
-
-    if worker_running:
-        market_label = "📈 市场开盘 Market Hours" if (worker and worker.is_market_hours) else "💤 非交易时段 Off-Hours"
-        st.caption(market_label)
-        if worker and worker.last_run_utc:
-            st.caption(f"最近运行 Last run: {worker.last_run_utc.strftime('%Y-%m-%d %H:%M:%S')} UTC")
-
-    col_start, col_stop = st.columns(2)
-    with col_start:
-        if st.button(
-            t("trading.worker.start", lang),
-            type="primary",
-            disabled=worker_running,
-            width="stretch",
-            key="worker_start_btn",
-        ):
-            manager = OrderManager(broker=broker, store=store)
-            new_worker = TradingWorker(
-                broker=broker, store=store, manager=manager,
-                reconciler=reconciler, strategy_id=selected_strategy,
-            )
-            new_worker.start(interval_seconds=60)
-            st.session_state.trading_worker = new_worker
-            st.success(t("trading.worker.started_msg", lang, strategy=strat.display_name))
-            st.rerun()
-
-    with col_stop:
-        if st.button(
-            t("trading.worker.stop", lang),
-            type="secondary",
-            disabled=not worker_running,
-            width="stretch",
-            key="worker_stop_btn",
-        ):
-            if worker:
-                worker.stop()
-                st.session_state.trading_worker = None
-            st.warning(t("trading.worker.stopped_msg", lang))
-            st.rerun()
-
-    # Hot-swap strategy while worker is running
-    if worker_running and worker and worker.strategy.strategy_id != selected_strategy:
-        worker.set_strategy(selected_strategy)
-        st.info(f"Strategy updated to: {strat.display_name}")
+    st.button(
+        t("trading.worker.stop", lang),
+        type="secondary",
+        disabled=True,
+        width="stretch",
+        key="worker_stop_btn",
+    )
 
     st.divider()
 
     # ── Last signal summary ──────────────────────────────────────────────
     st.markdown(f"### 📊 {t('trading.section.last_signals', lang)}")
-    if worker and worker.last_signal_summary:
-        for row in worker.last_signal_summary:
-            action = row.get("action", "")
-            color = "#34d399" if "BUY" in action else "#fb7185" if "EXIT" in action else "#64748b"
-            st.markdown(
-                f"<div class='rec-card' style='padding:.55rem .85rem;min-height:0;margin-bottom:.35rem;"
-                f"display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap;'>"
-                f"<span style='font-family:var(--mono);font-weight:800;color:var(--text);'>{html.escape(row.get('ticker','?'))}</span>"
-                f"<span style='font-family:var(--mono);font-size:.7rem;font-weight:700;color:{color};'>{html.escape(action)}</span>"
-                f"<span style='font-family:var(--mono);font-size:.68rem;color:var(--muted);'>"
-                f"{'$'+str(round(row['price'],2)) if 'price' in row else ''}"
-                f"{'  ×'+str(row['qty']) if 'qty' in row else ''}"
-                f"</span></div>",
-                unsafe_allow_html=True,
-            )
-            if "reason" in row:
-                st.caption(row["reason"][:120])
-    else:
-        _empty_state("🔍", t("trading.signals.empty", lang), t("trading.signals.empty_desc", lang))
+    _empty_state("🔍", t("trading.signals.empty", lang), t("trading.signals.empty_desc", lang))
 
-    # ── Open positions with trailing stops ───────────────────────────────
     if summary and summary.positions:
         st.divider()
         st.markdown(f"### {t('trading.positions.title', lang)}")
         for p in summary.positions:
-            meta = (worker._position_meta.get(p.symbol, {}) if worker else {})
-            stop  = meta.get("stop_loss_price")
-            strat_id = meta.get("strategy_id", "—")
             st.markdown(
                 "<div class='rec-card' style='padding:.65rem .85rem;min-height:0;margin-bottom:.4rem;"
                 "display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;'>"
                 f"<span style='font-family:var(--mono);font-weight:800;color:var(--text);font-size:.95rem;'>{html.escape(p.symbol)}</span>"
                 f"<span style='font-family:var(--mono);font-size:.75rem;color:var(--muted);'>{p.quantity} @ ${p.average_entry_price:,.2f}</span>"
-                + (f"<span style='font-family:var(--mono);font-size:.68rem;color:#fb7185;'>Stop: ${stop:,.2f}</span>" if stop else "")
-                + f"<span style='font-family:var(--mono);font-size:.64rem;color:var(--faint);'>{strat_id}</span>"
                 "</div>",
                 unsafe_allow_html=True,
             )
@@ -290,75 +272,45 @@ def _render_auto_tab(broker, store, reconciler, summary, lang: str) -> None:
 # Manual signal tab  (preserved from v1)
 # ---------------------------------------------------------------------------
 
-def _lab_result_reason(result) -> str:
-    """User-visible reject / fail text. Never invent success."""
-    detail = getattr(result, "detail", None)
-    if isinstance(detail, dict):
-        return str(detail.get("message") or detail.get("error") or detail)
-    if detail:
-        return str(detail)
-    order = getattr(result, "order", None)
-    return str(getattr(order, "error_message", None) or "rejected")
-
-
 def _render_manual_tab(broker, store, summary, lang: str) -> None:
+    """Ticket fields stay visible. Submit cannot place an order from this shell."""
+    del broker, store, summary
     st.markdown(f"### {t('trading.section.signal', lang)}")
-    st.caption(t("trading.signal.desc", lang))
+    st.caption(t("trading.signal.disabled", lang))
 
     with st.form("signal_injection_form"):
         col1, col2 = st.columns(2)
         with col1:
-            sym   = st.text_input(t("trading.signal.symbol", lang), value="AAPL").upper().strip()
-            side  = st.selectbox(t("trading.signal.side", lang), ["buy", "sell"],
-                                 format_func=lambda v: t(f"trading.signal.side.{v}", lang))
-            qty   = st.number_input(t("trading.signal.quantity", lang), min_value=1, value=1, step=1)
-        with col2:
-            order_type = st.selectbox(t("trading.signal.order_type", lang), ["limit", "market"],
-                                      format_func=lambda v: t(f"trading.signal.order_type.{v}", lang))
-            limit_price = st.number_input(t("trading.signal.limit_price", lang),
-                                          min_value=0.0, value=150.0, step=0.5,
-                                          disabled=order_type != "limit")
-            use_shadow = st.checkbox(t("trading.signal.shadow_mode", lang), value=True)
-
-        st.markdown(f"<div class='risk-note'>🛡️ {html.escape(t('trading.risk.note', lang))}</div>",
-                    unsafe_allow_html=True)
-        if use_shadow:
-            st.caption(t("trading.signal.shadow_hint", lang))
-
-        submitted = st.form_submit_button(t("trading.signal.submit", lang), type="primary", width="stretch")
-
-        if submitted and sym:
-            resolved = limit_price if order_type == "limit" else None
-            with st.spinner(t("trading.signal.processing", lang)):
-                result = place_lab_manual_order(
-                    broker=broker,
-                    store=store,
-                    symbol=sym,
-                    side=side,
-                    quantity=qty,
-                    order_type=order_type,
-                    limit_price=resolved,
-                    account=summary,
-                    execution_mode="shadow" if use_shadow else "paper",
-                )
-            reason = _lab_result_reason(result)
-            fill_ok = True
-            if use_shadow and result.order.status == OrderStatus.FILLED:
-                fill_ok = positive_price(getattr(result.order, "filled_avg_price", None)) is not None
-            honest_ok = (
-                (not result.blocked)
-                and result.http_status == 200
-                and result.journaled
-                and result.order.status != OrderStatus.REJECTED
-                and fill_ok
+            st.text_input(t("trading.signal.symbol", lang), value="AAPL", disabled=True)
+            st.selectbox(
+                t("trading.signal.side", lang),
+                ["buy", "sell"],
+                format_func=lambda v: t(f"trading.signal.side.{v}", lang),
+                disabled=True,
             )
-            if not honest_ok:
-                st.error(t("trading.signal.rejected", lang, reason=reason))
-            elif use_shadow:
-                st.success(t("trading.signal.shadow_complete", lang, status=result.order.status.value))
-            else:
-                st.success(t("trading.signal.submitted", lang,
-                             status=result.order.status.value, id=result.order.id))
+            st.number_input(t("trading.signal.quantity", lang), min_value=1, value=1, step=1, disabled=True)
+        with col2:
+            st.selectbox(
+                t("trading.signal.order_type", lang),
+                ["limit", "market"],
+                format_func=lambda v: t(f"trading.signal.order_type.{v}", lang),
+                disabled=True,
+            )
+            st.number_input(
+                t("trading.signal.limit_price", lang),
+                min_value=0.0,
+                value=150.0,
+                step=0.5,
+                disabled=True,
+            )
+            st.checkbox(t("trading.signal.shadow_mode", lang), value=True, disabled=True)
+
+        st.form_submit_button(
+            t("trading.signal.submit", lang),
+            type="primary",
+            width="stretch",
+            disabled=True,
+        )
 
 
 # ---------------------------------------------------------------------------

@@ -740,7 +740,8 @@ PAPER_GATE = "Do not set APCA_PAPER=false until the paper runbook is signed."
 JOURNAL_LEAD = (
     "Orders, risk rejects, and operator notes from the local ledger. "
     "Empty means nothing was recorded — not a live fill. "
-    "Fills appear only with a recorded fill price. Streamlit journal is lab/legacy."
+    "Fills appear only with a recorded fill price. "
+    "Streamlit journal is the Kelly portfolio experiment in data/."
 )
 ALERTS_BODY = (
     "New rules attach to saved research plans. Telegram worker stays the delivery path. "

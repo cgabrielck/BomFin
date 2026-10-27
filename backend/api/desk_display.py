@@ -20,18 +20,18 @@ LAB_BOOK_DIR_LABEL = "data/"
 BROKER_BOOK_DIR_LABEL = "backend/data/"
 DUAL_BOOK_CUE = (
     "Two books, two directories. Desk broker journal/ledger is backend/data/. "
-    "Streamlit Kelly/lab portfolio is data/. They are not the same book."
+    "Kelly portfolio experiment is data/. They are not the same paper ledger."
 )
 DUAL_BOOK_CUE_ZH = (
     "兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。"
-    "Streamlit Kelly／實驗室組合在 data/。兩者不是同一本帳。"
+    "Kelly 組合實驗在 data/。兩者不是同一本紙上帳本。"
 )
 DUAL_BOOK_UNIFIED_CUE = (
-    "Lab Kelly and Desk broker paths currently resolve to the same directory. "
+    "Kelly portfolio experiment and Desk broker paths currently resolve to the same directory. "
     "This is not a live or verified stamp."
 )
 DUAL_BOOK_UNIFIED_CUE_ZH = (
-    "Kelly／實驗室與 Desk 券商路徑目前指向同一目錄。這不是 live 或 verified 標記。"
+    "Kelly 組合實驗與 Desk 券商路徑目前指向同一目錄。這不是 live 或 verified 標記。"
 )
 _JOURNAL_FILL_STATUSES = frozenset({"filled", "partially_filled"})
 _FILL_ITEM_PRICE_KEYS = ("price", "filled_avg_price", "fill_price", "filled_price")

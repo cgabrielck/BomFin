@@ -331,6 +331,7 @@ def status(position_count: int = 0, halted: bool = False) -> Dict[str, Any]:
         "halted": bool(hb.get("halted", halted)),
         "last_signals": hb.get("last_signals") or [],
         "skip_counts": hb.get("skip_counts") if isinstance(hb.get("skip_counts"), dict) else {},
+        "session_card": hb.get("session_card") if isinstance(hb.get("session_card"), dict) else None,
         "pending_buys": [str(s) for s in (hb.get("pending_buys") or []) if s],
         "skip_by_ticker": (
             {str(k).upper(): str(v) for k, v in hb.get("skip_by_ticker").items() if k}

@@ -194,22 +194,22 @@ GUIDE_STEPS: List[Dict[str, Any]] = [
         "id": "desk",
         "en": {
             "title": "Desk is the paper book",
-            "body": "Equity, cash, and holdings come from your Alpaca paper account. An empty table means no fills yet — not that the desk is broken. Two books, two directories. Desk broker journal/ledger is backend/data/. Streamlit Kelly/lab portfolio is data/. They are not the same book.",
+            "body": "Equity, cash, and holdings come from your Alpaca paper account. An empty table means no fills yet — not that the desk is broken. Two books, two directories. Desk broker journal/ledger is backend/data/. Kelly portfolio experiment is data/. They are not the same paper ledger.",
         },
         "zh": {
             "title": "工作台是模擬持倉",
-            "body": "權益、現金與持倉來自 Alpaca 模擬帳戶。表格空白代表還沒成交，不是畫面壞掉。兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Streamlit Kelly／實驗室組合在 data/。兩者不是同一本帳。",
+            "body": "權益、現金與持倉來自 Alpaca 模擬帳戶。表格空白代表還沒成交，不是畫面壞掉。兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Kelly 組合實驗在 data/。兩者不是同一本紙上帳本。",
         },
     },
     {
         "id": "books",
         "en": {
             "title": "Two books, two directories",
-            "body": "Two books, two directories. Desk broker journal/ledger is backend/data/. Streamlit Kelly/lab portfolio is data/. They are not the same book.",
+            "body": "Two books, two directories. Desk broker journal/ledger is backend/data/. Kelly portfolio experiment is data/. They are not the same paper ledger.",
         },
         "zh": {
             "title": "兩本帳、兩個目錄",
-            "body": "兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Streamlit Kelly／實驗室組合在 data/。兩者不是同一本帳。",
+            "body": "兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Kelly 組合實驗在 data/。兩者不是同一本紙上帳本。",
         },
     },
     {
@@ -238,11 +238,11 @@ GUIDE_STEPS: List[Dict[str, Any]] = [
         "id": "journal",
         "en": {
             "title": "Trade journal is on the Desk",
-            "body": "More → Journal shows recent orders, risk rejects, and notes with audit/provenance links. Empty means nothing was recorded — not a live fill. Streamlit’s journal is lab/legacy only.",
+            "body": "More → Journal shows recent orders, risk rejects, and notes with audit/provenance links. Empty means nothing was recorded — not a live fill. The Streamlit journal is the Kelly portfolio experiment in data/.",
         },
         "zh": {
             "title": "交易日誌在 Desk",
-            "body": "更多 → 交易日誌顯示近期訂單、風控拒絕與筆記，並可跟著 audit／provenance 連結。空白代表尚未入帳，不是即時成交。Streamlit 日誌只是實驗室／舊介面。",
+            "body": "更多 → 交易日誌顯示近期訂單、風控拒絕與筆記，並可跟著 audit／provenance 連結。空白代表尚未入帳，不是即時成交。Streamlit 日誌是 data/ 的 Kelly 組合實驗。",
         },
     },
     {
@@ -480,13 +480,12 @@ def _fallback_teach(message: str, lang: str, role: str) -> str:
     if re.search(r"desk|工作台|導覽|导览|guide|教學|教学|help|ask cgab", q, re.I):
         if zh:
             return (
-                "Cgab Desk 是產品殼（web/static + FastAPI）。Streamlit 是實驗室／舊介面。\n"
+                "Cgab Desk（web/static + FastAPI）負責訂單與紙上自動。\n"
                 "Ask Cgab＝Help／導覽聊天：解釋頁面、Scan／Deep／Auto、空狀態與紙上 vs 研究。\n"
                 "不是下單代理，也不是 AI Mode。Draft ≠ Accepted 的設計稿不當已上線功能教。"
             )
         return (
-            "Cgab Desk is the product UI (web/static + FastAPI). Streamlit is"
-            " lab / legacy.\n"
+            "Cgab Desk (web/static + FastAPI) is where orders and paper auto run.\n"
             "Ask Cgab is teaching/guide chat: pages, Scan/Deep/Auto, empty"
             " states, paper vs research.\n"
             "It is not an order agent and not AI Mode. Draft ≠ Accepted design"

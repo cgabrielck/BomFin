@@ -720,8 +720,13 @@ def performance(refresh: bool = False, _auth: None = Depends(require_operator)) 
 
     summary_path = Path(DATA_DIR) / "strategy_backtest_stable_summary.json"
     summary = _read_json(summary_path, {})
+    from backend.trading.performance.display import attach_display
+
+    paper = attach_display(paper or {})
     empty = bool(paper.get("empty_book")) if paper else True
     kpis = compose_performance_kpis(paper, summary)
+    view = paper.get("display") if isinstance(paper.get("display"), dict) else {}
+    claims_ok = bool(view.get("claims_allowed")) and not empty
     return {
         "paper": paper,
         "source": paper.get("source") if paper else "none",
@@ -733,11 +738,14 @@ def performance(refresh: bool = False, _auth: None = Depends(require_operator)) 
         "profit_factor": kpis["profit_factor"],
         "sharpe_ratio": kpis["sharpe_ratio"],
         "max_drawdown_pct": kpis["max_drawdown_pct"],
-        "total_return_pct": kpis["total_return_pct"],
+        "total_return_pct": kpis["total_return_pct"] if claims_ok else None,
         "num_trades": kpis["num_trades"],
-        "spy_return_pct": None if empty else (paper.get("benchmark") or {}).get("spy_return_pct"),
-        "alpha_net_of_costs_pct": None if empty else (paper.get("benchmark") or {}).get("alpha_net_of_costs_pct"),
-        "beats_spy_net": None if empty else (paper.get("benchmark") or {}).get("beats_spy_net"),
+        "spy_return_pct": view.get("spy_return_pct") if claims_ok else None,
+        "alpha_net_of_costs_pct": view.get("alpha_net_of_costs_pct") if claims_ok else None,
+        "beats_spy_net": view.get("beats_spy_net") if claims_ok else None,
+        "annualized_return_pct": view.get("annualized_return_pct") if claims_ok else None,
+        "annualized_label": view.get("annualized_label") or "n/a",
+        "performance_display": view,
         "backtest": {
             "source": "stable_strategy_backtest" if summary else "none",
             "win_rate_pct": summary.get("win_rate_pct"),

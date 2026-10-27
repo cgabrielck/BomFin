@@ -341,7 +341,7 @@
       <button class="icon-btn help-top" id="helpBtn" type="button" title="Ask Cgab" aria-label="Ask Cgab" aria-controls="helpPanel" aria-expanded="false">?</button>
       <button class="btn ghost" id="refresh" data-i18n="btn.refresh">Refresh</button>
     </header>
-    <div class="books-banner" id="booksBanner" data-i18n="desk.books">Two books, two directories. Desk broker journal/ledger is backend/data/. Streamlit Kelly/lab portfolio is data/. They are not the same book.</div>
+    <div class="books-banner" id="booksBanner" data-i18n="desk.books">Two books, two directories. Desk broker journal/ledger is backend/data/. Kelly portfolio experiment is data/. They are not the same paper ledger.</div>
     <div class="content" id="root"><p class="muted">Loading Cgab…</p></div>
   </section>
 </div>
@@ -416,7 +416,7 @@ const I18N = {
     "page.calendar":"Events calendar",
     "page.guide":"Guide",
     "page.journal":"Trade journal",
-    "journal.lead":"Orders, risk rejects, and operator notes from the local ledger. Empty means nothing was recorded — not a live fill. Fills appear only with a recorded fill price. Streamlit journal is lab/legacy.",
+    "journal.lead":"Orders, risk rejects, and operator notes from the local ledger. Empty means nothing was recorded — not a live fill. Fills appear only with a recorded fill price. Streamlit journal is the Kelly portfolio experiment in data/.",
     "journal.add":"Add note",
     "journal.note_ph":"Note (not a fill)",
     "journal.empty":"No recorded orders, rejects, or notes yet. This is not a live book.",
@@ -467,6 +467,11 @@ const I18N = {
     "desk.alpha_net":"Alpha net cost",
     "desk.beats_spy":"Beats SPY (net)",
     "desk.no_alpha":"Does not beat SPY net of costs — sell as risk-gated research automation, not alpha.",
+    "desk.seal.withheld":"Seal not met: {reason}. No beat-SPY claim. Annualized n/a.",
+    "desk.outdated":"outdated · {days}d",
+    "desk.session":"session card · seal {seal} · not_a_seal {not_seal} · claims_beat_spy {claims}",
+    "desk.session.missing":"session card unavailable",
+    "desk.why":"why_no_trade: {summary}",
     "prov.chip":"{v} · as-of {a}",
     "prov.stale":"stale",
     "prov.yahoo":"yahoo",
@@ -514,7 +519,7 @@ const I18N = {
     "desk.digest.skips":"Why no buy",
     "desk.digest.not_seal":"Unfilled limits (new/accepted) are not a seal. Only priced fills count.",
     "desk.tear":"Tear sheet",
-    "desk.tear.hint":"QuantStats-style stats for the paper book or one ticker. Stub if lab extras are off.",
+    "desk.tear.hint":"QuantStats-style stats for the paper book or one ticker. JSON summary when the extra package is off.",
     "desk.tear.paper":"Paper book",
     "desk.tear.ticker":"One ticker",
     "desk.tear.run":"Generate tear",
@@ -532,7 +537,7 @@ const I18N = {
     "research.no_order":"Not an order. LLM cannot bypass RiskEngine.",
     "desk.holdings":"Holdings — broker inventory",
     "desk.holdings.hint":"Alpaca Paper real book (not a model portfolio)",
-    "desk.books":"Two books, two directories. Desk broker journal/ledger is backend/data/. Streamlit Kelly/lab portfolio is data/. They are not the same book.",
+    "desk.books":"Two books, two directories. Desk broker journal/ledger is backend/data/. Kelly portfolio experiment is data/. They are not the same paper ledger.",
     "desk.empty":"No positions yet — paper auto only fills when a signal passes every gate.",
     "desk.ticket":"Trade ticket",
     "desk.open":"Open orders",
@@ -586,7 +591,7 @@ const I18N = {
     "t1.t":"Three sidebar groups",
     "t1.b":"Navigation is the daily workspace. Apps is where you start the AI worker. More has the trade journal and written guide.",
     "t2.t":"Desk is the paper book",
-    "t2.b":"Equity and holdings come from Alpaca paper. An empty table means no fills yet — not a broken screen. Two books, two directories. Desk broker journal/ledger is backend/data/. Streamlit Kelly/lab portfolio is data/. They are not the same book.",
+    "t2.b":"Equity and holdings come from Alpaca paper. An empty table means no fills yet — not a broken screen. Two books, two directories. Desk broker journal/ledger is backend/data/. Kelly portfolio experiment is data/. They are not the same paper ledger.",
     "t3.t":"Start paper auto in AI Mode",
     "t3.b":"Saving sliders does not start the bot. Press Start paper auto. AUTO ON means the worker process is running (live pid, heartbeat not stale) — not an unverified heartbeat.",
     "t4.t":"Why you may see no trades",
@@ -659,7 +664,7 @@ const I18N = {
     "page.calendar":"財經／事件日曆",
     "page.guide":"教學",
     "page.journal":"交易日誌",
-    "journal.lead":"本機帳本中的訂單、風控拒絕與操作筆記。空白代表尚未入帳，不是即時成交。只有已記錄成交價才會顯示 fill。Streamlit 日誌只是實驗室／舊介面。",
+    "journal.lead":"本機帳本中的訂單、風控拒絕與操作筆記。空白代表尚未入帳，不是即時成交。只有已記錄成交價才會顯示 fill。Streamlit 日誌是 data/ 的 Kelly 組合實驗。",
     "journal.add":"新增筆記",
     "journal.note_ph":"筆記（不是成交）",
     "journal.empty":"尚無訂單、拒絕或筆記。這不是即時帳本。",
@@ -709,6 +714,11 @@ const I18N = {
     "desk.vs_spy":"紙上 vs SPY",
     "desk.alpha_net":"扣成本超额",
     "desk.beats_spy":"勝過 SPY（扣成本）",
+    "desk.seal.withheld":"未達封印：{reason}。不顯示勝過 SPY。年化 n/a。",
+    "desk.outdated":"過期 · {days} 天",
+    "desk.session":"session card · seal {seal} · not_a_seal {not_seal} · claims_beat_spy {claims}",
+    "desk.session.missing":"沒有 session card",
+    "desk.why":"why_no_trade：{summary}",
     "desk.no_alpha":"扣成本後未勝過 SPY — 定位為風控研究名單自動化，不是 alpha。",
     "prov.chip":"{v} · as-of {a}",
     "prov.stale":"過期",
@@ -757,7 +767,7 @@ const I18N = {
     "desk.digest.skips":"為何沒買",
     "desk.digest.not_seal":"未成交限價單（new／accepted）不算封印。只有已記錄成交價的 fill 才入帳。",
     "desk.tear":"報酬分析",
-    "desk.tear.hint":"紙上組合或單票的 QuantStats 風格指標。沒裝 lab 套件時顯示 JSON 摘要。",
+    "desk.tear.hint":"紙上組合或單票的 QuantStats 風格指標。未安裝額外套件時顯示 JSON 摘要。",
     "desk.tear.paper":"紙上組合",
     "desk.tear.ticker":"單票",
     "desk.tear.run":"產生報酬分析",
@@ -775,7 +785,7 @@ const I18N = {
     "research.no_order":"不是下單。LLM 不能繞過風控。",
     "desk.holdings":"持倉 — 券商帳本",
     "desk.holdings.hint":"Alpaca 模擬盤真實持倉（不是模型組合）",
-    "desk.books":"兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Streamlit Kelly／實驗室組合在 data/。兩者不是同一本帳。",
+    "desk.books":"兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Kelly 組合實驗在 data/。兩者不是同一本紙上帳本。",
     "desk.empty":"尚無持倉 — 紙上自動交易只有訊號通過所有關卡才會成交。",
     "desk.ticket":"下單",
     "desk.open":"未成交訂單",
@@ -829,7 +839,7 @@ const I18N = {
     "t1.t":"側欄三個分組",
     "t1.b":"導覽是日常工作區。應用用來啟動 AI 工作行程。更多裡面有交易日誌與完整教學。",
     "t2.t":"工作台是模擬帳本",
-    "t2.b":"權益與持倉來自 Alpaca 模擬帳戶。表格空白代表還沒成交，不是畫面壞掉。兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Streamlit Kelly／實驗室組合在 data/。兩者不是同一本帳。",
+    "t2.b":"權益與持倉來自 Alpaca 模擬帳戶。表格空白代表還沒成交，不是畫面壞掉。兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Kelly 組合實驗在 data/。兩者不是同一本紙上帳本。",
     "t3.t":"在 AI 模式啟動自動交易",
     "t3.b":"只儲存參數不會啟動機器人。請按「啟動紙上自動交易」。AUTO ON 代表工作行程進程在跑（有活 PID 且心跳未過期），不是未驗證心跳。",
     "t4.t":"為什麼可能沒有成交",
@@ -915,6 +925,16 @@ function closeMobileNav(){
   const scrim = $("#navScrim");
   if(side) side.classList.remove("open");
   if(scrim) scrim.classList.remove("open");
+}
+// Matches backend PERFORMANCE_STALE_AFTER_DAYS (7). Older snapshots are outdated, never live.
+const PERF_STALE_DAYS = 7;
+function snapshotAge(iso){
+  if(!iso) return {stale:true, age_days:null, label:"outdated"};
+  const ts = Date.parse(iso);
+  if(isNaN(ts)) return {stale:true, age_days:null, label:"outdated"};
+  const days = Math.floor((Date.now()-ts)/86400000);
+  const stale = (Date.now()-ts) > PERF_STALE_DAYS*86400000;
+  return {stale, age_days:days, label: stale ? ("outdated · "+days+"d") : ""};
 }
 function workerProcessOn(w){
   if(!w) return false;
@@ -1341,12 +1361,30 @@ async function desk(){
   const paperSharpe = paperEmpty ? null : paperRisk.sharpe_ratio;
   const paperMaxDd = paperEmpty ? null : paperRisk.max_drawdown_pct;
   const bench = paper.benchmark || {};
-  const beats = bench.beats_spy_net;
-  const alphaNet = bench.alpha_net_of_costs_pct;
-  const spyRet = bench.spy_return_pct;
-  const alphaLine = beats === false
+  const view = paper.display || perf.performance_display || {};
+  const claimsOk = view.claims_allowed === true;
+  const beats = claimsOk ? bench.beats_spy_net : null;
+  const alphaNet = claimsOk ? bench.alpha_net_of_costs_pct : null;
+  const spyRet = claimsOk ? bench.spy_return_pct : null;
+  const annLabel = claimsOk && view.annualized_label && view.annualized_label !== "n/a"
+    ? view.annualized_label
+    : "n/a";
+  const sealReason = view.reason || "trades/days below min";
+  const withholdLine = claimsOk ? "" : `<p class="muted" style="color:#e8b86d;margin:8px 0 0">${esc(t("desk.seal.withheld",{reason:sealReason}))}</p>`;
+  const alphaLine = claimsOk && beats === false
     ? `<p class="muted" style="color:#e8b86d;margin:8px 0 0">${t("desk.no_alpha")}</p>`
     : "";
+  const age = snapshotAge((view.freshness && view.freshness.generated_at) || paper.generated_at);
+  const ageLine = age.stale
+    ? `<p class="muted" style="color:#e8b86d;margin:8px 0 0">${esc(t("desk.outdated",{days: age.age_days==null?"—":age.age_days}))}</p>`
+    : "";
+  const card = worker && worker.session_card;
+  const sessionLine = card
+    ? `<p class="muted">${esc(t("desk.session",{seal:card.seal===true?"true":"false", not_seal:card.not_a_seal===false?"false":"true", claims:card.claims_beat_spy===true?"true":"false"}))}</p>`
+    : `<p class="muted">${esc(t("desk.session.missing"))}</p>`;
+  const whyMap = (card && card.why_no_trade) || (worker && worker.skip_counts) || {};
+  const whyKeys = Object.keys(whyMap).filter(k => whyMap[k] > 0);
+  const whyLine = `<p class="muted">${esc(t("desk.why",{summary: whyKeys.length?whyKeys.map(k=>k+" × "+whyMap[k]).join("; "):"—"}))}</p>`;
   root.innerHTML = `
     ${autoBanner()}
     <div class="kpis">
@@ -1368,9 +1406,14 @@ async function desk(){
         <div class="stat"><div class="lbl">Turnover</div><div class="val">${(paper.trading&&paper.trading.turnover_pct)!=null?num(paper.trading.turnover_pct,1)+"%":"—"}</div></div>
         <div class="stat"><div class="lbl">SPY</div><div class="val ${cls(spyRet)}">${spyRet!=null?num(spyRet,2)+"%":"—"}</div></div>
         <div class="stat"><div class="lbl">${t("desk.alpha_net")}</div><div class="val ${cls(alphaNet)}">${alphaNet!=null?num(alphaNet,2)+"%":"—"}</div></div>
-        <div class="stat"><div class="lbl">${t("desk.beats_spy")}</div><div class="val">${beats===true?"YES":beats===false?"NO":"—"}</div></div>
+        <div class="stat"><div class="lbl">${t("desk.beats_spy")}</div><div class="val">${beats===true?"YES":beats===false?"NO":"n/a"}</div></div>
+        <div class="stat"><div class="lbl">Ann.</div><div class="val">${esc(annLabel)}</div></div>
       </div>
+      ${withholdLine}
       ${alphaLine}
+      ${ageLine}
+      ${sessionLine}
+      ${whyLine}
       <p class="muted" style="margin:8px 0 0">${esc(paper.disclaimer||"")}</p>
     </div>
     ${digestCard(digest)}
@@ -1657,7 +1700,7 @@ function digestCard(d){
       <div class="stat"><div class="lbl">${t("desk.digest.pending")}</div><div class="val" style="font-size:16px">${pendingN}</div><div class="muted">${esc(pending)}</div></div>
     </div>
     <p class="muted">${t("desk.digest.skips")}: ${esc(skipTxt)}</p>
-    <p class="muted">${t("desk.alpha_net")}: ${pnl.alpha_net_of_costs_pct==null?"—":num(pnl.alpha_net_of_costs_pct,2)+"%"}${pnl.beats_spy_net===false?" · "+t("desk.no_alpha"):""}</p>
+    <p class="muted">${t("desk.alpha_net")}: ${(pnl.claims_allowed===true && pnl.alpha_net_of_costs_pct!=null)?num(pnl.alpha_net_of_costs_pct,2)+"%":"n/a"}${pnl.claims_allowed===true && pnl.beats_spy_net===false?" · "+t("desk.no_alpha"):""}${pnl.claims_allowed===true?"":(pnl.seal_reason?" · "+esc(pnl.seal_reason):"")}</p>
     <p class="muted" style="color:#e8b86d">${t("desk.digest.not_seal")}</p>
     <p class="muted">${esc(disc)}</p>
   </div>`;
@@ -1684,7 +1727,8 @@ function tearCard(tear){
         <div class="stat"><div class="lbl">α</div><div class="val ${cls(sum.alpha_pct)}">${sum.alpha_pct==null?"—":num(sum.alpha_pct,2)+"%"}</div></div>
       </div>
       ${spark}
-      <p class="muted" style="margin-top:8px">${esc(engineNote)} · n=${sum.n_days??"—"}</p>`}
+      <p class="muted" style="margin-top:8px">${esc(engineNote)} · n=${sum.n_days??"—"}</p>
+      ${(()=>{ const age=snapshotAge(tear.generated_at); return age.stale?`<p class="muted" style="color:#e8b86d">${esc(t("desk.outdated",{days:age.age_days==null?"—":age.age_days}))}</p>`:""; })()}`}
     <div class="row" style="margin-top:10px">
       <input id="tearSym" class="search" style="max-width:140px" placeholder="AAPL" />
       ${paperControls?`<button class="btn" id="tearPaper">${t("desk.tear.paper")}</button>`:""}
@@ -2427,12 +2471,14 @@ async function strategies(){
           const pnl = paper.pnl || {};
           const trading = paper.trading || {};
           const bench = paper.benchmark || {};
+          const view = paper.display || p.performance_display || {};
+          const claimsOk = view.claims_allowed === true;
           rows = [{
             strategy: "paper snapshot",
             sizing: "—",
-            return_pct: pnl.total_return_pct,
-            spy_pct: bench.spy_return_pct,
-            alpha_net: bench.alpha_net_of_costs_pct,
+            return_pct: claimsOk ? pnl.total_return_pct : null,
+            spy_pct: claimsOk ? bench.spy_return_pct : null,
+            alpha_net: claimsOk ? bench.alpha_net_of_costs_pct : null,
             trades: trading.num_trades,
             sharpe: risk.sharpe_ratio,
             max_dd: risk.max_drawdown_pct,

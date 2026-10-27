@@ -8,6 +8,12 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from backend.trading.fill_honesty import honest_fill_status, recorded_fill_price
+from backend.trading.performance.display import (
+    annualized_for_snapshot,
+    attach_display,
+    coerce_beats_spy_net,
+    gate_performance_claims,
+)
 from backend.trading.performance.tracker import (
     INITIAL_CAPITAL,
     evaluate_performance,
@@ -150,7 +156,17 @@ def build_paper_report(
                     "alpha_gross_pct": round(alpha_gross, 4),
                     "alpha_net_of_costs_pct": round(alpha_net, 4),
                 }
-                payload["beats_spy_net"] = bool(alpha_net > 0)
+                sealed = bool(seal.passed)
+                payload["beats_spy_net"] = coerce_beats_spy_net(
+                    bool(alpha_net > 0) if sealed else None,
+                    seal_passed=sealed,
+                )
+                pnl = payload.get("pnl") if isinstance(payload.get("pnl"), dict) else {}
+                pnl["annualized_return_pct"] = annualized_for_snapshot(
+                    pnl.get("annualized_return_pct"),
+                    seal_passed=sealed,
+                )
+                payload["pnl"] = pnl
                 path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         except Exception as exc:
             logger.warning("persist performance_paper failed: %s", exc)
@@ -158,7 +174,7 @@ def build_paper_report(
     empty = report.trading_days == 0 and report.num_trades == 0
     alpha_gross_out = None if empty else round(alpha_gross, 4)
     alpha_net_out = None if empty else round(alpha_net, 4)
-    return {
+    payload = {
         "available": not empty or alpaca_equity is not None,
         "empty_book": empty,
         "source": "sqlite_orders" if orders else "alpaca_equity_only",
@@ -172,7 +188,9 @@ def build_paper_report(
             "initial_capital": report.initial_capital,
             "final_equity": report.final_equity or alpaca_equity,
             "total_return_pct": report.total_return_pct if not empty else None,
-            "annualized_return_pct": report.annualized_return_pct if not empty else None,
+            "annualized_return_pct": (
+                report.annualized_return_pct if (not empty and seal.passed) else None
+            ),
             "day_pnl": day_pnl,
             "alpaca_equity": alpaca_equity,
         },
@@ -195,7 +213,11 @@ def build_paper_report(
             "beta": report.beta if not empty else None,
             "assumed_cost_bps": cost_bps,
             "cost_drag_pct": round(cost_drag_pct, 4) if not empty else None,
-            "beats_spy_net": bool(alpha_net > 0) if not empty else None,
+            "beats_spy_net": (
+                None
+                if empty or not seal.passed
+                else bool(alpha_net > 0)
+            ),
         },
         "seal_preview": {
             "passed": seal.passed if not empty else False,
@@ -207,6 +229,7 @@ def build_paper_report(
             "SKU B as risk-gated research-list automation — not alpha."
         ),
     }
+    return attach_display(payload)
 
 
 def load_cached_paper_report() -> Optional[Dict[str, Any]]:
@@ -312,18 +335,25 @@ def _benchmark_from_paper(paper: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     beats = bench.get("beats_spy_net")
     if beats is None and not empty:
         beats = paper.get("beats_spy_net")
+    view = gate_performance_claims(paper)
+    if beats is True and not view["claims_allowed"]:
+        beats = None
     cost_bps = bench.get("assumed_cost_bps")
     if cost_bps is None:
         cost_bps = costs.get("assumed_round_trip_bps", DEFAULT_COST_BPS)
+    claims_allowed = bool(view["claims_allowed"]) and not empty
     return {
         "alpha_net_of_costs_pct": None if empty else alpha_net,
         "spy_return_pct": None if empty else spy,
         "beats_spy_net": None if empty else beats,
+        "claims_allowed": claims_allowed,
+        "seal_reason": "" if claims_allowed else (view.get("reason") or "trades/days below min"),
         "assumed_cost_bps": cost_bps,
         "day_pnl": pnl.get("day_pnl"),
         "equity": pnl.get("final_equity") or pnl.get("alpaca_equity"),
         "empty_book": empty,
         "generated_at": paper.get("generated_at"),
+        "freshness": view.get("freshness"),
     }
 
 
@@ -490,6 +520,8 @@ def build_daily_digest(
             "equity": equity,
             "alpha_net_of_costs_pct": bench.get("alpha_net_of_costs_pct"),
             "beats_spy_net": bench.get("beats_spy_net"),
+            "claims_allowed": bench.get("claims_allowed"),
+            "seal_reason": bench.get("seal_reason"),
         },
         "worker": {
             "strategy": strategy,
@@ -541,14 +573,15 @@ def format_digest_text(digest: Dict[str, Any], *, heading: str = "📋 日報 Da
         lines.append(f"Day P&L：{_fmt_money(bench.get('day_pnl'))}")
     if bench.get("equity") is not None:
         lines.append(f"Equity：{_fmt_money(bench.get('equity'))}")
-    if bench.get("alpha_net_of_costs_pct") is not None:
+    if bench.get("claims_allowed") and bench.get("alpha_net_of_costs_pct") is not None:
         spy = bench.get("spy_return_pct")
         spy_s = f" · SPY {_fmt_pct(spy)}" if spy is not None else ""
         beats = bench.get("beats_spy_net")
         beats_s = " · 扣成本贏 SPY" if beats is True else (" · 扣成本未贏 SPY" if beats is False else "")
         lines.append(f"vs SPY（扣成本）：{_fmt_pct(bench.get('alpha_net_of_costs_pct'))}{spy_s}{beats_s}")
     else:
-        lines.append("vs SPY（扣成本）：尚無成交帳本")
+        reason = bench.get("seal_reason") or "trades/days below min"
+        lines.append(f"vs SPY（扣成本）：n/a · {reason}")
     lines.append("紙上模擬 · 非正式投資建議")
     return "\n".join(lines)
 
@@ -586,7 +619,7 @@ def format_digest_html(digest: Dict[str, Any], *, heading: Optional[str] = None)
         lines.append(f"<b>Day P&amp;L:</b> {esc(_fmt_money(bench.get('day_pnl')))}")
     if bench.get("equity") is not None:
         lines.append(f"<b>Equity:</b> {esc(_fmt_money(bench.get('equity')))}")
-    if bench.get("alpha_net_of_costs_pct") is not None:
+    if bench.get("claims_allowed") and bench.get("alpha_net_of_costs_pct") is not None:
         spy = bench.get("spy_return_pct")
         extra = f" · SPY {esc(_fmt_pct(spy))}" if spy is not None else ""
         beats = bench.get("beats_spy_net")
@@ -596,7 +629,8 @@ def format_digest_html(digest: Dict[str, Any], *, heading: Optional[str] = None)
             extra += " · 扣成本未贏 SPY"
         lines.append(f"<b>vs SPY (net cost):</b> {esc(_fmt_pct(bench.get('alpha_net_of_costs_pct')))}{extra}")
     else:
-        lines.append("<b>vs SPY (net cost):</b> 尚無成交帳本")
+        reason = bench.get("seal_reason") or "trades/days below min"
+        lines.append(f"<b>vs SPY (net cost):</b> n/a · {esc(reason)}")
     lines.append("")
     lines.append("紙上模擬 · 非正式投資建議")
     return "\n".join(lines)

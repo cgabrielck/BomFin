@@ -34,7 +34,7 @@ First visit: a short tour appears. Replay it from **More → Guide**. The bottom
 - **AI Mode** is the only place to pick the strategy and **Start / Stop paper auto**.
 - **Ask Cgab** (bottom-right FAB, or top-bar **?** / Guide) is teaching/guide chat. It is not AI Mode, not verified, not live, and it never places orders or changes rules.
 - Saving sliders does **not** start the bot. You must press **Start paper auto**.
-- Two books, two directories. Desk broker journal/ledger is backend/data/. Streamlit Kelly/lab portfolio is data/. They are not the same book. Holdings “not a model portfolio” is still true; it is not enough by itself — the two directories are separate writers.
+- Two books, two directories. Desk broker journal/ledger is backend/data/. Kelly portfolio experiment is data/. They are not the same paper ledger. Holdings “not a model portfolio” is still true; it is not enough by itself — the two directories are separate writers.
 
 The top bar **AUTO ON** means the worker process is running (live pid evidence, heartbeat not stale). It does **not** mean the account is loaded, and it does **not** light from an unverified or stale heartbeat. **AUTO OFF** / **AUTO STALE** means it is not a live worker.
 
@@ -108,7 +108,7 @@ Bind the FastAPI Desk so phones on the same Wi-Fi can open the **same** UI as lo
 - **AI 模式**才是選擇策略並 **啟動 / 停止紙上自動交易** 的地方。
 - **Ask Cgab**（右下角浮層，或頂欄 **?**／教學）是教學說明聊天。不是 AI Mode、不是 verified、不是 live，也不會下單或改規則。
 - 只儲存參數 **不會** 啟動機器人，必須再按啟動。
-- 兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Streamlit Kelly／實驗室組合在 data/。兩者不是同一本帳。持倉「不是模型組合」仍然正確，但單靠那句不夠——兩個目錄是分開的帳本。
+- 兩本帳、兩個目錄。Desk 券商日誌／帳本在 backend/data/。Kelly 組合實驗在 data/。兩者不是同一本紙上帳本。持倉「不是模型組合」仍然正確，但單靠那句不夠——兩個目錄是分開的帳本。
 
 頂欄 **AUTO ON** 代表工作行程進程在跑（有活 PID 證據且心跳未過期），不是帳戶已載入，也不是未驗證心跳或過期 PID。**AUTO OFF**／**AUTO STALE** 代表不是活著的 worker。
 

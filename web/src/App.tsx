@@ -149,11 +149,11 @@ function mandateGap(ops: any) {
   return `Mandate ${st} — Desk and paper worker fail-closed until mandate.json loads.`;
 }
 
-const DUAL_BOOK_CUE = "Two books, two directories. Desk broker journal/ledger is backend/data/. Streamlit Kelly/lab portfolio is data/. They are not the same book.";
+const DUAL_BOOK_CUE = "Two books, two directories. Desk broker journal/ledger is backend/data/. Kelly portfolio experiment is data/. They are not the same paper ledger.";
 const HOLDINGS_HINT = "Alpaca Paper real book (not a model portfolio)";
 const EMPTY_POSITIONS = "No positions yet — paper auto only fills when a signal passes every gate.";
 const OPEN_ORDERS_HINT = "new / accepted = sent to the broker, not filled yet. The limit must trade before shares hit the book.";
-const JOURNAL_LEAD = "Orders, risk rejects, and operator notes from the local ledger. Empty means nothing was recorded — not a live fill. Fills appear only with a recorded fill price. Streamlit journal is lab/legacy.";
+const JOURNAL_LEAD = "Orders, risk rejects, and operator notes from the local ledger. Empty means nothing was recorded — not a live fill. Fills appear only with a recorded fill price. Streamlit journal is the Kelly portfolio experiment in data/.";
 const JOURNAL_EMPTY = "No recorded orders, rejects, or notes yet. This is not a live book.";
 const ALERTS_BODY = "New rules attach to saved research plans. Telegram worker stays the delivery path. Not a live fill feed.";
 const AIMODE_LEAD = "Only place to tune the agent and start paper auto trading. LLM cannot bypass RiskEngine / kill / mandate.";

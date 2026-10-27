@@ -445,7 +445,8 @@ def persist_performance_snapshot(
             "initial_capital": report.initial_capital,
             "final_equity": report.final_equity,
             "total_return_pct": report.total_return_pct,
-            "annualized_return_pct": report.annualized_return_pct,
+            # Short windows annualize into absurd rates. Only a passing seal may publish one.
+            "annualized_return_pct": report.annualized_return_pct if seal.passed else None,
         },
         "benchmark": {
             "spy_return_pct": report.spy_return_pct,

@@ -2995,7 +2995,9 @@ def render_primary_navigation(lang: str) -> None:
 
 
 def render_trading_page(lang: str) -> None:
-    """Trading page — gated on Alpaca credentials being configured."""
+    """Trading page — browse the paper ledger. Orders are not placed here."""
+    from backend.trading.ui.dashboard import render_paper_book_status
+
     if not (os.getenv("APCA_API_KEY_ID") and os.getenv("APCA_API_SECRET_KEY")):
         st.markdown(
             f"<div class='brand-kicker'>{t('nav.trading', lang)}</div>"
@@ -3012,6 +3014,7 @@ def render_trading_page(lang: str) -> None:
             f"{html.escape(t('trading.not_configured.hint', lang))}</div></div>",
             unsafe_allow_html=True,
         )
+        render_paper_book_status(lang)
         st.warning(t("trading.dual_book", lang))
         return
 

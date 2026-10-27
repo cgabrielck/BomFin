@@ -380,7 +380,12 @@ def test_market_shadow_sell_with_position_mark_is_not_filled_at_zero(tmp_path):
 def test_dashboard_source_no_longer_stamps_without_evaluate():
     src = Path(__file__).resolve().parents[3] / "backend" / "trading" / "ui" / "dashboard.py"
     text = src.read_text(encoding="utf-8")
-    assert "place_lab_manual_order" in text
+    assert "place_lab_manual_order" not in text
+    assert "TradingWorker" not in text
+    assert ".start(" not in text
+    assert "trading.mode.live" not in text
+    assert "worker_start_btn" in text
+    assert "disabled=True" in text
     assert "o.status = OrderStatus.RISK_APPROVED" not in text
     assert "evaluate_order(o, summary) if summary else None" not in text
     assert "SignalProcessor" not in text
