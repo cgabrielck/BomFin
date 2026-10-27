@@ -200,6 +200,11 @@ export default function App() {
     setPage("research");
   }
 
+  function openChart(next: string) {
+    setSymbol(String(next || "").toUpperCase().trim());
+    setPage("chart");
+  }
+
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -243,7 +248,7 @@ export default function App() {
           {page === "desk" && <Desk account={account} onTrade={(s) => { setSymbol(s); }} onRefresh={refreshAccount} />}
           {page === "orders" && <Orders />}
           {page === "research" && <Research symbol={symbol} setSymbol={setSymbol} />}
-          {page === "market" && <Market onOpen={goSymbol} />}
+          {page === "market" && <Market onOpen={goSymbol} onWatch={openChart} />}
           {page === "chart" && <ChartPage symbol={symbol} setSymbol={setSymbol} />}
           {page === "aimode" && <AiMode />}
           {page === "strategies" && <Strategies />}
@@ -457,7 +462,7 @@ function Research({ symbol, setSymbol }: { symbol: string; setSymbol: (s: string
   );
 }
 
-function Market({ onOpen }: { onOpen: (s: string) => void }) {
+function Market({ onOpen, onWatch }: { onOpen: (s: string) => void; onWatch: (s: string) => void }) {
   const [quotes, setQuotes] = useState<any[]>([]);
   const [watch, setWatch] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
@@ -496,7 +501,7 @@ function Market({ onOpen }: { onOpen: (s: string) => void }) {
         <h3>Watchlist</h3>
         {watch.map((s) => (
           <div key={s} className="row" style={{ justifyContent: "space-between", marginBottom: 6 }}>
-            <button className="nav-btn" onClick={() => onOpen(s)}>{s}</button>
+            <button className="nav-btn" onClick={() => onWatch(s)}>{s}</button>
             <button className="btn ghost" onClick={() => api.delWatch(s).then((d) => setWatch(d.symbols))}>Remove</button>
           </div>
         ))}
@@ -521,15 +526,24 @@ function ChartPage({ symbol, setSymbol }: { symbol: string; setSymbol: (s: strin
   const [meta, setMeta] = useState<{ vendor?: string; asof?: string | null; fallback?: boolean }>({});
   const [err, setErr] = useState("");
   useEffect(() => {
+    const want = symbol.trim();
+    let cancelled = false;
+    setBars([]);
+    setMeta({});
     setErr("");
-    api.chart(symbol).then((d) => {
+    if (!want) return;
+    api.chart(want).then((d) => {
+      if (cancelled) return;
+      if (String(d.symbol || "").toUpperCase() !== want.toUpperCase()) return;
       setBars(Array.isArray(d.bars) ? d.bars : []);
       setMeta({ vendor: d.vendor, asof: d.asof, fallback: d.fallback });
     }).catch((e) => {
+      if (cancelled) return;
       setBars([]);
       setMeta({});
       setErr(e.message);
     });
+    return () => { cancelled = true; };
   }, [symbol]);
   const closes = bars.map((b) => b.c).filter((n) => typeof n === "number" && Number.isFinite(n));
   const max = Math.max(...closes, 1);

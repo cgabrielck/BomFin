@@ -56,6 +56,22 @@ def test_fetch_chart_data_falls_back_to_http(monkeypatch) -> None:
     assert len(result["data"]) == 12
 
 
+def test_empty_symbol_does_not_fetch_or_invent_bars(monkeypatch) -> None:
+    def boom(*_args, **_kwargs):
+        raise AssertionError("empty symbol must not fetch")
+
+    monkeypatch.setattr(chart_utils.yf, "Ticker", boom)
+    monkeypatch.setattr(chart_utils, "fetch_daily_adjusted", boom)
+    monkeypatch.setattr(chart_utils, "_fetch_yahoo_chart_http", boom)
+    chart_utils.fetch_chart_data.clear()
+
+    result = chart_utils.fetch_chart_data("   ", "1d", False)
+
+    assert result["error"] == "empty symbol"
+    assert result["stage"] == "symbol"
+    assert "data" not in result
+
+
 def test_invalid_ohlcv_returns_empty_frame() -> None:
     frame = chart_utils.normalize_chart_frame(pd.DataFrame({"Close": [100]}), False, False)
 

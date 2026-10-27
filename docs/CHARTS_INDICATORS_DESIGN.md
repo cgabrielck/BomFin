@@ -241,4 +241,14 @@ Intent→M8／H1–H3 **仍 OPEN**；圖表頁**唔**變成 Intent writer 或 M8
 
 ---
 
+## Delivery facts (2026-10-27) — Draft ≠ Accepted
+
+These facts do not change **Status: Draft**, do not accept ADR-004, and are not a product-acceptance claim. **未 Accepted.** Issue #10 stays OPEN.
+
+- PR #36, on the Desk `web/static` chart, vendored lightweight-charts v4.2.3 and serves real daily OHLCV candles, volume, and the closed indicator set (SMA20/50, EMA20, Bollinger, RSI, MACD) with vendor / as-of / fallback via `desk_chart` → `equity_ohlcv`.
+- Drawing tools (trend, horizontal, Fib, measure, text, plus magnet, undo, and lock) are a custom overlay on that chart. lightweight-charts does not include a full drawing library. The locked toolbar is Select, Trend, Horizontal, Fib, Measure, Magnet, Show/hide, Clear. Drawings persist per symbol in browser localStorage (`cgab.chart.draw.{SYMBOL}`) and are not an order path.
+- Streamlit Plotly stays a read-only mirror of bars. It is not embedded in Desk and the chart path does not place orders.
+
+---
+
 *Drafted 2026-10-23 for ns-1 charts/indicators design page. Owner／PM 審批前維持 Draft。Merge ≠ Accepted. Issue #10 stays OPEN.*

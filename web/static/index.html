@@ -92,6 +92,11 @@
     .tvchart-pane { width:100%; height:110px; }
     .ind-btn { background:#0d1f26; border:1px solid var(--line); color:var(--muted); border-radius:999px; padding:6px 10px; cursor:pointer; font-size:12px; font-weight:700; }
     .ind-btn.on { color:#052226; background:var(--cyan); border-color:var(--cyan); }
+    .ind-btn:disabled { opacity:.38; cursor:not-allowed; }
+    .chart-stage { position:relative; }
+    .chart-status { font-size:12px; font-variant-numeric:tabular-nums; color:var(--text); margin:0 0 8px; }
+    .draw-overlay { position:absolute; inset:0; z-index:4; pointer-events:none; }
+    .draw-overlay.armed { pointer-events:auto; cursor:crosshair; }
     .banner {
       display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
       margin-bottom:16px; padding:14px 16px; border-radius:16px;
@@ -410,6 +415,24 @@ const I18N = {
     "chart.period.6mo":"6M",
     "chart.period.1y":"1Y",
     "chart.period.2y":"2Y",
+    "chart.empty_symbol":"Enter a symbol. An empty symbol does not keep the previous chart.",
+    "chart.tool.select":"Select",
+    "chart.tool.trend":"Trend",
+    "chart.tool.hline":"Horizontal",
+    "chart.tool.fib":"Fib",
+    "chart.tool.measure":"Measure",
+    "chart.tool.magnet":"Magnet",
+    "chart.tool.hide":"Show/hide",
+    "chart.tool.clear":"Clear",
+    "chart.tool.text":"Text",
+    "chart.tool.undo":"Undo",
+    "chart.tool.lock":"Lock",
+    "chart.tool.text_prompt":"Note",
+    "chart.mode.observe":"Observe",
+    "chart.mode.draw":"Draw",
+    "chart.mode.measure":"Measure",
+    "chart.tf.1d":"1D",
+    "chart.status":"{symbol} · {tf} · {mode} · {vendor} / {asof}",
     "page.aimode":"AI Mode",
     "page.strategies":"Strategies",
     "page.alerts":"Alerts",
@@ -658,6 +681,24 @@ const I18N = {
     "chart.period.6mo":"6月",
     "chart.period.1y":"1年",
     "chart.period.2y":"2年",
+    "chart.empty_symbol":"請輸入代碼。空白代碼不會沿用上一張圖。",
+    "chart.tool.select":"選擇",
+    "chart.tool.trend":"趨勢線",
+    "chart.tool.hline":"水平線",
+    "chart.tool.fib":"Fib",
+    "chart.tool.measure":"測量",
+    "chart.tool.magnet":"磁鐵",
+    "chart.tool.hide":"顯示/隱藏",
+    "chart.tool.clear":"清除",
+    "chart.tool.text":"文字",
+    "chart.tool.undo":"復原",
+    "chart.tool.lock":"鎖定",
+    "chart.tool.text_prompt":"註記",
+    "chart.mode.observe":"觀察",
+    "chart.mode.draw":"畫線",
+    "chart.mode.measure":"測量",
+    "chart.tf.1d":"1D",
+    "chart.status":"{symbol} · {tf} · {mode} · {vendor} / {asof}",
     "page.aimode":"AI 模式",
     "page.strategies":"策略",
     "page.alerts":"警示",
@@ -880,6 +921,19 @@ let chartPeriod = localStorage.getItem("cgab.chart.period") || "6mo";
 let chartInd = null;
 let _deskCharts = [];
 let _lwChartsPromise = null;
+let chartTool = "select";
+let chartMagnet = localStorage.getItem("cgab.chart.magnet") === "1";
+let chartHasBars = false;
+let chartMeta = {vendor:"—", asof:"—"};
+let chartReq = 0;
+let drawState = {items:[], hidden:false, locked:false};
+let drawUndo = [];
+let drawDraft = null;
+let drawCtx = null;
+let drawResizeObs = null;
+let chartKeysBound = false;
+const DRAW_TOOL_ORDER = ["select","trend","hline","fib","measure"];
+const FIB_RATIOS = [-0.272, 0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272];
 const CHART_PERIODS = ["1mo","3mo","6mo","1y","2y"];
 const CHART_IND_DEFAULT = {sma20:true,sma50:true,ema20:true,bb:true,rsi:true,macd:true};
 const t = (k, vars) => {
@@ -2103,11 +2157,12 @@ async function market(){
   root.innerHTML = `<div class="layout">
     <div class="card"><h3>${t("page.market")}</h3>
       <table><thead><tr><th>Symbol</th><th>Name</th><th>Last</th><th>Chg</th><th>Sector</th></tr></thead>
-      <tbody>${(q.quotes||[]).map(r=>`<tr class="open" data-s="${r.symbol}" style="cursor:pointer"><td>${r.symbol}</td><td>${r.name}</td><td>${r.last?.toFixed?.(2)}</td><td class="${cls(r.chg_pct)}">${r.chg_pct}%</td><td>${r.sector||""}</td></tr>`).join("")}</tbody></table>
+      <tbody>${(q.quotes||[]).map(r=>`<tr class="quote-open" data-s="${esc(r.symbol)}" style="cursor:pointer"><td>${esc(r.symbol)}</td><td>${esc(r.name)}</td><td>${r.last?.toFixed?.(2)}</td><td class="${cls(r.chg_pct)}">${r.chg_pct}%</td><td>${esc(r.sector||"")}</td></tr>`).join("")}</tbody></table>
     </div>
-    <div class="card"><h3>Watchlist</h3>${(w.symbols||[]).map(s=>`<div class="row" style="justify-content:space-between"><button class="nav-btn open" data-s="${s}">${s}</button></div>`).join("")}</div>
+    <div class="card"><h3>Watchlist</h3>${(w.symbols||[]).map(s=>`<div class="row" style="justify-content:space-between"><button type="button" class="nav-btn watch-open" data-s="${esc(s)}">${esc(s)}</button></div>`).join("")||`<p class="muted">${t("desk.none")}</p>`}</div>
   </div>`;
-  root.querySelectorAll(".open").forEach(b=>b.onclick=()=>{symbol=b.dataset.s; navTo("research");});
+  root.querySelectorAll(".quote-open").forEach(b=>b.onclick=()=>{symbol=String(b.dataset.s||"").trim().toUpperCase(); navTo("research");});
+  root.querySelectorAll(".watch-open").forEach(b=>b.onclick=()=>{symbol=String(b.dataset.s||"").trim().toUpperCase(); navTo("chart");});
 }
 
 function loadChartInd(){
@@ -2124,6 +2179,8 @@ function saveChartInd(){
 function wipeDeskCharts(){
   _deskCharts.forEach(c => { try { c.remove(); } catch(e){} });
   _deskCharts = [];
+  drawCtx = null;
+  if(drawResizeObs){ try { drawResizeObs.disconnect(); } catch(e){} drawResizeObs = null; }
 }
 function loadLwCharts(){
   if(window.LightweightCharts) return Promise.resolve(window.LightweightCharts);
@@ -2268,6 +2325,7 @@ function paintDeskChart(d){
   main.timeScale().subscribeVisibleLogicalRangeChange(range => {
     if(!range) return;
     panes.forEach(c => { try { c.timeScale().setVisibleLogicalRange(range); } catch(e){} });
+    redrawDrawOverlay();
   });
   const legend = $("#chartLegend");
   const writeLegend = (time) => {
@@ -2301,18 +2359,393 @@ function paintDeskChart(d){
       writeLegend(null);
     };
   });
+  attachDrawOverlay(main, candleSeries, bars, d.symbol || symbol);
+}
+function drawStorageKey(sym){
+  const s = String(sym||"").trim().toUpperCase();
+  if(!s) return "";
+  return "cgab.chart.draw."+s;
+}
+function newDrawId(){
+  return "d"+Math.random().toString(36).slice(2,10);
+}
+function numOrNull(v){
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+function sanitizePt(p){
+  if(!p) return null;
+  const price = numOrNull(p.price);
+  const time = p.time ? chartTimeStr(p.time).slice(0,32) : "";
+  if(price==null || !time) return null;
+  return {time, price};
+}
+function sanitizeDrawItem(it){
+  if(!it || typeof it!=="object") return null;
+  const type = it.type;
+  const id = String(it.id||newDrawId());
+  if(type==="hline"){
+    const price = numOrNull(it.price);
+    if(price==null) return null;
+    return {id, type, price};
+  }
+  if(type==="text"){
+    const price = numOrNull(it.price);
+    const time = it.time ? chartTimeStr(it.time).slice(0,32) : "";
+    const text = String(it.text||"").trim().slice(0,80);
+    if(price==null || !time || !text) return null;
+    return {id, type, time, price, text};
+  }
+  if(type==="trend" || type==="fib" || type==="measure"){
+    const a = sanitizePt(it.a);
+    const b = sanitizePt(it.b);
+    if(!a || !b) return null;
+    return {id, type, a, b};
+  }
+  return null;
+}
+function loadDrawState(sym){
+  drawUndo = [];
+  drawDraft = null;
+  const key = drawStorageKey(sym);
+  if(!key){
+    drawState = {items:[], hidden:false, locked:false};
+    return;
+  }
+  try {
+    const raw = JSON.parse(localStorage.getItem(key)||"null");
+    const items = Array.isArray(raw && raw.items) ? raw.items.map(sanitizeDrawItem).filter(Boolean) : [];
+    drawState = {items, hidden: !!(raw && raw.hidden), locked: !!(raw && raw.locked)};
+  } catch(e) {
+    drawState = {items:[], hidden:false, locked:false};
+  }
+}
+function saveDrawState(){
+  const key = drawStorageKey(symbol);
+  if(!key) return;
+  const items = drawState.items.map(sanitizeDrawItem).filter(Boolean);
+  drawState.items = items;
+  localStorage.setItem(key, JSON.stringify({
+    v:1,
+    symbol: key.slice("cgab.chart.draw.".length),
+    items,
+    hidden: !!drawState.hidden,
+    locked: !!drawState.locked
+  }));
+}
+function pushUndo(){
+  drawUndo.push(JSON.stringify(drawState.items));
+  if(drawUndo.length>40) drawUndo.shift();
+}
+function chartModeKey(){
+  if(chartTool==="measure") return "chart.mode.measure";
+  if(chartTool==="select") return "chart.mode.observe";
+  return "chart.mode.draw";
+}
+function chartStatusLine(){
+  const sym = String(symbol||"").trim() || "—";
+  const vendor = chartMeta && chartMeta.vendor ? chartMeta.vendor : "—";
+  const asof = chartMeta && chartMeta.asof ? chartMeta.asof : "—";
+  return t("chart.status", {
+    symbol: sym,
+    tf: t("chart.tf.1d"),
+    mode: t(chartModeKey()),
+    vendor: String(vendor),
+    asof: String(asof)
+  });
+}
+function drawControlDisabled(tool){
+  if(!String(symbol||"").trim() || !chartHasBars) return true;
+  if(drawState.locked && tool!=="select") return true;
+  return false;
+}
+function drawActDisabled(id){
+  const can = !!String(symbol||"").trim() && chartHasBars;
+  if(!can) return true;
+  if(id==="lock" || id==="hide") return false;
+  if(drawState.locked) return true;
+  if(id==="undo") return drawUndo.length===0;
+  if(id==="clear") return drawState.items.length===0;
+  return false;
+}
+function drawToolBtn(id){
+  const on = chartTool===id ? " on" : "";
+  const dis = drawControlDisabled(id) ? " disabled" : "";
+  return `<button type="button" class="ind-btn draw-tool${on}" data-tool="${id}"${dis}>${t("chart.tool."+id)}</button>`;
+}
+function drawAct(id){
+  const on = (id==="magnet" && chartMagnet) || (id==="hide" && drawState.hidden) || (id==="lock" && drawState.locked) ? " on" : "";
+  const dis = drawActDisabled(id) ? " disabled" : "";
+  return `<button type="button" class="ind-btn${on}" data-act="${id}" id="chartAct-${id}"${dis}>${t("chart.tool."+id)}</button>`;
+}
+function timeNum(time){
+  const s = chartTimeStr(time);
+  const ms = Date.parse(s+"T00:00:00Z");
+  return Number.isFinite(ms) ? ms : 0;
+}
+function nearestBarIndex(bars, time){
+  const target = timeNum(time);
+  let best = -1;
+  let bestD = Infinity;
+  (bars||[]).forEach((b, i) => {
+    const d = Math.abs(timeNum(b.t)-target);
+    if(d<bestD){ bestD = d; best = i; }
+  });
+  return best;
+}
+function applyMagnet(pt, bars){
+  if(!chartMagnet || !pt || !bars || !bars.length) return pt;
+  let best = bars[0];
+  let bestD = Infinity;
+  const tn = timeNum(pt.time);
+  bars.forEach(b => {
+    const d = Math.abs(timeNum(b.t)-tn);
+    if(d<bestD){ bestD = d; best = b; }
+  });
+  const prices = [best.o, best.h, best.l, best.c].map(Number).filter(Number.isFinite);
+  let snap = pt.price;
+  let pd = Infinity;
+  prices.forEach(p => {
+    const d = Math.abs(p-pt.price);
+    if(d<pd){ pd = d; snap = p; }
+  });
+  return {time: best.t, price: snap};
+}
+function eventToPoint(ev){
+  if(!drawCtx) return null;
+  const svg = document.getElementById("drawSvg");
+  if(!svg) return null;
+  const rect = svg.getBoundingClientRect();
+  const x = ev.clientX - rect.left;
+  const y = ev.clientY - rect.top;
+  let time = null;
+  let price = null;
+  try { time = drawCtx.chart.timeScale().coordinateToTime(x); } catch(e){ time = null; }
+  try { price = drawCtx.series.coordinateToPrice(y); } catch(e){ price = null; }
+  if(price==null || !Number.isFinite(price)) return null;
+  const timeStr = time==null ? "" : chartTimeStr(time);
+  if(!timeStr) return null;
+  return applyMagnet({time: timeStr, price}, drawCtx.bars);
+}
+function svgEl(name, attrs){
+  const node = document.createElementNS("http://www.w3.org/2000/svg", name);
+  Object.entries(attrs||{}).forEach(([k,v]) => {
+    if(v==null || v==="") return;
+    node.setAttribute(k, String(v));
+  });
+  return node;
+}
+function svgText(x, y, text, fill){
+  const node = svgEl("text", {x, y, fill: fill||"#d7ecec", "font-size":"11"});
+  node.textContent = String(text||"");
+  return node;
+}
+function drawXY(chart, series, time, price){
+  if(time==null || price==null || !Number.isFinite(Number(price))) return null;
+  let x = null;
+  let y = null;
+  try { x = chart.timeScale().timeToCoordinate(time); } catch(e){ x = null; }
+  try { y = series.priceToCoordinate(Number(price)); } catch(e){ y = null; }
+  if(x==null || y==null || !Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return {x, y};
+}
+function measureLabel(a, b){
+  const dp = b.price - a.price;
+  const pct = a.price ? (dp / a.price) * 100 : 0;
+  const bars = (drawCtx && drawCtx.bars) || [];
+  const i1 = nearestBarIndex(bars, a.time);
+  const i2 = nearestBarIndex(bars, b.time);
+  const span = (i1<0 || i2<0) ? 0 : Math.abs(i2-i1);
+  const sign = dp>=0 ? "+" : "";
+  const psign = pct>=0 ? "+" : "";
+  return sign+dp.toFixed(2)+" ("+psign+pct.toFixed(2)+"%) · "+span+" bars";
+}
+function sizeDrawSvg(svg){
+  const rect = svg.getBoundingClientRect();
+  const w = Math.max(1, Math.round(rect.width || svg.clientWidth || 1));
+  const h = Math.max(1, Math.round(rect.height || svg.clientHeight || 1));
+  svg.setAttribute("viewBox", "0 0 "+w+" "+h);
+  return {w, h};
+}
+function paintDrawItem(svg, chart, series, item, width){
+  if(item.type==="hline"){
+    let y = null;
+    try { y = series.priceToCoordinate(item.price); } catch(e){ y = null; }
+    if(y==null || !Number.isFinite(y)) return;
+    svg.appendChild(svgEl("line", {x1:0, y1:y, x2:width, y2:y, stroke:"#fbbf24", "stroke-width":1.5}));
+    svg.appendChild(svgText(8, Math.max(12, y-4), fmtPx(item.price), "#fbbf24"));
+    return;
+  }
+  if(item.type==="text"){
+    const p = drawXY(chart, series, item.time, item.price);
+    if(!p) return;
+    svg.appendChild(svgText(p.x+6, p.y, item.text, "#e7f6f6"));
+    return;
+  }
+  if(item.type==="fib" && item.a && item.b){
+    FIB_RATIOS.forEach(r => {
+      const price = item.a.price + (item.b.price - item.a.price) * r;
+      let y = null;
+      try { y = series.priceToCoordinate(price); } catch(e){ y = null; }
+      if(y==null || !Number.isFinite(y)) return;
+      svg.appendChild(svgEl("line", {x1:0, y1:y, x2:width, y2:y, stroke:"#a78bfa", "stroke-width":1, "stroke-dasharray":"3 3"}));
+      svg.appendChild(svgText(6, Math.max(11, y-3), (r*100).toFixed(1)+"% "+fmtPx(price), "#c4b5fd"));
+    });
+    return;
+  }
+  if((item.type==="trend" || item.type==="measure") && item.a && item.b){
+    const a = drawXY(chart, series, item.a.time, item.a.price);
+    const b = drawXY(chart, series, item.b.time, item.b.price);
+    if(!a || !b) return;
+    const stroke = item.type==="measure" ? "#22d3c5" : "#7dd3fc";
+    svg.appendChild(svgEl("line", {x1:a.x, y1:a.y, x2:b.x, y2:b.y, stroke, "stroke-width":1.5}));
+    if(item.type==="measure") svg.appendChild(svgText((a.x+b.x)/2, (a.y+b.y)/2-6, measureLabel(item.a, item.b), "#22d3c5"));
+  }
+}
+function redrawDrawOverlay(){
+  const svg = document.getElementById("drawSvg");
+  if(!svg) return;
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  const box = sizeDrawSvg(svg);
+  if(!drawCtx || drawState.hidden) return;
+  drawState.items.forEach(item => paintDrawItem(svg, drawCtx.chart, drawCtx.series, item, box.w));
+  if(drawDraft && drawDraft.a && drawDraft.b) paintDrawItem(svg, drawCtx.chart, drawCtx.series, drawDraft, box.w);
+}
+function undoDraw(){
+  if(drawActDisabled("undo")) return;
+  const prev = drawUndo.pop();
+  if(prev==null) return;
+  try {
+    const parsed = JSON.parse(prev);
+    drawState.items = Array.isArray(parsed) ? parsed.map(sanitizeDrawItem).filter(Boolean) : [];
+  } catch(e) {
+    drawState.items = [];
+  }
+  drawDraft = null;
+  saveDrawState();
+  syncDrawChrome();
+  redrawDrawOverlay();
+}
+function syncDrawChrome(){
+  root.querySelectorAll("[data-tool]").forEach(btn => {
+    btn.disabled = drawControlDisabled(btn.dataset.tool);
+    btn.classList.toggle("on", chartTool===btn.dataset.tool);
+  });
+  root.querySelectorAll("[data-act]").forEach(btn => {
+    const act = btn.dataset.act;
+    btn.disabled = drawActDisabled(act);
+    const on = (act==="magnet" && chartMagnet) || (act==="hide" && drawState.hidden) || (act==="lock" && drawState.locked);
+    btn.classList.toggle("on", on);
+  });
+  const status = $("#chartStatus");
+  if(status) status.textContent = chartStatusLine();
+  const textInp = $("#drawText");
+  if(textInp) textInp.style.display = chartTool==="text" ? "" : "none";
+  const svg = document.getElementById("drawSvg");
+  if(svg){
+    const armed = chartTool!=="select" && !drawControlDisabled(chartTool);
+    svg.classList.toggle("armed", armed);
+  }
+}
+function bindChartKeys(){
+  if(chartKeysBound) return;
+  chartKeysBound = true;
+  document.addEventListener("keydown", e => {
+    if(page!=="chart") return;
+    const tag = e.target && e.target.tagName;
+    if(tag==="INPUT" || tag==="TEXTAREA" || tag==="SELECT") return;
+    if((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase()==="z"){
+      e.preventDefault();
+      undoDraw();
+    } else if(e.key==="Escape"){
+      chartTool = "select";
+      drawDraft = null;
+      syncDrawChrome();
+      redrawDrawOverlay();
+    }
+  });
+}
+function attachDrawOverlay(chart, series, bars, sym){
+  drawCtx = {chart, series, bars: bars||[], symbol: String(sym||"").toUpperCase()};
+  chartHasBars = !!(bars && bars.length);
+  const svg = document.getElementById("drawSvg");
+  if(svg){
+    svg.onmousemove = ev => {
+      if(!drawDraft || !drawDraft.a || drawState.locked || chartTool==="select") return;
+      const pt = eventToPoint(ev);
+      if(!pt) return;
+      drawDraft = {type: drawDraft.type, a: drawDraft.a, b: pt, id:"preview"};
+      redrawDrawOverlay();
+    };
+    svg.onclick = ev => {
+      if(drawState.locked || chartTool==="select" || !chartHasBars) return;
+      const pt = eventToPoint(ev);
+      if(!pt) return;
+      if(chartTool==="hline"){
+        pushUndo();
+        drawState.items.push({id:newDrawId(), type:"hline", price: pt.price});
+        saveDrawState();
+        syncDrawChrome();
+        redrawDrawOverlay();
+        return;
+      }
+      if(chartTool==="text"){
+        const box = $("#drawText");
+        const text = box ? String(box.value||"").trim().slice(0,80) : "";
+        if(!text) return;
+        pushUndo();
+        drawState.items.push({id:newDrawId(), type:"text", time: pt.time, price: pt.price, text});
+        saveDrawState();
+        syncDrawChrome();
+        redrawDrawOverlay();
+        return;
+      }
+      if(chartTool==="trend" || chartTool==="fib" || chartTool==="measure"){
+        if(!drawDraft || !drawDraft.a || drawDraft.type!==chartTool){
+          drawDraft = {type: chartTool, a: pt};
+          return;
+        }
+        const a = drawDraft.a;
+        const b = pt;
+        drawDraft = null;
+        if(a.time===b.time && Math.abs(a.price-b.price)<1e-9){
+          redrawDrawOverlay();
+          return;
+        }
+        pushUndo();
+        drawState.items.push({id:newDrawId(), type: chartTool, a, b});
+        saveDrawState();
+        syncDrawChrome();
+        redrawDrawOverlay();
+      }
+    };
+  }
+  try { chart.timeScale().subscribeVisibleLogicalRangeChange(() => redrawDrawOverlay()); } catch(e){}
+  if(drawResizeObs){ try { drawResizeObs.disconnect(); } catch(e){} }
+  if(window.ResizeObserver){
+    const host = document.getElementById("tvPrice");
+    if(host){
+      drawResizeObs = new ResizeObserver(() => redrawDrawOverlay());
+      drawResizeObs.observe(host);
+    }
+  }
+  syncDrawChrome();
+  redrawDrawOverlay();
 }
 function chartShell(inner){
   const on = loadChartInd();
-  const periods = CHART_PERIODS.map(p => `<button class="tab ${chartPeriod===p?"on":""}" data-p="${p}">${t("chart.period."+p)}</button>`).join("");
-  const tog = (key, label) => `<button class="ind-btn ${on[key]?"on":""}" data-ind="${key}">${label}</button>`;
-  return `<div class="card"><h3>${t("page.chart")} ${symbol}</h3>
+  const periods = CHART_PERIODS.map(p => `<button type="button" class="tab ${chartPeriod===p?"on":""}" data-p="${p}">${t("chart.period."+p)}</button>`).join("");
+  const tog = (key, label) => `<button type="button" class="ind-btn ${on[key]?"on":""}" data-ind="${key}">${label}</button>`;
+  return `<div class="card"><h3>${t("page.chart")} ${esc(symbol)||"—"}</h3>
     <p class="muted">${t("chart.lead")}</p>
     <div class="chart-toolbar">
-      <input id="chartSym" value="${symbol}" style="width:110px" />
+      <input id="chartSym" value="${esc(symbol)}" style="width:110px" />
       <span class="muted">${t("chart.period")}</span>
       <div class="row" id="chartPeriods">${periods}</div>
     </div>
+    <div class="chart-toolbar" id="chartDrawBar">${DRAW_TOOL_ORDER.map(drawToolBtn).join("")}${drawAct("magnet")}${drawAct("hide")}${drawAct("clear")}</div>
+    <div class="chart-toolbar" id="chartDrawExtra">${drawToolBtn("text")}${drawAct("undo")}${drawAct("lock")}<input id="drawText" maxlength="80" placeholder="${esc(t("chart.tool.text_prompt"))}" style="width:140px;display:${chartTool==="text"?"":"none"}" /></div>
+    <p class="chart-status" id="chartStatus">${esc(chartStatusLine())}</p>
     <div class="chart-toolbar">
       <span class="muted">${t("chart.overlays")}</span>
       ${tog("sma20", t("chart.sma20"))}${tog("sma50", t("chart.sma50"))}${tog("ema20", t("chart.ema20"))}${tog("bb", t("chart.bb"))}
@@ -2326,7 +2759,10 @@ function bindChartChrome(){
   const inp = $("#chartSym");
   if(inp){
     inp.addEventListener("keydown", e => {
-      if(e.key==="Enter"){ symbol = inp.value.trim().toUpperCase() || symbol; chart(); }
+      if(e.key==="Enter"){
+        symbol = inp.value.trim().toUpperCase();
+        chart();
+      }
     });
   }
   root.querySelectorAll("#chartPeriods .tab").forEach(b => {
@@ -2336,34 +2772,104 @@ function bindChartChrome(){
       chart();
     };
   });
+  root.querySelectorAll("#chartDrawBar [data-tool], #chartDrawExtra [data-tool]").forEach(btn => {
+    btn.onclick = () => {
+      if(btn.disabled) return;
+      chartTool = btn.dataset.tool;
+      drawDraft = null;
+      syncDrawChrome();
+      redrawDrawOverlay();
+    };
+  });
+  root.querySelectorAll("[data-act]").forEach(btn => {
+    btn.onclick = () => {
+      if(btn.disabled) return;
+      const act = btn.dataset.act;
+      if(act==="magnet"){
+        chartMagnet = !chartMagnet;
+        localStorage.setItem("cgab.chart.magnet", chartMagnet ? "1" : "0");
+      } else if(act==="hide"){
+        drawState.hidden = !drawState.hidden;
+        saveDrawState();
+      } else if(act==="clear"){
+        pushUndo();
+        drawState.items = [];
+        drawDraft = null;
+        saveDrawState();
+      } else if(act==="undo"){
+        undoDraw();
+        return;
+      } else if(act==="lock"){
+        drawState.locked = !drawState.locked;
+        if(drawState.locked){
+          chartTool = "select";
+          drawDraft = null;
+        }
+        saveDrawState();
+      }
+      syncDrawChrome();
+      redrawDrawOverlay();
+    };
+  });
+  const textInp = $("#drawText");
+  if(textInp){
+    textInp.addEventListener("keydown", e => {
+      e.stopPropagation();
+      if(e.key==="Enter") e.preventDefault();
+    });
+  }
+  syncDrawChrome();
+  bindChartKeys();
 }
 async function chart(){
+  const gen = ++chartReq;
   wipeDeskCharts();
-  const want = (symbol||"").toUpperCase();
+  const want = String(symbol||"").trim().toUpperCase();
+  symbol = want;
+  chartHasBars = false;
+  chartMeta = {vendor:"—", asof:"—"};
+  loadDrawState(want);
+  if(!want) chartTool = "select";
+  else if(drawState.locked) chartTool = "select";
   const period = CHART_PERIODS.includes(chartPeriod) ? chartPeriod : "6mo";
   chartPeriod = period;
+  if(!want){
+    root.innerHTML = chartShell(`<p class="err">${t("chart.empty_symbol")}</p>
+      <p class="muted">${t("chart.not_live")}</p>
+      <p class="muted">${t("chart.not_order")}</p>`);
+    bindChartChrome();
+    return;
+  }
   root.innerHTML = chartShell(`<p class="muted">${t("chart.lead")}</p>`);
   bindChartChrome();
   try {
     await loadLwCharts();
+    if(gen!==chartReq || page!=="chart") return;
     const d = await api("/api/chart/"+encodeURIComponent(want)+"?period="+encodeURIComponent(period));
-    if(page!=="chart") return;
-    if((d.symbol||want) && d.symbol) symbol = d.symbol;
+    if(gen!==chartReq || page!=="chart") return;
+    const got = String(d.symbol||"").toUpperCase();
+    if(got && got!==want) return;
+    symbol = got || want;
     const bars = d.bars || [];
     if(!bars.length){
+      chartHasBars = false;
       wipeDeskCharts();
       root.innerHTML = chartShell(`<p class="err">${t("chart.empty")}</p>
         <p class="muted">${t("chart.not_live")}</p>`);
       bindChartChrome();
       return;
     }
+    chartMeta = {vendor: d.vendor||"none", asof: d.asof||"—"};
     const fallback = d.fallback ? ` · ${t("chart.fallback")}` : "";
     const prov = t("chart.prov", {vendor: d.vendor||"none", asof: d.asof||"—", bars: String(bars.length)}) + fallback;
     root.innerHTML = chartShell(`
-      <p class="muted" id="chartProv">${prov}</p>
+      <p class="muted" id="chartProv">${esc(prov)}</p>
       <div class="chart-legend" id="chartLegend"></div>
       <div class="chart-host">
-        <div id="tvPrice" class="tvchart"></div>
+        <div class="chart-stage">
+          <div id="tvPrice" class="tvchart"></div>
+          <svg id="drawSvg" class="draw-overlay"></svg>
+        </div>
         <div id="tvRsi" class="tvchart-pane"></div>
         <div id="tvMacd" class="tvchart-pane"></div>
       </div>
@@ -2373,11 +2879,12 @@ async function chart(){
     bindChartChrome();
     paintDeskChart(d);
   } catch(e) {
-    if(page!=="chart") return;
+    if(gen!==chartReq || page!=="chart") return;
+    chartHasBars = false;
     wipeDeskCharts();
     const msg = (e && e.message) ? e.message : t("chart.load_error");
     root.innerHTML = chartShell(`<p class="err">${chartErrorTitle(e)}</p>
-      <p class="muted">${msg}</p>
+      <p class="muted">${esc(msg)}</p>
       <p class="muted">${t("chart.not_live")}</p>`);
     bindChartChrome();
   }

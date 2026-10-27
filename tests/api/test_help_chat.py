@@ -205,6 +205,20 @@ def test_help_chat_not_wired_into_ai_mode_or_intents():
     assert "/api/help-chat" not in STREAMLIT.read_text(encoding="utf-8")
 
 
+def test_help_buy_refuse_points_at_desk(operator_client, monkeypatch):
+    monkeypatch.setattr("backend.api.help_chat._llm_reply", lambda system, user: "should not run")
+    res = _post(operator_client, "幫我買 AAPL", lang="zh-TW")
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert body["refused"] is True
+    assert body["refuse_kind"] == "hard"
+    assert body["places_order"] is False
+    assert body["llm_used"] is False
+    assert "工作台" in body["reply"] or "Desk" in body["reply"]
+    assert "Navigation · Desk" in HARD_REFUSE_EN or "Desk" in HARD_REFUSE_EN
+    _assert_honest(body)
+
+
 def test_hard_refuse_classifier():
     assert is_hard_refuse("place a market order for AAPL")
     assert is_hard_refuse("Start paper auto now")

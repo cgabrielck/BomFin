@@ -21,7 +21,16 @@ REQUIRED_OHLCV = ("Open", "High", "Low", "Close", "Volume")
 
 @st.cache_data(ttl=300, show_spinner=False)
 def fetch_chart_data(ticker: str, interval: str, extended_hours: bool) -> Dict[str, Any]:
+    ticker = (ticker or "").strip()
     yf_interval, period = CHART_INTERVALS.get(interval, CHART_INTERVALS["1d"])
+    if not ticker:
+        return {
+            "error": "empty symbol",
+            "stage": "symbol",
+            "provider": "unavailable",
+            "interval": yf_interval,
+            "period": period,
+        }
     is_intraday = yf_interval != "1d"
     errors = []
     try:

@@ -590,6 +590,10 @@ def _build_tech_chart(
     import plotly.graph_objects as go
     from utils.chart_utils import fetch_chart_data
 
+    ticker = (ticker or "").strip().upper()
+    if not ticker:
+        return {"error": "empty symbol", "stage": "symbol", "provider": "unavailable"}
+
     result = fetch_chart_data(ticker, interval, extended_hours)
     if result.get("error"):
         return result
@@ -659,6 +663,8 @@ def _build_tech_chart(
         _focus_recent_candles(fig, df, is_intraday)
         if not extended_hours or not is_intraday:
             fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
+        if df.empty:
+            return {**result, "error": "empty history", "stage": "history"}
         result["figure"] = fig
         result["rows"] = len(df)
         result["first_bar"] = df.index[0].isoformat()
@@ -736,6 +742,10 @@ def _render_kline_chart(
     ticker: str, lang: str, key_prefix: str, current_price: Optional[float] = None,
     trade_plan: Optional[Dict[str, Any]] = None,
 ) -> None:
+    ticker = (ticker or "").strip().upper()
+    if not ticker:
+        st.error(t("chart.error", lang, stage="symbol", msg="empty symbol"))
+        return
     intervals = ["1d", "60m", "15m", "1m"]
     interval_labels = {
         "1d": t("chart.horizon_year", lang), "60m": t("chart.horizon_short", lang),
@@ -781,9 +791,12 @@ def _render_kline_chart(
     st.plotly_chart(
         chart["figure"], width="stretch", theme=None, key=f"{key_prefix}_plot",
         config={
-            "modeBarButtonsToAdd": ["drawline", "eraseshape"] if detail_mode else [],
-            "modeBarButtonsToRemove": ["sendDataToCloud", "lasso2d", "select2d", "zoom2d", "pan2d", "autoScale2d", "resetScale2d"],
-            "displayModeBar": detail_mode,
+            "modeBarButtonsToRemove": [
+                "sendDataToCloud", "lasso2d", "select2d",
+                "drawline", "drawopenpath", "drawrect", "drawcircle", "eraseshape",
+                "zoom2d", "pan2d", "autoScale2d", "resetScale2d",
+            ],
+            "displayModeBar": False,
             "displaylogo": False,
             "scrollZoom": True,
             "responsive": True,
