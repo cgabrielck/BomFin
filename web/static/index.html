@@ -96,7 +96,17 @@
     .chart-stage { position:relative; }
     .chart-status { font-size:12px; font-variant-numeric:tabular-nums; color:var(--text); margin:0 0 8px; }
     .draw-overlay { position:absolute; inset:0; z-index:4; pointer-events:none; }
-    .draw-overlay.armed { pointer-events:auto; cursor:crosshair; }
+    .draw-overlay.zone-canvas { z-index:3; pointer-events:none; }
+    .draw-overlay.armed { pointer-events:all; cursor:crosshair; }
+    .draw-overlay.picking { pointer-events:none; }
+    .zone-ico {
+      display:inline-block; width:12px; height:8px; margin-right:5px;
+      border:1.5px solid rgba(160,185,195,.9);
+      background:rgba(120,150,165,.35);
+      border-radius:1px; vertical-align:-1px;
+    }
+    .ind-btn.on .zone-ico { border-color:#052226; background:rgba(5,34,38,.28); }
+    .zone-props { align-items:center; }
     .banner {
       display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
       margin-bottom:16px; padding:14px 16px; border-radius:16px;
@@ -420,7 +430,17 @@ const I18N = {
     "chart.tool.trend":"Trend",
     "chart.tool.hline":"Horizontal",
     "chart.tool.fib":"Fib",
+    "chart.tool.zone":"Zone",
     "chart.tool.measure":"Measure",
+    "chart.zone.role":"Tint",
+    "chart.zone.neutral":"Neutral",
+    "chart.zone.support":"Support",
+    "chart.zone.resist":"Resistance",
+    "chart.zone.extend_left":"Extend left",
+    "chart.zone.extend_right":"Extend right",
+    "chart.zone.label_ph":"Label (optional)",
+    "chart.zone.remove":"Remove",
+    "chart.zone.hint":"Manual price band. Tint only — not a signal.",
     "chart.tool.magnet":"Magnet",
     "chart.tool.hide":"Show/hide",
     "chart.tool.clear":"Clear",
@@ -686,7 +706,17 @@ const I18N = {
     "chart.tool.trend":"趨勢線",
     "chart.tool.hline":"水平線",
     "chart.tool.fib":"Fib",
+    "chart.tool.zone":"價區",
     "chart.tool.measure":"測量",
+    "chart.zone.role":"著色",
+    "chart.zone.neutral":"中性",
+    "chart.zone.support":"支撐",
+    "chart.zone.resist":"阻力",
+    "chart.zone.extend_left":"向左延伸",
+    "chart.zone.extend_right":"向右延伸",
+    "chart.zone.label_ph":"標籤（可空）",
+    "chart.zone.remove":"移除",
+    "chart.zone.hint":"人手價區。著色只是 tint，不是訊號。",
     "chart.tool.magnet":"磁鐵",
     "chart.tool.hide":"顯示/隱藏",
     "chart.tool.clear":"清除",
@@ -929,10 +959,13 @@ let chartReq = 0;
 let drawState = {items:[], hidden:false, locked:false};
 let drawUndo = [];
 let drawDraft = null;
+let drawDrag = null;
+let drawSelectedId = null;
 let drawCtx = null;
 let drawResizeObs = null;
+let drawPointerBind = null;
 let chartKeysBound = false;
-const DRAW_TOOL_ORDER = ["select","trend","hline","fib","measure"];
+const DRAW_TOOL_ORDER = ["select","trend","hline","fib","zone","measure"];
 const FIB_RATIOS = [-0.272, 0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272];
 const CHART_PERIODS = ["1mo","3mo","6mo","1y","2y"];
 const CHART_IND_DEFAULT = {sma20:true,sma50:true,ema20:true,bb:true,rsi:true,macd:true};
@@ -2176,10 +2209,22 @@ function loadChartInd(){
 function saveChartInd(){
   localStorage.setItem("cgab.chart.ind", JSON.stringify(loadChartInd()));
 }
+function clearDrawPointer(){
+  if(!drawPointerBind) return;
+  const b = drawPointerBind;
+  try { b.stage.removeEventListener("pointerdown", b.down, true); } catch(e){}
+  window.removeEventListener("pointermove", b.move);
+  window.removeEventListener("pointerup", b.up);
+  window.removeEventListener("pointercancel", b.cancel);
+  drawPointerBind = null;
+}
 function wipeDeskCharts(){
   _deskCharts.forEach(c => { try { c.remove(); } catch(e){} });
   _deskCharts = [];
   drawCtx = null;
+  drawDrag = null;
+  drawDraft = null;
+  clearDrawPointer();
   if(drawResizeObs){ try { drawResizeObs.disconnect(); } catch(e){} drawResizeObs = null; }
 }
 function loadLwCharts(){
@@ -2369,66 +2414,304 @@ function drawStorageKey(sym){
 function newDrawId(){
   return "d"+Math.random().toString(36).slice(2,10);
 }
-function numOrNull(v){
-  const n = Number(v);
-  return Number.isFinite(n) ? n : null;
-}
-function sanitizePt(p){
-  if(!p) return null;
-  const price = numOrNull(p.price);
-  const time = p.time ? chartTimeStr(p.time).slice(0,32) : "";
-  if(price==null || !time) return null;
-  return {time, price};
-}
-function sanitizeDrawItem(it){
-  if(!it || typeof it!=="object") return null;
-  const type = it.type;
-  const id = String(it.id||newDrawId());
-  if(type==="hline"){
-    const price = numOrNull(it.price);
-    if(price==null) return null;
-    return {id, type, price};
+/* CGAB_DRAW_ZONE_BEGIN
+ * Self-built price-zone overlay for the Desk chart (lightweight-charts v4.2.3).
+ * Canvas batch uses fillRect + stroke. This is not the TradingView
+ * rectangle-drawing-tool and not a lightweight-charts built-in rectangle plugin.
+ * Schema v2 is per symbol on the daily chart (same key shape as v1; no interval
+ * segment). extendLeft / extendRight are flags — never fake timestamps.
+ * Unknown kinds are dropped. Illegal zone objects are dropped. Fail closed.
+ */
+const CgabDraw = (function(){
+  const DRAW_SCHEMA_VERSION = 2;
+  const ZONE_ROLES = ["neutral","support","resist"];
+  const ZONE_LABEL_MAX = 40;
+  const ZONE_TINT = {
+    neutral: {fill:"rgba(120, 150, 165, 0.22)", stroke:"rgba(160, 185, 195, 0.55)"},
+    support: {fill:"rgba(62, 224, 160, 0.22)", stroke:"rgba(62, 224, 160, 0.70)"},
+    resist: {fill:"rgba(255, 107, 129, 0.22)", stroke:"rgba(255, 107, 129, 0.70)"}
+  };
+  const ZONE_HANDLES = ["nw","n","ne","e","se","s","sw","w"];
+
+  function chartTimeStr(time){
+    if(time==null) return "";
+    if(typeof time==="string") return time.slice(0,10);
+    if(typeof time==="object" && time.year){
+      const m = String(time.month).padStart(2,"0");
+      const d = String(time.day).padStart(2,"0");
+      return time.year+"-"+m+"-"+d;
+    }
+    return String(time).slice(0,10);
   }
-  if(type==="text"){
-    const price = numOrNull(it.price);
-    const time = it.time ? chartTimeStr(it.time).slice(0,32) : "";
-    const text = String(it.text||"").trim().slice(0,80);
-    if(price==null || !time || !text) return null;
-    return {id, type, time, price, text};
+  function numOrNull(v){
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
   }
-  if(type==="trend" || type==="fib" || type==="measure"){
-    const a = sanitizePt(it.a);
-    const b = sanitizePt(it.b);
+  function timeNum(time){
+    const s = chartTimeStr(time);
+    const ms = Date.parse(s+"T00:00:00Z");
+    return Number.isFinite(ms) ? ms : 0;
+  }
+  function newId(){
+    return "d"+Math.random().toString(36).slice(2,10);
+  }
+  function cleanId(raw){
+    const id = String(raw||"");
+    if(!/^[\w-]{1,40}$/.test(id) || id==="preview") return newId();
+    return id;
+  }
+  function isDay(s){
+    return /^\d{4}-\d{2}-\d{2}$/.test(s);
+  }
+  function sanitizeZoneLabel(raw){
+    const text = String(raw==null ? "" : raw).replace(/\s+/g," ").trim().slice(0, ZONE_LABEL_MAX);
+    if(!text) return "";
+    if(/必買|止蝕|止損|必賣|verified|已驗證|已验证/i.test(text)) return "";
+    if(/AI\s*已|AI\s*confirmed/i.test(text)) return "";
+    if(/^live$/i.test(text)) return "";
+    return text;
+  }
+  function sanitizePt(p){
+    if(!p) return null;
+    const price = numOrNull(p.price);
+    const time = p.time ? chartTimeStr(p.time) : "";
+    if(price==null || !isDay(time)) return null;
+    return {time, price};
+  }
+  function sanitizeZone(it, id){
+    const priceA = numOrNull(it.priceHigh);
+    const priceB = numOrNull(it.priceLow);
+    const timeA = it.timeLeft ? chartTimeStr(it.timeLeft) : "";
+    const timeB = it.timeRight ? chartTimeStr(it.timeRight) : "";
+    if(priceA==null || priceB==null || !isDay(timeA) || !isDay(timeB)) return null;
+    const priceHigh = Math.max(priceA, priceB);
+    const priceLow = Math.min(priceA, priceB);
+    if(!(priceHigh > priceLow)) return null;
+    let timeLeft = timeA;
+    let timeRight = timeB;
+    if(timeNum(timeLeft) > timeNum(timeRight)){
+      const swap = timeLeft;
+      timeLeft = timeRight;
+      timeRight = swap;
+    }
+    const role = ZONE_ROLES.indexOf(it.role)>=0 ? it.role : "neutral";
+    return {
+      id: id,
+      type: "zone",
+      priceHigh: priceHigh,
+      priceLow: priceLow,
+      timeLeft: timeLeft,
+      timeRight: timeRight,
+      extendLeft: it.extendLeft===true,
+      extendRight: it.extendRight===true,
+      role: role,
+      label: sanitizeZoneLabel(it.label)
+    };
+  }
+  function sanitizeDrawItem(it){
+    if(!it || typeof it!=="object") return null;
+    const type = it.type;
+    const id = cleanId(it.id);
+    if(type==="hline"){
+      const price = numOrNull(it.price);
+      if(price==null) return null;
+      return {id:id, type:type, price:price};
+    }
+    if(type==="text"){
+      const price = numOrNull(it.price);
+      const time = it.time ? chartTimeStr(it.time) : "";
+      const text = String(it.text||"").trim().slice(0,80);
+      if(price==null || !isDay(time) || !text) return null;
+      return {id:id, type:type, time:time, price:price, text:text};
+    }
+    if(type==="trend" || type==="fib" || type==="measure"){
+      const a = sanitizePt(it.a);
+      const b = sanitizePt(it.b);
+      if(!a || !b) return null;
+      return {id:id, type:type, a:a, b:b};
+    }
+    if(type==="zone") return sanitizeZone(it, id);
+    return null;
+  }
+  function sanitizeDrawList(list){
+    if(!Array.isArray(list)) return [];
+    const out = [];
+    for(let i=0;i<list.length;i++){
+      try {
+        const clean = sanitizeDrawItem(list[i]);
+        if(clean) out.push(clean);
+      } catch(err) { /* drop this object; keep the rest */ }
+    }
+    return out;
+  }
+  function zoneFromPoints(a, b){
     if(!a || !b) return null;
-    return {id, type, a, b};
+    return sanitizeZone({
+      priceHigh: a.price,
+      priceLow: b.price,
+      timeLeft: a.time,
+      timeRight: b.time,
+      extendLeft: false,
+      extendRight: false,
+      role: "neutral",
+      label: ""
+    }, "pending");
   }
-  return null;
+  function withZonePatch(item, patch){
+    if(!item || item.type!=="zone") return null;
+    return sanitizeZone({
+      priceHigh: item.priceHigh,
+      priceLow: item.priceLow,
+      timeLeft: item.timeLeft,
+      timeRight: item.timeRight,
+      extendLeft: item.extendLeft===true,
+      extendRight: item.extendRight===true,
+      role: item.role,
+      label: item.label,
+      ...patch
+    }, item.id);
+  }
+  function withZoneRole(item, role){
+    if(!item || item.type!=="zone") return null;
+    if(ZONE_ROLES.indexOf(role)<0) return null;
+    if(item.role===role) return item;
+    return withZonePatch(item, {role: role});
+  }
+  function withZoneExtend(item, flag){
+    if(!item || item.type!=="zone") return null;
+    if(flag!=="extendLeft" && flag!=="extendRight") return null;
+    const patch = {};
+    patch[flag] = item[flag]!==true;
+    return withZonePatch(item, patch);
+  }
+  function withZoneLabel(item, label){
+    if(!item || item.type!=="zone") return null;
+    const next = sanitizeZoneLabel(label);
+    if(next===(item.label||"")) return item;
+    return withZonePatch(item, {label: next});
+  }
+  function resizeZone(item, handle, pt){
+    if(!item || item.type!=="zone" || !pt) return item;
+    const movesHigh = handle==="n" || handle==="nw" || handle==="ne";
+    const movesLow = handle==="s" || handle==="sw" || handle==="se";
+    const movesLeft = (handle==="w" || handle==="nw" || handle==="sw") && item.extendLeft!==true;
+    const movesRight = (handle==="e" || handle==="ne" || handle==="se") && item.extendRight!==true;
+    let high = item.priceHigh;
+    let low = item.priceLow;
+    let left = item.timeLeft;
+    let right = item.timeRight;
+    if(movesHigh) high = pt.price;
+    if(movesLow) low = pt.price;
+    if(movesLeft) left = pt.time;
+    if(movesRight) right = pt.time;
+    const next = sanitizeZone({
+      priceHigh: high,
+      priceLow: low,
+      timeLeft: left,
+      timeRight: right,
+      extendLeft: item.extendLeft,
+      extendRight: item.extendRight,
+      role: item.role,
+      label: item.label
+    }, item.id);
+    return next || item;
+  }
+  function nearestBar(bars, time){
+    let best = null;
+    let bestD = Infinity;
+    const tn = timeNum(time);
+    (bars||[]).forEach(b => {
+      const d = Math.abs(timeNum(b && b.t)-tn);
+      if(d<bestD){ bestD = d; best = b; }
+    });
+    return best;
+  }
+  function magnetZonePoint(pt, bars, handle, magnetOn){
+    if(!magnetOn || !pt || !bars || !bars.length) return pt;
+    const bar = nearestBar(bars, pt.time);
+    if(!bar) return pt;
+    const priceOnly = handle==="n" || handle==="s";
+    const timeOnly = handle==="e" || handle==="w";
+    const time = priceOnly ? pt.time : chartTimeStr(bar.t);
+    let price = pt.price;
+    if(!timeOnly){
+      const highEdge = handle==="n" || handle==="nw" || handle==="ne";
+      const lowEdge = handle==="s" || handle==="sw" || handle==="se";
+      if(highEdge){
+        const h = Number(bar.h);
+        if(Number.isFinite(h)) price = h;
+      } else if(lowEdge){
+        const l = Number(bar.l);
+        if(Number.isFinite(l)) price = l;
+      }
+    }
+    if(!isDay(time) || !Number.isFinite(price)) return pt;
+    return {time: time, price: price};
+  }
+  return {
+    DRAW_SCHEMA_VERSION: DRAW_SCHEMA_VERSION,
+    ZONE_ROLES: ZONE_ROLES,
+    ZONE_LABEL_MAX: ZONE_LABEL_MAX,
+    ZONE_TINT: ZONE_TINT,
+    ZONE_HANDLES: ZONE_HANDLES,
+    sanitizeDrawItem: sanitizeDrawItem,
+    sanitizeDrawList: sanitizeDrawList,
+    sanitizeZoneLabel: sanitizeZoneLabel,
+    zoneFromPoints: zoneFromPoints,
+    withZoneRole: withZoneRole,
+    withZoneExtend: withZoneExtend,
+    withZoneLabel: withZoneLabel,
+    resizeZone: resizeZone,
+    magnetZonePoint: magnetZonePoint
+  };
+})();
+globalThis.CgabDraw = CgabDraw;
+/* CGAB_DRAW_ZONE_END */
+const DRAW_SCHEMA_VERSION = CgabDraw.DRAW_SCHEMA_VERSION;
+function sanitizeDrawItem(it){
+  return CgabDraw.sanitizeDrawItem(it);
 }
 function loadDrawState(sym){
   drawUndo = [];
   drawDraft = null;
+  drawDrag = null;
   const key = drawStorageKey(sym);
+  const requested = String(sym||"").trim().toUpperCase();
   if(!key){
     drawState = {items:[], hidden:false, locked:false};
+    drawSelectedId = null;
     return;
   }
   try {
     const raw = JSON.parse(localStorage.getItem(key)||"null");
-    const items = Array.isArray(raw && raw.items) ? raw.items.map(sanitizeDrawItem).filter(Boolean) : [];
-    drawState = {items, hidden: !!(raw && raw.hidden), locked: !!(raw && raw.locked)};
+    if(!raw || typeof raw!=="object" || Array.isArray(raw)){
+      drawState = {items:[], hidden:false, locked:false};
+      drawSelectedId = null;
+      return;
+    }
+    const blobSym = raw.symbol==null ? "" : String(raw.symbol).trim().toUpperCase();
+    if(blobSym && blobSym!==requested){
+      drawState = {items:[], hidden:false, locked:false};
+      drawSelectedId = null;
+      return;
+    }
+    const items = CgabDraw.sanitizeDrawList(raw.items);
+    drawState = {items: items, hidden: !!raw.hidden, locked: !!raw.locked};
   } catch(e) {
     drawState = {items:[], hidden:false, locked:false};
   }
+  if(!drawState.items.some(it => it.id===drawSelectedId)) drawSelectedId = null;
 }
 function saveDrawState(){
   const key = drawStorageKey(symbol);
   if(!key) return;
-  const items = drawState.items.map(sanitizeDrawItem).filter(Boolean);
+  const items = CgabDraw.sanitizeDrawList(drawState.items);
   drawState.items = items;
+  if(!items.some(it => it.id===drawSelectedId)) drawSelectedId = null;
   localStorage.setItem(key, JSON.stringify({
-    v:1,
+    v: DRAW_SCHEMA_VERSION,
     symbol: key.slice("cgab.chart.draw.".length),
-    items,
+    items: items,
     hidden: !!drawState.hidden,
     locked: !!drawState.locked
   }));
@@ -2471,7 +2754,8 @@ function drawActDisabled(id){
 function drawToolBtn(id){
   const on = chartTool===id ? " on" : "";
   const dis = drawControlDisabled(id) ? " disabled" : "";
-  return `<button type="button" class="ind-btn draw-tool${on}" data-tool="${id}"${dis}>${t("chart.tool."+id)}</button>`;
+  const icon = id==="zone" ? `<span class="zone-ico" aria-hidden="true"></span>` : "";
+  return `<button type="button" class="ind-btn draw-tool${on}" data-tool="${id}"${dis}>${icon}${t("chart.tool."+id)}</button>`;
 }
 function drawAct(id){
   const on = (id==="magnet" && chartMagnet) || (id==="hide" && drawState.hidden) || (id==="lock" && drawState.locked) ? " on" : "";
@@ -2511,21 +2795,31 @@ function applyMagnet(pt, bars){
   });
   return {time: best.t, price: snap};
 }
-function eventToPoint(ev){
-  if(!drawCtx) return null;
+function overlayPoint(ev){
   const svg = document.getElementById("drawSvg");
-  if(!svg) return null;
-  const rect = svg.getBoundingClientRect();
-  const x = ev.clientX - rect.left;
-  const y = ev.clientY - rect.top;
+  const stage = document.getElementById("chartStage");
+  const host = svg || stage;
+  if(!host) return null;
+  const rect = host.getBoundingClientRect();
+  return {x: ev.clientX - rect.left, y: ev.clientY - rect.top, w: rect.width, h: rect.height};
+}
+function eventToRawPoint(ev){
+  if(!drawCtx) return null;
+  const loc = overlayPoint(ev);
+  if(!loc) return null;
   let time = null;
   let price = null;
-  try { time = drawCtx.chart.timeScale().coordinateToTime(x); } catch(e){ time = null; }
-  try { price = drawCtx.series.coordinateToPrice(y); } catch(e){ price = null; }
+  try { time = drawCtx.chart.timeScale().coordinateToTime(loc.x); } catch(e){ time = null; }
+  try { price = drawCtx.series.coordinateToPrice(loc.y); } catch(e){ price = null; }
   if(price==null || !Number.isFinite(price)) return null;
   const timeStr = time==null ? "" : chartTimeStr(time);
   if(!timeStr) return null;
-  return applyMagnet({time: timeStr, price}, drawCtx.bars);
+  return {time: timeStr, price: price};
+}
+function eventToPoint(ev){
+  const pt = eventToRawPoint(ev);
+  if(!pt || !drawCtx) return null;
+  return applyMagnet(pt, drawCtx.bars);
 }
 function svgEl(name, attrs){
   const node = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -2602,14 +2896,147 @@ function paintDrawItem(svg, chart, series, item, width){
     if(item.type==="measure") svg.appendChild(svgText((a.x+b.x)/2, (a.y+b.y)/2-6, measureLabel(item.a, item.b), "#22d3c5"));
   }
 }
+function selectedZone(){
+  return drawState.items.find(it => it.id===drawSelectedId && it.type==="zone") || null;
+}
+function zoneEdgeX(chart, time, extend, side, width){
+  if(extend) return side==="left" ? 0 : width;
+  let x = null;
+  try { x = chart.timeScale().timeToCoordinate(time); } catch(e){ x = null; }
+  if(x==null || !Number.isFinite(x)) return side==="left" ? 0 : width;
+  return x;
+}
+function zoneScreenGeom(item, width){
+  if(!drawCtx || !item) return null;
+  let yHigh = null;
+  let yLow = null;
+  try { yHigh = drawCtx.series.priceToCoordinate(item.priceHigh); } catch(e){ yHigh = null; }
+  try { yLow = drawCtx.series.priceToCoordinate(item.priceLow); } catch(e){ yLow = null; }
+  if(yHigh==null || yLow==null || !Number.isFinite(yHigh) || !Number.isFinite(yLow)) return null;
+  const xLeft = zoneEdgeX(drawCtx.chart, item.timeLeft, item.extendLeft===true, "left", width);
+  const xRight = zoneEdgeX(drawCtx.chart, item.timeRight, item.extendRight===true, "right", width);
+  return {
+    x1: Math.min(xLeft, xRight),
+    x2: Math.max(xLeft, xRight),
+    y1: Math.min(yHigh, yLow),
+    y2: Math.max(yHigh, yLow)
+  };
+}
+function zoneHandlePoints(geom){
+  const cx = (geom.x1 + geom.x2) / 2;
+  const cy = (geom.y1 + geom.y2) / 2;
+  return {
+    nw:{x:geom.x1, y:geom.y1}, n:{x:cx, y:geom.y1}, ne:{x:geom.x2, y:geom.y1},
+    e:{x:geom.x2, y:cy}, se:{x:geom.x2, y:geom.y2}, s:{x:cx, y:geom.y2},
+    sw:{x:geom.x1, y:geom.y2}, w:{x:geom.x1, y:cy}
+  };
+}
+function hitTestZone(x, y, width){
+  if(!drawCtx || drawState.hidden) return null;
+  const selected = selectedZone();
+  if(selected && !drawState.locked){
+    const geom = zoneScreenGeom(selected, width);
+    if(geom){
+      const pts = zoneHandlePoints(geom);
+      const order = ["nw","ne","sw","se","n","e","s","w"];
+      for(let i=0;i<order.length;i++){
+        const p = pts[order[i]];
+        if(Math.abs(p.x-x)<=8 && Math.abs(p.y-y)<=8) return {id: selected.id, handle: order[i]};
+      }
+    }
+  }
+  for(let i=drawState.items.length-1; i>=0; i--){
+    const it = drawState.items[i];
+    if(!it || it.type!=="zone") continue;
+    const geom = zoneScreenGeom(it, width);
+    if(!geom) continue;
+    if(x>=geom.x1-4 && x<=geom.x2+4 && y>=geom.y1-4 && y<=geom.y2+4) return {id: it.id, handle: null};
+  }
+  return null;
+}
+function sizeZoneCanvas(canvas, box){
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(1, box.w);
+  const h = Math.max(1, box.h);
+  const bw = Math.max(1, Math.round(w * dpr));
+  const bh = Math.max(1, Math.round(h * dpr));
+  if(canvas.width!==bw) canvas.width = bw;
+  if(canvas.height!==bh) canvas.height = bh;
+  canvas.style.width = w+"px";
+  canvas.style.height = h+"px";
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  return ctx;
+}
+function paintZoneCanvas(canvas, box){
+  if(!canvas) return;
+  const ctx = sizeZoneCanvas(canvas, box);
+  if(!drawCtx || drawState.hidden) return;
+  const list = drawState.items.filter(it => it && it.type==="zone");
+  if(drawDraft && drawDraft.type==="zone" && drawDraft.a && drawDraft.b){
+    const prev = CgabDraw.zoneFromPoints(drawDraft.a, drawDraft.b);
+    if(prev) list.push(prev);
+  }
+  list.forEach(item => {
+    const geom = zoneScreenGeom(item, box.w);
+    if(!geom) return;
+    const tint = CgabDraw.ZONE_TINT[item.role] || CgabDraw.ZONE_TINT.neutral;
+    const w = Math.max(1, geom.x2 - geom.x1);
+    const h = Math.max(1, geom.y2 - geom.y1);
+    ctx.fillStyle = tint.fill;
+    ctx.fillRect(geom.x1, geom.y1, w, h);
+    ctx.strokeStyle = tint.stroke;
+    ctx.lineWidth = 1.25;
+    ctx.strokeRect(geom.x1 + 0.5, geom.y1 + 0.5, Math.max(0, w - 1), Math.max(0, h - 1));
+    if(item.id===drawSelectedId){
+      ctx.strokeStyle = "rgba(232,255,251,0.85)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(geom.x1 + 2.5, geom.y1 + 2.5, Math.max(0, w - 5), Math.max(0, h - 5));
+    }
+    if(item.label){
+      ctx.fillStyle = item.role==="support" ? "#3ee0a0" : (item.role==="resist" ? "#ff6b81" : "#d7ecec");
+      ctx.font = "700 11px Segoe UI, sans-serif";
+      ctx.fillText(item.label, geom.x1 + 6, Math.min(geom.y2 - 4, geom.y1 + 14));
+    }
+  });
+}
+function paintZoneHandles(svg, width){
+  if(drawState.hidden || drawState.locked) return;
+  const item = selectedZone();
+  if(!item) return;
+  const geom = zoneScreenGeom(item, width);
+  if(!geom) return;
+  const pts = zoneHandlePoints(geom);
+  CgabDraw.ZONE_HANDLES.forEach(name => {
+    const p = pts[name];
+    svg.appendChild(svgEl("rect", {
+      x: p.x - 4,
+      y: p.y - 4,
+      width: 8,
+      height: 8,
+      fill: "#e8fffb",
+      stroke: "#071016",
+      "stroke-width": 1,
+      "pointer-events": "none"
+    }));
+  });
+}
 function redrawDrawOverlay(){
   const svg = document.getElementById("drawSvg");
   if(!svg) return;
   while(svg.firstChild) svg.removeChild(svg.firstChild);
   const box = sizeDrawSvg(svg);
+  paintZoneCanvas(document.getElementById("drawZoneCanvas"), box);
   if(!drawCtx || drawState.hidden) return;
-  drawState.items.forEach(item => paintDrawItem(svg, drawCtx.chart, drawCtx.series, item, box.w));
-  if(drawDraft && drawDraft.a && drawDraft.b) paintDrawItem(svg, drawCtx.chart, drawCtx.series, drawDraft, box.w);
+  drawState.items.forEach(item => {
+    if(item.type==="zone") return;
+    paintDrawItem(svg, drawCtx.chart, drawCtx.series, item, box.w);
+  });
+  if(drawDraft && drawDraft.type!=="zone" && drawDraft.a && drawDraft.b){
+    paintDrawItem(svg, drawCtx.chart, drawCtx.series, drawDraft, box.w);
+  }
+  paintZoneHandles(svg, box.w);
 }
 function undoDraw(){
   if(drawActDisabled("undo")) return;
@@ -2617,14 +3044,58 @@ function undoDraw(){
   if(prev==null) return;
   try {
     const parsed = JSON.parse(prev);
-    drawState.items = Array.isArray(parsed) ? parsed.map(sanitizeDrawItem).filter(Boolean) : [];
+    drawState.items = CgabDraw.sanitizeDrawList(parsed);
   } catch(e) {
     drawState.items = [];
   }
   drawDraft = null;
+  drawDrag = null;
+  if(!drawState.items.some(it => it.id===drawSelectedId)) drawSelectedId = null;
   saveDrawState();
   syncDrawChrome();
   redrawDrawOverlay();
+}
+function commitZoneEdit(next){
+  if(!next || drawState.locked) return;
+  const idx = drawState.items.findIndex(it => it.id===next.id);
+  if(idx<0) return;
+  if(JSON.stringify(drawState.items[idx])===JSON.stringify(next)) return;
+  pushUndo();
+  drawState.items[idx] = next;
+  saveDrawState();
+  syncDrawChrome();
+  redrawDrawOverlay();
+}
+function removeSelectedZone(){
+  const item = selectedZone();
+  if(!item || drawState.locked) return;
+  pushUndo();
+  drawState.items = drawState.items.filter(it => it.id!==item.id);
+  drawSelectedId = null;
+  drawDraft = null;
+  saveDrawState();
+  syncDrawChrome();
+  redrawDrawOverlay();
+}
+function syncZoneProps(){
+  const host = document.getElementById("zoneProps");
+  if(!host) return;
+  const item = selectedZone();
+  const show = !!(item && !drawState.hidden);
+  host.style.display = show ? "" : "none";
+  if(!show) return;
+  host.querySelectorAll("[data-zone-role]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.zoneRole===item.role);
+    btn.disabled = !!drawState.locked;
+  });
+  host.querySelectorAll("[data-zone-ext]").forEach(btn => {
+    btn.classList.toggle("on", item[btn.dataset.zoneExt]===true);
+    btn.disabled = !!drawState.locked;
+  });
+  const lab = document.getElementById("zoneLabel");
+  if(lab && document.activeElement!==lab) lab.value = item.label || "";
+  const rm = host.querySelector("[data-zone-act='remove']");
+  if(rm) rm.disabled = !!drawState.locked;
 }
 function syncDrawChrome(){
   root.querySelectorAll("[data-tool]").forEach(btn => {
@@ -2645,7 +3116,9 @@ function syncDrawChrome(){
   if(svg){
     const armed = chartTool!=="select" && !drawControlDisabled(chartTool);
     svg.classList.toggle("armed", armed);
+    svg.classList.toggle("picking", chartTool==="select" && !drawState.locked && chartHasBars);
   }
+  syncZoneProps();
 }
 function bindChartKeys(){
   if(chartKeysBound) return;
@@ -2660,10 +3133,175 @@ function bindChartKeys(){
     } else if(e.key==="Escape"){
       chartTool = "select";
       drawDraft = null;
+      drawDrag = null;
+      drawSelectedId = null;
+      syncDrawChrome();
+      redrawDrawOverlay();
+    } else if((e.key==="Delete" || e.key==="Backspace") && selectedZone()){
+      e.preventDefault();
+      removeSelectedZone();
+    }
+  });
+}
+function chartReadyForDraw(){
+  return !!String(symbol||"").trim() && chartHasBars && !drawState.locked;
+}
+function beginZoneDrag(hit, ev){
+  const item = drawState.items.find(it => it.id===hit.id && it.type==="zone");
+  if(!item || drawState.locked) return;
+  drawSelectedId = item.id;
+  drawDraft = null;
+  drawDrag = {id: item.id, handle: hit.handle, snapshot: JSON.parse(JSON.stringify(item))};
+  try {
+    const stage = document.getElementById("chartStage");
+    if(stage && ev && stage.setPointerCapture) stage.setPointerCapture(ev.pointerId);
+  } catch(e){}
+  syncDrawChrome();
+  redrawDrawOverlay();
+}
+function moveZoneDrag(ev){
+  if(!drawDrag || !drawCtx) return;
+  const raw = eventToRawPoint(ev);
+  if(!raw) return;
+  const pt = CgabDraw.magnetZonePoint(raw, drawCtx.bars, drawDrag.handle, chartMagnet);
+  const next = CgabDraw.resizeZone(drawDrag.snapshot, drawDrag.handle, pt);
+  const idx = drawState.items.findIndex(it => it.id===drawDrag.id);
+  if(idx<0 || !next) return;
+  drawState.items[idx] = next;
+  redrawDrawOverlay();
+}
+function endZoneDrag(){
+  if(!drawDrag) return;
+  const before = drawDrag.snapshot;
+  const id = drawDrag.id;
+  drawDrag = null;
+  const idx = drawState.items.findIndex(it => it.id===id);
+  if(idx<0){
+    redrawDrawOverlay();
+    return;
+  }
+  const after = drawState.items[idx];
+  if(JSON.stringify(before)!==JSON.stringify(after)){
+    const committed = drawState.items.slice();
+    drawState.items = committed.map(it => it.id===id ? before : it);
+    pushUndo();
+    drawState.items = committed;
+  }
+  saveDrawState();
+  syncDrawChrome();
+  redrawDrawOverlay();
+}
+function finishZoneDraw(ev){
+  if(!drawDraft || drawDraft.type!=="zone") return;
+  const pt = eventToPoint(ev) || drawDraft.b;
+  const a = drawDraft.a;
+  drawDraft = null;
+  const built = (a && pt) ? CgabDraw.zoneFromPoints(a, pt) : null;
+  if(!built){
+    redrawDrawOverlay();
+    return;
+  }
+  built.id = newDrawId();
+  pushUndo();
+  drawState.items.push(built);
+  drawSelectedId = built.id;
+  saveDrawState();
+  syncDrawChrome();
+  redrawDrawOverlay();
+}
+function onStagePointerDown(ev){
+  if(page!=="chart") return;
+  if(ev.button!=null && ev.button!==0) return;
+  if(!chartReadyForDraw()) return;
+  const loc = overlayPoint(ev);
+  if(!loc) return;
+  const hit = hitTestZone(loc.x, loc.y, loc.w);
+  if(chartTool==="select"){
+    if(hit && hit.handle){
+      ev.preventDefault();
+      ev.stopPropagation();
+      beginZoneDrag(hit, ev);
+      return;
+    }
+    if(hit){
+      ev.preventDefault();
+      ev.stopPropagation();
+      drawSelectedId = hit.id;
+      drawDraft = null;
+      syncDrawChrome();
+      redrawDrawOverlay();
+      return;
+    }
+    if(drawSelectedId){
+      drawSelectedId = null;
       syncDrawChrome();
       redrawDrawOverlay();
     }
-  });
+    return;
+  }
+  if(chartTool!=="zone") return;
+  if(hit && hit.handle && hit.id===drawSelectedId){
+    ev.preventDefault();
+    ev.stopPropagation();
+    beginZoneDrag(hit, ev);
+    return;
+  }
+  if(hit && !hit.handle){
+    ev.preventDefault();
+    ev.stopPropagation();
+    drawSelectedId = hit.id;
+    drawDraft = null;
+    syncDrawChrome();
+    redrawDrawOverlay();
+    return;
+  }
+  const pt = eventToPoint(ev);
+  if(!pt) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  drawSelectedId = null;
+  drawDraft = {type:"zone", a:pt, b:pt, id:"preview"};
+  try {
+    const stage = document.getElementById("chartStage");
+    if(stage && stage.setPointerCapture) stage.setPointerCapture(ev.pointerId);
+  } catch(e){}
+  syncDrawChrome();
+  redrawDrawOverlay();
+}
+function onStagePointerMove(ev){
+  if(page!=="chart") return;
+  if(drawDrag){
+    moveZoneDrag(ev);
+    return;
+  }
+  if(!drawDraft || drawDraft.type!=="zone" || chartTool!=="zone" || !drawDraft.a) return;
+  const pt = eventToPoint(ev);
+  if(!pt) return;
+  drawDraft = {type:"zone", a: drawDraft.a, b: pt, id:"preview"};
+  redrawDrawOverlay();
+}
+function onStagePointerUp(ev){
+  if(page!=="chart") return;
+  if(drawDrag){
+    endZoneDrag();
+    return;
+  }
+  if(drawDraft && drawDraft.type==="zone") finishZoneDraw(ev);
+}
+function onStagePointerCancel(){
+  if(drawDrag){
+    const id = drawDrag.id;
+    const snap = drawDrag.snapshot;
+    drawDrag = null;
+    const idx = drawState.items.findIndex(it => it.id===id);
+    if(idx>=0 && snap) drawState.items[idx] = snap;
+    redrawDrawOverlay();
+    return;
+  }
+  if(drawDraft && drawDraft.type==="zone"){
+    drawDraft = null;
+    redrawDrawOverlay();
+  }
 }
 function attachDrawOverlay(chart, series, bars, sym){
   drawCtx = {chart, series, bars: bars||[], symbol: String(sym||"").toUpperCase()};
@@ -2671,14 +3309,14 @@ function attachDrawOverlay(chart, series, bars, sym){
   const svg = document.getElementById("drawSvg");
   if(svg){
     svg.onmousemove = ev => {
-      if(!drawDraft || !drawDraft.a || drawState.locked || chartTool==="select") return;
+      if(!drawDraft || !drawDraft.a || drawState.locked || chartTool==="select" || chartTool==="zone" || drawDraft.type==="zone") return;
       const pt = eventToPoint(ev);
       if(!pt) return;
       drawDraft = {type: drawDraft.type, a: drawDraft.a, b: pt, id:"preview"};
       redrawDrawOverlay();
     };
     svg.onclick = ev => {
-      if(drawState.locked || chartTool==="select" || !chartHasBars) return;
+      if(drawState.locked || chartTool==="select" || chartTool==="zone" || !chartHasBars) return;
       const pt = eventToPoint(ev);
       if(!pt) return;
       if(chartTool==="hline"){
@@ -2720,6 +3358,21 @@ function attachDrawOverlay(chart, series, bars, sym){
       }
     };
   }
+  clearDrawPointer();
+  const stage = document.getElementById("chartStage");
+  if(stage){
+    stage.addEventListener("pointerdown", onStagePointerDown, true);
+    window.addEventListener("pointermove", onStagePointerMove);
+    window.addEventListener("pointerup", onStagePointerUp);
+    window.addEventListener("pointercancel", onStagePointerCancel);
+    drawPointerBind = {
+      stage: stage,
+      down: onStagePointerDown,
+      move: onStagePointerMove,
+      up: onStagePointerUp,
+      cancel: onStagePointerCancel
+    };
+  }
   try { chart.timeScale().subscribeVisibleLogicalRangeChange(() => redrawDrawOverlay()); } catch(e){}
   if(drawResizeObs){ try { drawResizeObs.disconnect(); } catch(e){} }
   if(window.ResizeObserver){
@@ -2745,6 +3398,17 @@ function chartShell(inner){
     </div>
     <div class="chart-toolbar" id="chartDrawBar">${DRAW_TOOL_ORDER.map(drawToolBtn).join("")}${drawAct("magnet")}${drawAct("hide")}${drawAct("clear")}</div>
     <div class="chart-toolbar" id="chartDrawExtra">${drawToolBtn("text")}${drawAct("undo")}${drawAct("lock")}<input id="drawText" maxlength="80" placeholder="${esc(t("chart.tool.text_prompt"))}" style="width:140px;display:${chartTool==="text"?"":"none"}" /></div>
+    <div class="chart-toolbar zone-props" id="zoneProps" style="display:none">
+      <span class="muted">${t("chart.zone.role")}</span>
+      <button type="button" class="ind-btn" data-zone-role="neutral">${t("chart.zone.neutral")}</button>
+      <button type="button" class="ind-btn" data-zone-role="support">${t("chart.zone.support")}</button>
+      <button type="button" class="ind-btn" data-zone-role="resist">${t("chart.zone.resist")}</button>
+      <button type="button" class="ind-btn" data-zone-ext="extendLeft">${t("chart.zone.extend_left")}</button>
+      <button type="button" class="ind-btn" data-zone-ext="extendRight">${t("chart.zone.extend_right")}</button>
+      <input id="zoneLabel" maxlength="40" placeholder="${esc(t("chart.zone.label_ph"))}" style="width:140px" />
+      <button type="button" class="ind-btn" data-zone-act="remove">${t("chart.zone.remove")}</button>
+      <span class="muted">${t("chart.zone.hint")}</span>
+    </div>
     <p class="chart-status" id="chartStatus">${esc(chartStatusLine())}</p>
     <div class="chart-toolbar">
       <span class="muted">${t("chart.overlays")}</span>
@@ -2777,6 +3441,7 @@ function bindChartChrome(){
       if(btn.disabled) return;
       chartTool = btn.dataset.tool;
       drawDraft = null;
+      drawDrag = null;
       syncDrawChrome();
       redrawDrawOverlay();
     };
@@ -2795,6 +3460,8 @@ function bindChartChrome(){
         pushUndo();
         drawState.items = [];
         drawDraft = null;
+        drawDrag = null;
+        drawSelectedId = null;
         saveDrawState();
       } else if(act==="undo"){
         undoDraw();
@@ -2816,6 +3483,36 @@ function bindChartChrome(){
     textInp.addEventListener("keydown", e => {
       e.stopPropagation();
       if(e.key==="Enter") e.preventDefault();
+    });
+  }
+  root.querySelectorAll("[data-zone-role]").forEach(btn => {
+    btn.onclick = () => {
+      const item = selectedZone();
+      if(!item || btn.disabled) return;
+      commitZoneEdit(CgabDraw.withZoneRole(item, btn.dataset.zoneRole));
+    };
+  });
+  root.querySelectorAll("[data-zone-ext]").forEach(btn => {
+    btn.onclick = () => {
+      const item = selectedZone();
+      if(!item || btn.disabled) return;
+      commitZoneEdit(CgabDraw.withZoneExtend(item, btn.dataset.zoneExt));
+    };
+  });
+  const zoneRm = document.querySelector("#zoneProps [data-zone-act='remove']");
+  if(zoneRm) zoneRm.onclick = () => { if(!zoneRm.disabled) removeSelectedZone(); };
+  const zoneLab = $("#zoneLabel");
+  if(zoneLab){
+    zoneLab.addEventListener("keydown", e => {
+      e.stopPropagation();
+      if(e.key==="Enter"){ e.preventDefault(); zoneLab.blur(); }
+    });
+    zoneLab.addEventListener("change", () => {
+      const item = selectedZone();
+      if(!item) return;
+      const next = CgabDraw.withZoneLabel(item, zoneLab.value);
+      commitZoneEdit(next);
+      if(next && document.activeElement!==zoneLab) zoneLab.value = next.label || "";
     });
   }
   syncDrawChrome();
@@ -2866,8 +3563,9 @@ async function chart(){
       <p class="muted" id="chartProv">${esc(prov)}</p>
       <div class="chart-legend" id="chartLegend"></div>
       <div class="chart-host">
-        <div class="chart-stage">
+        <div class="chart-stage" id="chartStage">
           <div id="tvPrice" class="tvchart"></div>
+          <canvas id="drawZoneCanvas" class="draw-overlay zone-canvas" width="2" height="2"></canvas>
           <svg id="drawSvg" class="draw-overlay"></svg>
         </div>
         <div id="tvRsi" class="tvchart-pane"></div>

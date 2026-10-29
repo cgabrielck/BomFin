@@ -387,7 +387,7 @@ def test_registering_an_order_tool_fails_the_gate():
     assert not source_registers_order_tool("def wire():\n    register_tool('explain_chart')\n")
     assert js_registers_order_tool("registerTool('place_order')")
     assert js_registers_order_tool('fetch("/api/orders")')
-    assert not js_registers_order_tool('const DRAW_TOOL_ORDER = ["select","trend","hline","fib","measure"]')
+    assert not js_registers_order_tool('const DRAW_TOOL_ORDER = ["select","trend","hline","fib","zone","measure"]')
 
 
 def test_chart_js_streamlit_chart_and_help_chat_do_not_register_order_tools():
@@ -409,7 +409,7 @@ def test_chart_js_streamlit_chart_and_help_chat_do_not_register_order_tools():
 
 def test_drawing_toolbar_persistence_and_watchlist_chart_link():
     html = INDEX.read_text(encoding="utf-8")
-    assert 'const DRAW_TOOL_ORDER = ["select","trend","hline","fib","measure"]' in html
+    assert 'const DRAW_TOOL_ORDER = ["select","trend","hline","fib","zone","measure"]' in html
     shell = html[html.find("function chartShell(") : html.find("function bindChartChrome(")]
     bar = shell[shell.find('id="chartDrawBar"') : shell.find('id="chartDrawExtra"')]
     assert "DRAW_TOOL_ORDER.map(drawToolBtn)" in bar
