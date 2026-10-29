@@ -18,7 +18,7 @@
 - Desk **已 vendored** [TradingView Lightweight Charts **v4.2.3**](https://github.com/tradingview/lightweight-charts)（PR **#36** ns-1 charts v0）＋閉合經典指標集方向（對齊 CHARTS §7）。**本 ADR 唔係綠地選型**，而係 **確認既有引擎** 同鎖 **畫線／多殼能力邊界**。
 - `CHARTS_INDICATORS_DESIGN`（Draft）**GC1** 原先寫「建議預設 lightweight-charts、未鎖」；程式已採用 **lightweight-charts v4.2.3**。**Gabriel ③ 已確認**（2026-10-27）：Desk 引擎＝既有 LC v4.2.3。本 ADR Status 仍係 **Owner-approved pending Accepted**（未標 Accepted）；CHARTS 頁維持 **Draft ≠ Accepted**。
 - Vendored 引擎 **唔等於**「完整畫線庫已齊」或「對外可承諾 TradingView 級 drawing tools」。
-- Chat＋圖表／TA 觀察功能要開工前，必須寫清：**既有引擎能做咩、做唔到咩、邊個殼係權威、邊啲係 P0／P2**，避免過度承諾（尤其畫線）。
+- Chat＋圖表／TA 觀察功能要開工前，必須寫清：**既有引擎能做咩、做唔到咩、邊個殼係權威、邊啲係 P0／P0.5／P2**，避免過度承諾（尤其畫線）。
 
 ---
 
@@ -46,7 +46,7 @@
 |--------------------|------------------|
 | Plotly.js 做 Desk 預設 | **否**（lab 可留；CHARTS GC5） |
 | 官方 TradingView Widget／Charting Library | **否**（默認）；另決先要授權／Owner |
-| 為「完整畫線」而換引擎或自研全套 canvas（P0） | **否**；畫線能力另見 D3／P2 |
+| 為「完整畫線」而換引擎或自研全套 canvas（P0） | **否**；畫線能力另見 D3（P0 最小集／**P0.5 Zone**／P2） |
 
 **③ 已確認（Gabriel 2026-10-27）：** Desk 圖表引擎＝**lightweight-charts v4.2.3**（PR #36）；接受「無完整內建畫線庫」邊界。本 ADR Status＝**Owner-approved pending Accepted**（未標 Accepted 前，唔寫「引擎 ADR 已 Accepted」；實作可寫「Desk 現用 LC v4.2.3」）。
 
@@ -60,15 +60,16 @@
 | 閉合經典 overlay／副圖（SMA／EMA／BB／RSI／MACD 等，跟 CHARTS §7） | ✅（參數可見） | 任意用戶腳本／Pine 執行引擎 |
 | 十字線、legend、時框至少日線 | ✅ | 完整多屏 workspace／社群 |
 | 數據 provenance（vendor／asof／fallback） | ✅ | Yahoo 扮 Polygon／verified |
-| **完整 TradingView 級畫線庫**（矩形／平行通道／任意工具全集等） | ❌ **永不當 LC 內建承諾** | 唔寫「LC 已齊畫線」 |
+| **完整 TradingView 級畫線庫**（平行通道／任意工具全集等） | ❌ **永不當 LC 內建承諾** | 唔寫「LC 已齊畫線」。價區／矩形價帶見下行 **P0.5**，**唔**計入本列、**唔**等於 TV 庫已齊 |
 | **Desk 畫線 v1 最小集**（趨勢線／水平線／**Fib**／**測量**） | **Owner 已批准 → P0 交付**；實作＝**自研 overlay**（或明確標註之 plugin），**非**宣稱 LC 內建齊；永遠標「最小畫具＝自研 overlay」 | TV 完整畫線庫 |
+| **P0.5 價區 Zone（矩形價帶）** | **P0.5 shipped**（自原 P2「矩形」提前）— PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；實作＝自研 overlay **`kind: zone`**，**非** LC 內建矩形、**非** TV 完整畫線庫。**落碼 ≠ 本 ADR Accepted** | 平行通道／更多工具／進階模板仍 **P2**；唔寫「LC 已有 rectangle」 |
 | 保存／重載用戶畫線 | 隨畫線 v1（P0）一併；存 Desk 權威 Drawing store | Streamlit／Chat 寫入權威線 |
 | 多 timeframe 同步、bar replay／回放 | **P2**（見 §3） | 當未排期嘅 P0 默認 |
 | 圖表 → 下單／一鍵買入 | **永遠禁止**（本 ADR + 方向 C） | 「觀察＝執行」 |
 
 **過度承諾禁令：** UI／Chat／文件禁止寫「同 TradingView 一樣齊畫線」「完整 drawing tools 已內建於 lightweight-charts」。只可寫「TradingView-*style* 可讀性」＋當前真實能力清單。
 
-**用語對齊（Coding／UI UX）：** P0「最小畫具」＝**自研 overlay** 疊喺 LC 之上，**唔係** LC 產品功能清單。Desk 畫線 v1 最小集（趨勢／水平／Fib／測量）——**Owner 已批准入 P0**；永遠保留「唔承諾＝TV 完整畫線庫」。**P1（chat→圖）延後**（Gabriel 卡面②）。
+**用語對齊（Coding／UI UX）：** P0「最小畫具」＝**自研 overlay** 疊喺 LC 之上，**唔係** LC 產品功能清單。Desk 畫線 v1 最小集（趨勢／水平／Fib／測量）——**Owner 已批准入 P0**；永遠保留「唔承諾＝TV 完整畫線庫」。**P0.5：** Zone（價區／矩形價帶）已落碼（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）——自原 P2 矩形提前；**唔係** LC 內建矩形、**唔係** TV 完整畫線庫；落碼 **唔** Accept ADR-004。**P1（chat→圖）延後**（Gabriel 卡面②）。
 
 ### D4. 權威畫線 vs 唯讀鏡像
 
@@ -93,7 +94,8 @@
 | 層級 | 範圍 | 做 | 不做（推去 P2 或另決） |
 |------|------|----|------------------------|
 | **P0** | 圖表／TA **觀察**＋最小畫具可用、誠實 | Desk：可靠 K 線＋volume＋閉合指標＋provenance；Desk 畫線 v1（趨勢／水平／**Fib**／**測量**）＝**自研 overlay**；Chat：讀價／指標／解釋、**零下單**（chat→圖 **P1 延後**）；Streamlit：唯讀鏡像；文件標清「LC 無完整內建畫線」 | TV 完整畫線庫；多 TF 聯動；replay；官方 TV embed；期權／黃金圖 SKU；把最小畫具寫成「LC 內建」；P1 chat→圖（延後） |
-| **P2** | 進階研究體驗 | 見下表 P2 acceptance | 用 P2 能力當「引擎已選＝已交付」；P2 完成前對外宣稱齊全 |
+| **P0.5** | 價區 Zone（矩形價帶）；自原 P2「矩形」提前 | Desk 自研 overlay **`kind: zone`** **已落碼**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`）。**非** LC 內建矩形、**非** TV 完整畫線庫。**Zone 落碼 ≠ 本 ADR Accepted** | 平行通道／更多工具／進階模板（仍 P2）；唔把 Zone 寫成 LC 內建或 TV 全集 |
+| **P2** | 進階研究體驗 | 見下表 P2 acceptance（矩形價帶已拆去 P0.5） | 用 P2 能力當「引擎已選＝已交付」；P2 完成前對外宣稱齊全 |
 
 **取捨原則：** 先令「睇得清楚、講得明白、落唔到單」穩定，再加「畫得多、回放得多」。唔用 P2／延後嘅 P1 塞進 P0 驗收。
 
@@ -105,7 +107,8 @@
 | **Drawing templates** | Desk 可存／套用命名模板（一組線／區） | 模板只寫入 Desk 權威 Drawing store；Streamlit／Chat **唔**寫模板 |
 | **Read my drawings** | Chat／觀察助手可呼叫唯讀 API，回傳 **JSON**（座標、類型、symbol、tf、asof） | JSON＝觀察資料，**唔係**下單指令；無 order fields |
 | **多 TF** | 多 timeframe 切換／對齊（若排期） | 唔當 P0；唔暗示引擎內建齊全畫線 |
-| **Desk 畫線超出最小集** | 矩形／通道／更多工具、進階模板等（若排期） | 最小集（趨勢／水平／Fib／測量）屬 **P0＋自研 overlay**；LC 仍無完整內建畫線庫 |
+| **Zone（價區／矩形價帶）** | **P0.5 shipped**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）。自原 P2「矩形」提前，**不再屬本 P2 列** | **非** LC 內建矩形、**非** TV 完整畫線庫；落碼 **唔** Accept ADR-004 |
+| **Desk 畫線超出最小集（仍 P2）** | 平行通道／更多工具／進階模板等（若排期） | 最小集（趨勢／水平／Fib／測量）屬 **P0＋自研 overlay**；Zone 已係 P0.5；LC 仍無完整內建畫線庫 |
 | **P1 chat→圖**（延後） | Chat 驅動圖表焦點／標註聯動（若日後排期） | **Gabriel 卡面②：P1 延後**；唔當 P0；零 order tools 不變 |
 
 對齊備註：UI UX 線框以 Desk＝Drawing store 權威為準；本 ADR 不改線框，只鎖文件邊界。
@@ -123,6 +126,7 @@
 **代價**
 
 - 若用戶期望「開箱齊 TradingView 畫線」，要文案管理預期；P0＝Owner 批准嘅**最小畫具（自研 overlay，含 Fib／測量）**，永遠唔等於完整 TV 畫線庫；P1 chat→圖延後。
+- **價區 Zone（矩形價帶）** 已自原 P2「矩形」提前為 **P0.5 shipped**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）。矩形價帶唔再只屬 P2；平行通道／更多工具／進階模板仍 P2。**Zone 落碼唔 Accept ADR-004**（Status 維持 Owner-approved pending Accepted）。
 - Streamlit 現有 Plotly 畫線／互動若存在，要降級或標 lab-only，避免同 Desk 權威衝突。
 
 ---
@@ -149,6 +153,7 @@
 4. 多 TF／replay／P1 chat→圖 已係 P0 交付。  
 5. ADR-002 仍有效；Confirmed 變成 6 項；Issue #10 已關。  
 6. 本檔合入＝改 runtime／產品預設。
+7. P0.5 Zone 落碼＝本 ADR 已 Accepted，或 lightweight-charts 內建矩形，或 TV 完整畫線庫已齊。
 
 ---
 
@@ -175,3 +180,5 @@
 ---
 
 *Drafted 2026-10-27 by Docs Arch；Owner-approved 2026-10-27（Gabriel：P0＋③ LWC v4.2.3＋Fib／測量入 P0 自研 overlay；P1 延後）。唔承諾 TV 完整畫線庫。Owner-approved ≠ Accepted ≠ runtime。*
+
+*Docs sync 2026-10-29：價區 Zone＝P0.5 shipped（PR #52 @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）。落碼 ≠ Accepted ≠ runtime。Status 仍 **Owner-approved pending Accepted**。*

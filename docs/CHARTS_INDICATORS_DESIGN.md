@@ -245,6 +245,10 @@ Intent→M8／H1–H3 **仍 OPEN**；圖表頁**唔**變成 Intent writer 或 M8
 
 These facts do not change **Status: Draft**, do not accept ADR-004, and are not a product-acceptance claim. **未 Accepted.** Issue #10 stays OPEN.
 
+- P0.5 Zone（`kind: zone`）已合入 main via #52 @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`。
+- P1 zone evidence（stable id／API／session_card）已合入 main via #54 @ `44d2f4142398e2fd627001e4f642ca6d4c6bea5f`。
+- 呢個 P1 只係 zone-evidence，**唔係** P1 chat→圖（chat→圖仍按 ADR-004 延後）。**Merge ≠ Accepted ≠ runtime。** ADR-004 Status 仍 **Owner-approved pending Accepted**。
+
 - PR #36, on the Desk `web/static` chart, vendored lightweight-charts v4.2.3 and serves real daily OHLCV candles, volume, and the closed indicator set (SMA20/50, EMA20, Bollinger, RSI, MACD) with vendor / as-of / fallback via `desk_chart` → `equity_ohlcv`.
 - Drawing tools (trend, horizontal, Fib, zone, measure, text, plus magnet, undo, and lock) are a custom overlay on that chart. lightweight-charts does not include a full drawing library. The zone tool (`kind: zone`) is a self-built canvas overlay: one context, batched `fillRect` plus stroke, HiDPI-aligned to the pane. It is not the TradingView `rectangle-drawing-tool`, not a lightweight-charts built-in rectangle plugin, and not a reason to move off v4.2.3. The toolbar is Select, Trend, Horizontal, Fib, Zone (價區), Measure, Magnet, Show/hide, Clear. Drawings persist per symbol in browser localStorage (`cgab.chart.draw.{SYMBOL}`, schema v3; v1 and v2 payloads still load item-by-item and keep their ids). Unknown kinds are dropped. Zone tint maps the user role label (neutral / support / resistance) and is not a signal. P1 evidence adds stable ids, notes, and archive on the Desk panel only. The chart path does not place orders.
 - Streamlit Plotly stays a read-only mirror of bars. Stored zone evidence, when shown there, is the same read-only mirror (no role, notes, or archive editor). It is not embedded in Desk and the chart path does not place orders.
