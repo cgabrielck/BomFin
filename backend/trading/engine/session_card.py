@@ -72,6 +72,7 @@ def build_session_card(
     invested_pct: Optional[float] = None,
     performance_report: Optional[Mapping[str, Any]] = None,
     ai_judge: bool = False,
+    zone_evidence: Optional[Mapping[str, Any]] = None,
 ) -> dict:
     """One cycle's honest book. ``seal`` is always false."""
     requested = [str(s).upper() for s in universe_requested if str(s).strip()]
@@ -138,4 +139,38 @@ def build_session_card(
         "paper_vs_spy": paper_label,
         "data_fault": data_fault,
         "note": "; ".join(note_parts),
+        "evidence": _zone_evidence_block(zone_evidence),
     }
+
+
+def _zone_evidence_block(zone_evidence: Optional[Mapping[str, Any]]) -> dict:
+    """Cite stored zones. Never a seal and never verified/live."""
+    if zone_evidence is None:
+        try:
+            from backend.api.desk_zones import session_zone_evidence
+
+            block = session_zone_evidence()
+        except Exception:
+            block = {"zones": [], "verified": False, "live": False, "seal": False}
+    else:
+        raw_zones = zone_evidence.get("zones") if isinstance(zone_evidence, Mapping) else None
+        zones = []
+        for row in raw_zones or []:
+            if not isinstance(row, Mapping):
+                continue
+            item = dict(row)
+            item["verified"] = False
+            item["live"] = False
+            item.pop("seal", None)
+            zones.append(item)
+        block = {"zones": zones, "verified": False, "live": False, "seal": False}
+    zones_out = []
+    for row in block.get("zones") or []:
+        if not isinstance(row, Mapping):
+            continue
+        item = dict(row)
+        item["verified"] = False
+        item["live"] = False
+        item.pop("seal", None)
+        zones_out.append(item)
+    return {"zones": zones_out, "verified": False, "live": False, "seal": False}

@@ -1,4 +1,4 @@
-"""P0.5 zone tool: schema v2, fail-closed sanitize, tint/extend geometry."""
+"""P0.5 zone tool: schema v3, fail-closed sanitize, tint/extend geometry."""
 from __future__ import annotations
 
 import json
@@ -152,7 +152,7 @@ console.log(JSON.stringify({
 }));
 """,
     )
-    assert result["version"] == 2
+    assert result["version"] == 3
     zone = result["zone"]
     assert zone["role"] == "neutral"
     assert zone["label"] == ""

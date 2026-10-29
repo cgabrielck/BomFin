@@ -91,8 +91,15 @@ def build_journal_response(
     }
 
 
-def add_note(symbol: str, note: str, side: Optional[str] = None) -> Dict[str, Any]:
-    entry = make_note_entry(symbol, note, side)
+def add_note(
+    symbol: str,
+    note: str,
+    side: Optional[str] = None,
+    *,
+    zone_id: Optional[str] = None,
+    zone_cite: Optional[str] = None,
+) -> Dict[str, Any]:
+    entry = make_note_entry(symbol, note, side, zone_id=zone_id, zone_cite=zone_cite)
     stored = journal_store.append_entry(entry)
     return stored
 

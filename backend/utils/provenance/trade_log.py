@@ -294,6 +294,28 @@ def normalize_trade_log(raw: Any) -> Optional[Dict[str, Any]]:
                 "reason_codes": list(raw.get("reason_codes") or []),
             }
         )
+        zone_ref = str((raw.get("links") or {}).get("zone_ref") or "").strip()
+        if zone_ref:
+            entry["links"]["zone_ref"] = zone_ref
+        refs = []
+        for item in raw.get("evidence_refs") or []:
+            if not isinstance(item, dict):
+                continue
+            zid = str(item.get("zone_id") or "").strip()
+            ref = str(item.get("ref") or "").strip()
+            if not zid or not ref:
+                continue
+            refs.append(
+                {
+                    "type": "zone",
+                    "zone_id": zid,
+                    "ref": ref,
+                    "verified": False,
+                    "live": False,
+                }
+            )
+        if refs:
+            entry["evidence_refs"] = refs
         entry["kind"] = display_kind(entry["status"])
         prov = raw.get("provenance")
         entry["provenance"] = _honest_provenance(prov, source="trade_journal", as_of=entry["ts"])
@@ -578,7 +600,14 @@ def merge_trade_logs(
     return entries[: max(1, int(limit))] if entries else []
 
 
-def make_note_entry(symbol: str, note: str, side: Optional[str] = None) -> Dict[str, Any]:
+def make_note_entry(
+    symbol: str,
+    note: str,
+    side: Optional[str] = None,
+    *,
+    zone_id: Optional[str] = None,
+    zone_cite: Optional[str] = None,
+) -> Dict[str, Any]:
     symbol_u = str(symbol or "").upper().strip()
     ts = utc_now_iso()
     entry = empty_trade_log(log_id=new_log_id(), ts=ts, symbol=symbol_u, status="proposed")
@@ -594,6 +623,19 @@ def make_note_entry(symbol: str, note: str, side: Optional[str] = None) -> Dict[
             ),
         }
     )
+    cite = str(zone_cite or "").strip()
+    zid = str(zone_id or "").strip()
+    if zid and cite:
+        entry["links"]["zone_ref"] = cite
+        entry["evidence_refs"] = [
+            {
+                "type": "zone",
+                "zone_id": zid,
+                "ref": cite,
+                "verified": False,
+                "live": False,
+            }
+        ]
     return entry
 
 

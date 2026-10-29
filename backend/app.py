@@ -1964,6 +1964,39 @@ def render_valuation_tab() -> None:
     st.dataframe(df[display_cols], hide_index=True, width="stretch", height=600)
 
 
+def _render_zone_evidence_mirror(symbol: str, lang: str) -> None:
+    """Read-only Streamlit mirror. Desk is the only meta editor. No orders."""
+    from backend.api.desk_zones import ZoneError, list_zones
+
+    st.subheader(t("zone.mirror.title", lang))
+    st.caption(t("zone.mirror.readonly", lang))
+    try:
+        rows = list_zones(symbol=symbol, status="all")
+    except ZoneError:
+        st.caption(t("zone.mirror.unable", lang))
+        return
+    if not rows:
+        st.caption(t("zone.mirror.empty", lang))
+        return
+    table = []
+    for row in rows:
+        geom = row.get("geometry") if isinstance(row.get("geometry"), dict) else {}
+        table.append(
+            {
+                "zone_id": row.get("zone_id") or "",
+                "role": row.get("role") or "",
+                "notes": row.get("notes") or "",
+                "status": row.get("status") or "",
+                "price_high": geom.get("price_high"),
+                "price_low": geom.get("price_low"),
+                "extend_left": geom.get("extend_left"),
+                "extend_right": geom.get("extend_right"),
+                "cite": row.get("cite") or "",
+            }
+        )
+    st.dataframe(pd.DataFrame(table), hide_index=True, width="stretch")
+
+
 def render_charts_tab() -> None:
     lang = st.session_state.get("lang", "zh_tw")
     recs = st.session_state.recommendations
@@ -1977,6 +2010,7 @@ def render_charts_tab() -> None:
     selected_rec = next((rec for rec in recs if rec["ticker"] == selected), {})
     st.subheader(t("chart.title", lang))
     _render_kline_chart(selected, lang, "charts_workspace", selected_rec.get("price"))
+    _render_zone_evidence_mirror(selected, lang)
     st.markdown("---")
     st.subheader(t("charts.title", lang))
 

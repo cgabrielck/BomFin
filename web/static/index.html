@@ -107,6 +107,25 @@
     }
     .ind-btn.on .zone-ico { border-color:#052226; background:rgba(5,34,38,.28); }
     .zone-props { align-items:center; }
+    .chart-with-zone { display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:12px; align-items:start; }
+    .zone-detail {
+      border:1px solid var(--line); border-radius:12px; background:#0b1820;
+      padding:12px; max-height:640px; overflow:auto;
+    }
+    .zone-detail h4 { margin:0 0 8px; font-size:13px; }
+    .zone-id { font-family:ui-monospace,monospace; font-size:12px; word-break:break-all; }
+    .zone-ro { font-size:12px; color:var(--muted); margin:8px 0; word-break:break-all; }
+    .zone-list { list-style:none; padding:0; margin:8px 0 0; }
+    .zone-list button {
+      width:100%; text-align:left; background:#0d1f26; border:1px solid var(--line);
+      color:var(--text); border-radius:8px; padding:6px 8px; cursor:pointer; margin-bottom:4px;
+    }
+    .zone-list button.on { border-color:var(--cyan); }
+    .zone-toast {
+      position:fixed; bottom:18px; right:18px; background:#12242c; color:var(--text);
+      border:1px solid var(--line); border-radius:999px; padding:8px 12px; font-size:12px; z-index:30;
+    }
+    @media (max-width:860px){ .chart-with-zone { grid-template-columns:1fr; } }
     .banner {
       display:flex; gap:14px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
       margin-bottom:16px; padding:14px 16px; border-radius:16px;
@@ -432,7 +451,8 @@ const I18N = {
     "chart.tool.fib":"Fib",
     "chart.tool.zone":"Zone",
     "chart.tool.measure":"Measure",
-    "chart.zone.role":"Tint",
+    "chart.zone.role":"Role label",
+    "chart.zone.role_label":"Role label",
     "chart.zone.neutral":"Neutral",
     "chart.zone.support":"Support",
     "chart.zone.resist":"Resistance",
@@ -440,7 +460,31 @@ const I18N = {
     "chart.zone.extend_right":"Extend right",
     "chart.zone.label_ph":"Label (optional)",
     "chart.zone.remove":"Remove",
-    "chart.zone.hint":"Manual price band. Tint only — not a signal.",
+    "chart.zone.hint":"Manual price band. Role label only — not a signal.",
+    "chart.zone.panel":"Zone evidence",
+    "chart.zone.pick":"Select a zone on the chart.",
+    "chart.zone.id":"zone_id",
+    "chart.zone.copy_id":"Copy id",
+    "chart.zone.notes":"Notes",
+    "chart.zone.notes_ph":"Short note (optional)",
+    "chart.zone.clear_notes":"Clear notes",
+    "chart.zone.status":"Status",
+    "chart.zone.active":"Active",
+    "chart.zone.archive":"Archive",
+    "chart.zone.geom_line":"High {high} · Low {low} · Extend L {l} · R {r}",
+    "chart.zone.on":"on",
+    "chart.zone.off":"off",
+    "chart.zone.cite":"Copy cite",
+    "chart.zone.copied":"Copied",
+    "chart.zone.copy_fail":"Copy failed",
+    "chart.zone.unable":"無法引用",
+    "chart.zone.list_active":"Active",
+    "chart.zone.list_archive":"Archive",
+    "chart.zone.empty_active":"No active zones for this symbol.",
+    "chart.zone.empty_archive":"No archived zones for this symbol.",
+    "chart.zone.guest_hint":"View only. Select a zone to copy its cite.",
+    "chart.zone.sync_fail":"Could not sync zones",
+    "chart.zone.load_fail":"Could not load saved zones",
     "chart.tool.magnet":"Magnet",
     "chart.tool.hide":"Show/hide",
     "chart.tool.clear":"Clear",
@@ -708,7 +752,8 @@ const I18N = {
     "chart.tool.fib":"Fib",
     "chart.tool.zone":"價區",
     "chart.tool.measure":"測量",
-    "chart.zone.role":"著色",
+    "chart.zone.role":"角色標籤",
+    "chart.zone.role_label":"角色標籤",
     "chart.zone.neutral":"中性",
     "chart.zone.support":"支撐",
     "chart.zone.resist":"阻力",
@@ -716,7 +761,31 @@ const I18N = {
     "chart.zone.extend_right":"向右延伸",
     "chart.zone.label_ph":"標籤（可空）",
     "chart.zone.remove":"移除",
-    "chart.zone.hint":"人手價區。著色只是 tint，不是訊號。",
+    "chart.zone.hint":"人手價區。角色標籤只是標籤，不是訊號。",
+    "chart.zone.panel":"價區證據",
+    "chart.zone.pick":"在圖上選取一條價區。",
+    "chart.zone.id":"zone_id",
+    "chart.zone.copy_id":"複製 ID",
+    "chart.zone.notes":"備註",
+    "chart.zone.notes_ph":"短備註（可空）",
+    "chart.zone.clear_notes":"清除備註",
+    "chart.zone.status":"狀態",
+    "chart.zone.active":"使用中",
+    "chart.zone.archive":"封存",
+    "chart.zone.geom_line":"高 {high} · 低 {low} · 向左延伸 {l} · 向右延伸 {r}",
+    "chart.zone.on":"是",
+    "chart.zone.off":"否",
+    "chart.zone.cite":"複製引用",
+    "chart.zone.copied":"已複製",
+    "chart.zone.copy_fail":"無法複製",
+    "chart.zone.unable":"無法引用",
+    "chart.zone.list_active":"使用中",
+    "chart.zone.list_archive":"封存",
+    "chart.zone.empty_active":"此代碼沒有使用中價區。",
+    "chart.zone.empty_archive":"此代碼沒有封存價區。",
+    "chart.zone.guest_hint":"只可查看。選取價區後可複製引用。",
+    "chart.zone.sync_fail":"未能同步價區",
+    "chart.zone.load_fail":"未能讀取價區",
     "chart.tool.magnet":"磁鐵",
     "chart.tool.hide":"顯示/隱藏",
     "chart.tool.clear":"清除",
@@ -961,6 +1030,12 @@ let drawUndo = [];
 let drawDraft = null;
 let drawDrag = null;
 let drawSelectedId = null;
+let zoneListMode = "active";
+let zonePushGen = 0;
+let zoneHydrateToken = 0;
+let zoneHydrateReady = false;
+let zoneSnapshotPending = false;
+let zoneMetaQueue = [];
 let drawCtx = null;
 let drawResizeObs = null;
 let drawPointerBind = null;
@@ -2412,20 +2487,23 @@ function drawStorageKey(sym){
   return "cgab.chart.draw."+s;
 }
 function newDrawId(){
-  return "d"+Math.random().toString(36).slice(2,10);
+  return CgabDraw.newDrawId();
 }
 /* CGAB_DRAW_ZONE_BEGIN
  * Self-built price-zone overlay for the Desk chart (lightweight-charts v4.2.3).
  * Canvas batch uses fillRect + stroke. This is not the TradingView
  * rectangle-drawing-tool and not a lightweight-charts built-in rectangle plugin.
- * Schema v2 is per symbol on the daily chart (same key shape as v1; no interval
- * segment). extendLeft / extendRight are flags — never fake timestamps.
+ * Schema v3 keeps v2 geometry on the same per-symbol key (no interval segment).
+ * Stored ids are kept. New ids are UUIDs. notes and status are meta.
+ * extendLeft / extendRight are flags — never fake timestamps.
  * Unknown kinds are dropped. Illegal zone objects are dropped. Fail closed.
  */
 const CgabDraw = (function(){
-  const DRAW_SCHEMA_VERSION = 2;
+  const DRAW_SCHEMA_VERSION = 3;
   const ZONE_ROLES = ["neutral","support","resist"];
+  const ZONE_ROLE_CITE = {neutral:"中性", support:"支撐", resist:"阻力"};
   const ZONE_LABEL_MAX = 40;
+  const ZONE_NOTES_MAX = 280;
   const ZONE_TINT = {
     neutral: {fill:"rgba(120, 150, 165, 0.22)", stroke:"rgba(160, 185, 195, 0.55)"},
     support: {fill:"rgba(62, 224, 160, 0.22)", stroke:"rgba(62, 224, 160, 0.70)"},
@@ -2452,12 +2530,22 @@ const CgabDraw = (function(){
     const ms = Date.parse(s+"T00:00:00Z");
     return Number.isFinite(ms) ? ms : 0;
   }
-  function newId(){
-    return "d"+Math.random().toString(36).slice(2,10);
+  function newDrawId(){
+    const c = globalThis.crypto;
+    if(c && typeof c.randomUUID==="function") return c.randomUUID();
+    const bytes = new Uint8Array(16);
+    if(c && typeof c.getRandomValues==="function") c.getRandomValues(bytes);
+    else {
+      for(let i=0;i<16;i++) bytes[i] = (Date.now()+i*17) % 256;
+    }
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = Array.from(bytes, b => b.toString(16).padStart(2,"0")).join("");
+    return hex.slice(0,8)+"-"+hex.slice(8,12)+"-"+hex.slice(12,16)+"-"+hex.slice(16,20)+"-"+hex.slice(20);
   }
   function cleanId(raw){
     const id = String(raw||"");
-    if(!/^[\w-]{1,40}$/.test(id) || id==="preview") return newId();
+    if(!/^[\w-]{1,40}$/.test(id) || id==="preview") return newDrawId();
     return id;
   }
   function isDay(s){
@@ -2470,6 +2558,24 @@ const CgabDraw = (function(){
     if(/AI\s*已|AI\s*confirmed/i.test(text)) return "";
     if(/^live$/i.test(text)) return "";
     return text;
+  }
+  function sanitizeZoneNotes(raw){
+    const text = String(raw==null ? "" : raw).replace(/[\r\n]+/g," ").replace(/[ \t]+/g," ").trim().slice(0, ZONE_NOTES_MAX);
+    if(!text) return "";
+    if(/必買|止蝕|止損|必賣|verified|已驗證|已验证/i.test(text)) return "";
+    if(/AI\s*已|AI\s*confirmed/i.test(text)) return "";
+    if(/^live$/i.test(text)) return "";
+    return text;
+  }
+  function citeZone(item){
+    if(!item || typeof item!=="object") return "";
+    const id = String(item.id || item.zone_id || "");
+    if(!/^[\w-]{1,40}$/.test(id) || id==="preview") return "";
+    const token = ZONE_ROLES.indexOf(item.role)>=0 ? item.role : "neutral";
+    const role = ZONE_ROLE_CITE[token] || "中性";
+    const notes = sanitizeZoneNotes(item.notes);
+    const base = "用戶標註價區 "+id+"｜"+role;
+    return notes ? base+"｜"+notes : base;
   }
   function sanitizePt(p){
     if(!p) return null;
@@ -2495,6 +2601,7 @@ const CgabDraw = (function(){
       timeRight = swap;
     }
     const role = ZONE_ROLES.indexOf(it.role)>=0 ? it.role : "neutral";
+    const status = it.status==="archive" ? "archive" : "active";
     return {
       id: id,
       type: "zone",
@@ -2505,7 +2612,9 @@ const CgabDraw = (function(){
       extendLeft: it.extendLeft===true,
       extendRight: it.extendRight===true,
       role: role,
-      label: sanitizeZoneLabel(it.label)
+      label: sanitizeZoneLabel(it.label),
+      notes: sanitizeZoneNotes(it.notes),
+      status: status
     };
   }
   function sanitizeDrawItem(it){
@@ -2568,6 +2677,8 @@ const CgabDraw = (function(){
       extendRight: item.extendRight===true,
       role: item.role,
       label: item.label,
+      notes: item.notes,
+      status: item.status,
       ...patch
     }, item.id);
   }
@@ -2589,6 +2700,18 @@ const CgabDraw = (function(){
     const next = sanitizeZoneLabel(label);
     if(next===(item.label||"")) return item;
     return withZonePatch(item, {label: next});
+  }
+  function withZoneNotes(item, notes){
+    if(!item || item.type!=="zone") return null;
+    const next = sanitizeZoneNotes(notes);
+    if(next===(item.notes||"")) return item;
+    return withZonePatch(item, {notes: next});
+  }
+  function withZoneStatus(item, status){
+    if(!item || item.type!=="zone") return null;
+    if(status!=="active" && status!=="archive") return null;
+    if((item.status||"active")===status) return item;
+    return withZonePatch(item, {status: status});
   }
   function resizeZone(item, handle, pt){
     if(!item || item.type!=="zone" || !pt) return item;
@@ -2612,7 +2735,9 @@ const CgabDraw = (function(){
       extendLeft: item.extendLeft,
       extendRight: item.extendRight,
       role: item.role,
-      label: item.label
+      label: item.label,
+      notes: item.notes,
+      status: item.status
     }, item.id);
     return next || item;
   }
@@ -2648,19 +2773,90 @@ const CgabDraw = (function(){
     if(!isDay(time) || !Number.isFinite(price)) return pt;
     return {time: time, price: price};
   }
+  function zoneFromServer(row){
+    if(!row || typeof row!=="object") return null;
+    const geom = (row.geometry && typeof row.geometry==="object") ? row.geometry : {};
+    const high = geom.price_high!=null ? geom.price_high : row.priceHigh;
+    const low = geom.price_low!=null ? geom.price_low : row.priceLow;
+    return sanitizeDrawItem({
+      type: "zone",
+      id: row.zone_id || row.id,
+      priceHigh: high,
+      priceLow: low,
+      timeLeft: geom.time_left || row.timeLeft,
+      timeRight: geom.time_right || row.timeRight,
+      extendLeft: geom.extend_left===true || row.extendLeft===true,
+      extendRight: geom.extend_right===true || row.extendRight===true,
+      role: row.role,
+      notes: row.notes,
+      status: row.status,
+      label: row.label
+    });
+  }
+  function mergeZoneItems(localItems, serverRows){
+    /* Local geometry wins on the same zone_id. Server meta wins on that id.
+     * Server-only ids are appended. Non-zone drawings stay put. */
+    const local = sanitizeDrawList(localItems);
+    const remoteById = {};
+    (serverRows||[]).forEach(row => {
+      const zone = zoneFromServer(row);
+      if(zone) remoteById[zone.id] = zone;
+    });
+    const seen = {};
+    const out = [];
+    local.forEach(it => {
+      if(!it || it.type!=="zone"){
+        out.push(it);
+        return;
+      }
+      seen[it.id] = true;
+      const remote = remoteById[it.id];
+      if(!remote){
+        out.push(it);
+        return;
+      }
+      const kept = sanitizeDrawItem({
+        type: "zone",
+        id: it.id,
+        priceHigh: it.priceHigh,
+        priceLow: it.priceLow,
+        timeLeft: it.timeLeft,
+        timeRight: it.timeRight,
+        extendLeft: it.extendLeft===true,
+        extendRight: it.extendRight===true,
+        label: it.label,
+        role: remote.role,
+        notes: remote.notes,
+        status: remote.status
+      });
+      out.push(kept || it);
+    });
+    Object.keys(remoteById).forEach(id => {
+      if(!seen[id]) out.push(remoteById[id]);
+    });
+    return out;
+  }
   return {
     DRAW_SCHEMA_VERSION: DRAW_SCHEMA_VERSION,
     ZONE_ROLES: ZONE_ROLES,
     ZONE_LABEL_MAX: ZONE_LABEL_MAX,
+    ZONE_NOTES_MAX: ZONE_NOTES_MAX,
     ZONE_TINT: ZONE_TINT,
     ZONE_HANDLES: ZONE_HANDLES,
+    newDrawId: newDrawId,
     sanitizeDrawItem: sanitizeDrawItem,
     sanitizeDrawList: sanitizeDrawList,
     sanitizeZoneLabel: sanitizeZoneLabel,
+    sanitizeZoneNotes: sanitizeZoneNotes,
+    citeZone: citeZone,
+    ZONE_ROLE_CITE: ZONE_ROLE_CITE,
+    mergeZoneItems: mergeZoneItems,
     zoneFromPoints: zoneFromPoints,
     withZoneRole: withZoneRole,
     withZoneExtend: withZoneExtend,
     withZoneLabel: withZoneLabel,
+    withZoneNotes: withZoneNotes,
+    withZoneStatus: withZoneStatus,
     resizeZone: resizeZone,
     magnetZonePoint: magnetZonePoint
   };
@@ -2702,7 +2898,7 @@ function loadDrawState(sym){
   }
   if(!drawState.items.some(it => it.id===drawSelectedId)) drawSelectedId = null;
 }
-function saveDrawState(){
+function writeDrawLocal(){
   const key = drawStorageKey(symbol);
   if(!key) return;
   const items = CgabDraw.sanitizeDrawList(drawState.items);
@@ -2715,6 +2911,10 @@ function saveDrawState(){
     hidden: !!drawState.hidden,
     locked: !!drawState.locked
   }));
+}
+function saveDrawState(){
+  writeDrawLocal();
+  pushZoneSnapshot();
 }
 function pushUndo(){
   drawUndo.push(JSON.stringify(drawState.items));
@@ -2739,12 +2939,14 @@ function chartStatusLine(){
 }
 function drawControlDisabled(tool){
   if(!String(symbol||"").trim() || !chartHasBars) return true;
+  if(!paperControls && tool!=="select") return true;
   if(drawState.locked && tool!=="select") return true;
   return false;
 }
 function drawActDisabled(id){
   const can = !!String(symbol||"").trim() && chartHasBars;
   if(!can) return true;
+  if(!paperControls) return id!=="hide";
   if(id==="lock" || id==="hide") return false;
   if(drawState.locked) return true;
   if(id==="undo") return drawUndo.length===0;
@@ -2934,7 +3136,7 @@ function zoneHandlePoints(geom){
 function hitTestZone(x, y, width){
   if(!drawCtx || drawState.hidden) return null;
   const selected = selectedZone();
-  if(selected && !drawState.locked){
+  if(selected && !drawState.locked && paperControls){
     const geom = zoneScreenGeom(selected, width);
     if(geom){
       const pts = zoneHandlePoints(geom);
@@ -2984,25 +3186,29 @@ function paintZoneCanvas(canvas, box){
     const tint = CgabDraw.ZONE_TINT[item.role] || CgabDraw.ZONE_TINT.neutral;
     const w = Math.max(1, geom.x2 - geom.x1);
     const h = Math.max(1, geom.y2 - geom.y1);
+    const archived = item.status==="archive";
+    ctx.save();
+    if(archived) ctx.globalAlpha = 0.32;
     ctx.fillStyle = tint.fill;
     ctx.fillRect(geom.x1, geom.y1, w, h);
     ctx.strokeStyle = tint.stroke;
     ctx.lineWidth = 1.25;
     ctx.strokeRect(geom.x1 + 0.5, geom.y1 + 0.5, Math.max(0, w - 1), Math.max(0, h - 1));
-    if(item.id===drawSelectedId){
-      ctx.strokeStyle = "rgba(232,255,251,0.85)";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(geom.x1 + 2.5, geom.y1 + 2.5, Math.max(0, w - 5), Math.max(0, h - 5));
-    }
     if(item.label){
       ctx.fillStyle = item.role==="support" ? "#3ee0a0" : (item.role==="resist" ? "#ff6b81" : "#d7ecec");
       ctx.font = "700 11px Segoe UI, sans-serif";
       ctx.fillText(item.label, geom.x1 + 6, Math.min(geom.y2 - 4, geom.y1 + 14));
     }
+    ctx.restore();
+    if(item.id===drawSelectedId){
+      ctx.strokeStyle = "rgba(232,255,251,0.85)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(geom.x1 + 2.5, geom.y1 + 2.5, Math.max(0, w - 5), Math.max(0, h - 5));
+    }
   });
 }
 function paintZoneHandles(svg, width){
-  if(drawState.hidden || drawState.locked) return;
+  if(drawState.hidden || drawState.locked || !paperControls) return;
   const item = selectedZone();
   if(!item) return;
   const geom = zoneScreenGeom(item, width);
@@ -3055,8 +3261,20 @@ function undoDraw(){
   syncDrawChrome();
   redrawDrawOverlay();
 }
+function commitZoneMeta(next){
+  if(!next || !paperControls) return;
+  const idx = drawState.items.findIndex(it => it.id===next.id && it.type==="zone");
+  if(idx<0) return;
+  if(JSON.stringify(drawState.items[idx])===JSON.stringify(next)) return;
+  pushUndo();
+  drawState.items[idx] = next;
+  writeDrawLocal();
+  syncDrawChrome();
+  redrawDrawOverlay();
+  patchZoneMeta(next, 0);
+}
 function commitZoneEdit(next){
-  if(!next || drawState.locked) return;
+  if(!next || drawState.locked || !paperControls) return;
   const idx = drawState.items.findIndex(it => it.id===next.id);
   if(idx<0) return;
   if(JSON.stringify(drawState.items[idx])===JSON.stringify(next)) return;
@@ -3068,7 +3286,7 @@ function commitZoneEdit(next){
 }
 function removeSelectedZone(){
   const item = selectedZone();
-  if(!item || drawState.locked) return;
+  if(!item || drawState.locked || !paperControls) return;
   pushUndo();
   drawState.items = drawState.items.filter(it => it.id!==item.id);
   drawSelectedId = null;
@@ -3086,18 +3304,317 @@ function syncZoneProps(){
   if(!show) return;
   host.querySelectorAll("[data-zone-role]").forEach(btn => {
     btn.classList.toggle("on", btn.dataset.zoneRole===item.role);
-    btn.disabled = !!drawState.locked;
+    btn.disabled = !!drawState.locked || !paperControls;
   });
   host.querySelectorAll("[data-zone-ext]").forEach(btn => {
     btn.classList.toggle("on", item[btn.dataset.zoneExt]===true);
-    btn.disabled = !!drawState.locked;
+    btn.disabled = !!drawState.locked || !paperControls;
   });
   const lab = document.getElementById("zoneLabel");
-  if(lab && document.activeElement!==lab) lab.value = item.label || "";
+  if(lab){
+    lab.disabled = !!drawState.locked || !paperControls;
+    if(document.activeElement!==lab) lab.value = item.label || "";
+  }
   const rm = host.querySelector("[data-zone-act='remove']");
-  if(rm) rm.disabled = !!drawState.locked;
+  if(rm) rm.disabled = !!drawState.locked || !paperControls;
+}
+function showZoneToast(msg){
+  const el = document.getElementById("zoneToast");
+  if(!el) return;
+  el.hidden = false;
+  el.textContent = msg;
+  clearTimeout(showZoneToast._t);
+  showZoneToast._t = setTimeout(() => { el.hidden = true; }, 1600);
+}
+function copyZoneFallback(value){
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = value;
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return !!ok;
+  } catch(e) {
+    return false;
+  }
+}
+function copyZoneText(text){
+  const value = String(text||"");
+  if(!value){
+    const miss = document.getElementById("zoneCiteMiss");
+    if(miss) miss.hidden = false;
+    return;
+  }
+  const done = () => showZoneToast(t("chart.zone.copied"));
+  const fail = () => showZoneToast(t("chart.zone.copy_fail"));
+  try {
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(value).then(done).catch(() => {
+        if(copyZoneFallback(value)) done(); else fail();
+      });
+      return;
+    }
+  } catch(e) {}
+  if(copyZoneFallback(value)) done(); else fail();
+}
+function applyZoneMeta(row){
+  if(!row || !row.zone_id) return;
+  const idx = drawState.items.findIndex(it => it && it.type==="zone" && it.id===row.zone_id);
+  if(idx<0) return;
+  const cur = drawState.items[idx];
+  const next = CgabDraw.sanitizeDrawItem({
+    type: "zone",
+    id: cur.id,
+    priceHigh: cur.priceHigh,
+    priceLow: cur.priceLow,
+    timeLeft: cur.timeLeft,
+    timeRight: cur.timeRight,
+    extendLeft: cur.extendLeft===true,
+    extendRight: cur.extendRight===true,
+    label: cur.label,
+    role: row.role,
+    notes: row.notes,
+    status: row.status
+  });
+  if(!next || JSON.stringify(cur)===JSON.stringify(next)) return;
+  drawState.items[idx] = next;
+  writeDrawLocal();
+  syncDrawChrome();
+  redrawDrawOverlay();
+}
+function zoneGeometryPayload(){
+  return (drawState.items||[]).filter(it => it && it.type==="zone").map(it => ({
+    id: it.id,
+    zone_id: it.id,
+    priceHigh: it.priceHigh,
+    priceLow: it.priceLow,
+    timeLeft: it.timeLeft,
+    timeRight: it.timeRight,
+    extendLeft: it.extendLeft===true,
+    extendRight: it.extendRight===true,
+    label: it.label || ""
+  }));
+}
+function pushZoneSnapshotNow(){
+  if(!paperControls) return Promise.resolve(null);
+  if(!zoneHydrateReady){
+    zoneSnapshotPending = true;
+    return Promise.resolve(null);
+  }
+  const sym = String(symbol||"").trim().toUpperCase();
+  if(!sym || typeof api!=="function") return Promise.resolve(null);
+  const gen = ++zonePushGen;
+  return api("/api/desk/zones/snapshot", {
+    method: "PUT",
+    body: JSON.stringify({symbol: sym, source: "desk_draw", zones: zoneGeometryPayload()})
+  }).then(data => {
+    if(gen!==zonePushGen) return null;
+    return data;
+  }).catch(() => {
+    if(gen===zonePushGen) showZoneToast(t("chart.zone.sync_fail"));
+    return null;
+  });
+}
+function pushZoneSnapshot(){
+  return pushZoneSnapshotNow();
+}
+function patchZoneMeta(item, attempt){
+  if(!paperControls || !item || !item.id) return Promise.resolve(null);
+  const n = attempt || 0;
+  if(!zoneHydrateReady && n===0){
+    if(zoneMetaQueue.indexOf(item.id)<0) zoneMetaQueue.push(item.id);
+    return Promise.resolve(null);
+  }
+  const body = JSON.stringify({
+    role: item.role || "neutral",
+    notes: item.notes || "",
+    status: item.status==="archive" ? "archive" : "active"
+  });
+  const path = "/api/desk/zones/"+encodeURIComponent(item.id);
+  const send = () => api(path, {method:"PATCH", body: body});
+  return send().then(row => {
+    applyZoneMeta(row);
+    return row;
+  }).catch(err => {
+    if(err && err.status===404 && n<1){
+      return pushZoneSnapshotNow().then(pushed => {
+        if(!pushed) throw err;
+        return patchZoneMeta(item, n+1);
+      });
+    }
+    throw err;
+  }).catch(() => {
+    showZoneToast(t("chart.zone.sync_fail"));
+    return null;
+  });
+}
+function flushZoneMetaQueue(){
+  const ids = zoneMetaQueue.splice(0, zoneMetaQueue.length);
+  ids.forEach(id => {
+    const item = (drawState.items||[]).find(it => it && it.type==="zone" && it.id===id);
+    if(item) patchZoneMeta(item, 0);
+  });
+}
+function scheduleZoneHydrate(){
+  const sym = String(symbol||"").trim().toUpperCase();
+  const token = ++zoneHydrateToken;
+  zoneHydrateReady = false;
+  if(!sym || typeof api!=="function"){
+    zoneHydrateReady = true;
+    return;
+  }
+  api("/api/desk/zones?symbol="+encodeURIComponent(sym)+"&status=all").then(data => {
+    if(token!==zoneHydrateToken) return;
+    if(String(symbol||"").trim().toUpperCase()!==sym) return;
+    const remote = data && Array.isArray(data.zones) ? data.zones : [];
+    const merged = CgabDraw.mergeZoneItems(drawState.items, remote);
+    const changed = JSON.stringify(merged)!==JSON.stringify(drawState.items);
+    if(changed) drawState.items = merged;
+    zoneHydrateReady = true;
+    const pending = zoneSnapshotPending || changed;
+    zoneSnapshotPending = false;
+    const done = () => {
+      flushZoneMetaQueue();
+      syncDrawChrome();
+      redrawDrawOverlay();
+    };
+    if(pending && paperControls){
+      writeDrawLocal();
+      pushZoneSnapshotNow().then(done).catch(done);
+      return;
+    }
+    if(changed) writeDrawLocal();
+    done();
+  }).catch(() => {
+    if(token!==zoneHydrateToken) return;
+    zoneHydrateReady = false;
+    showZoneToast(t("chart.zone.load_fail"));
+  });
+}
+function syncZoneList(){
+  const list = document.getElementById("zoneList");
+  const empty = document.getElementById("zoneListEmpty");
+  if(!list) return;
+  const mode = zoneListMode==="archive" ? "archive" : "active";
+  list.replaceChildren();
+  const rows = (drawState.items||[]).filter(it => {
+    if(!it || it.type!=="zone") return false;
+    const archived = it.status==="archive";
+    return mode==="archive" ? archived : !archived;
+  });
+  rows.forEach(item => {
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.dataset.zonePick = item.id;
+    btn.className = item.id===drawSelectedId ? "on" : "";
+    const roleKey = item.role==="support" || item.role==="resist" ? item.role : "neutral";
+    const note = item.notes ? " · "+String(item.notes).slice(0, 24) : "";
+    btn.textContent = String(item.id).slice(0, 8)+" · "+t("chart.zone."+roleKey)+note;
+    li.appendChild(btn);
+    list.appendChild(li);
+  });
+  if(empty){
+    empty.hidden = rows.length>0;
+    empty.textContent = mode==="archive" ? t("chart.zone.empty_archive") : t("chart.zone.empty_active");
+  }
+  document.querySelectorAll("[data-zone-list]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.zoneList===mode);
+  });
+}
+function syncZoneDetail(){
+  const host = document.getElementById("zoneDetail");
+  if(!host) return;
+  syncZoneList();
+  const item = selectedZone();
+  const missing = !!(drawSelectedId && !item);
+  const miss = document.getElementById("zoneCiteMiss");
+  if(miss) miss.hidden = !missing;
+  const guestHint = document.getElementById("zoneGuestHint");
+  if(guestHint){
+    guestHint.hidden = !!paperControls;
+    guestHint.textContent = t("chart.zone.guest_hint");
+  }
+  const pick = document.getElementById("zoneDetailPick");
+  const body = document.getElementById("zoneDetailBody");
+  if(pick) pick.hidden = !!item || missing;
+  if(body) body.hidden = !item;
+  const metaOff = !paperControls;
+  host.querySelectorAll("[data-zone-meta-role],[data-zone-meta-status],#zoneNotes,#zoneClearNotes").forEach(el => {
+    el.disabled = metaOff;
+  });
+  if(!item) return;
+  const idEl = document.getElementById("zoneDetailId");
+  if(idEl) idEl.textContent = item.id;
+  host.querySelectorAll("[data-zone-meta-role]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.zoneMetaRole===item.role);
+  });
+  host.querySelectorAll("[data-zone-meta-status]").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.zoneMetaStatus===(item.status||"active"));
+  });
+  const notes = document.getElementById("zoneNotes");
+  if(notes && document.activeElement!==notes) notes.value = item.notes || "";
+  const geom = document.getElementById("zoneGeom");
+  if(geom){
+    geom.textContent = t("chart.zone.geom_line", {
+      high: fmtPx(item.priceHigh),
+      low: fmtPx(item.priceLow),
+      l: item.extendLeft ? t("chart.zone.on") : t("chart.zone.off"),
+      r: item.extendRight ? t("chart.zone.on") : t("chart.zone.off")
+    });
+  }
+  const preview = document.getElementById("zoneCitePreview");
+  if(preview) preview.textContent = CgabDraw.citeZone(item);
+}
+function zoneDetailShell(){
+  return `<aside id="zoneDetail" class="zone-detail" aria-label="${esc(t("chart.zone.panel"))}">
+    <h4>${esc(t("chart.zone.panel"))}</h4>
+    <p class="muted" id="zoneGuestHint" hidden></p>
+    <p class="muted" id="zoneDetailPick">${esc(t("chart.zone.pick"))}</p>
+    <p class="err" id="zoneCiteMiss" hidden>${esc(t("chart.zone.unable"))}</p>
+    <div id="zoneDetailBody" hidden>
+      <div class="field"><span>${esc(t("chart.zone.id"))}</span>
+        <div class="row"><code class="zone-id" id="zoneDetailId"></code>
+          <button type="button" class="ind-btn" id="zoneCopyId">${esc(t("chart.zone.copy_id"))}</button>
+        </div>
+      </div>
+      <div class="field"><span>${esc(t("chart.zone.role_label"))}</span>
+        <div class="row">
+          <button type="button" class="ind-btn" data-zone-meta-role="neutral">${esc(t("chart.zone.neutral"))}</button>
+          <button type="button" class="ind-btn" data-zone-meta-role="support">${esc(t("chart.zone.support"))}</button>
+          <button type="button" class="ind-btn" data-zone-meta-role="resist">${esc(t("chart.zone.resist"))}</button>
+        </div>
+      </div>
+      <label class="field">${esc(t("chart.zone.notes"))}
+        <textarea id="zoneNotes" maxlength="280" rows="3" placeholder="${esc(t("chart.zone.notes_ph"))}"></textarea>
+      </label>
+      <button type="button" class="ind-btn" id="zoneClearNotes">${esc(t("chart.zone.clear_notes"))}</button>
+      <div class="field"><span>${esc(t("chart.zone.status"))}</span>
+        <div class="row">
+          <button type="button" class="ind-btn" data-zone-meta-status="active">${esc(t("chart.zone.active"))}</button>
+          <button type="button" class="ind-btn" data-zone-meta-status="archive">${esc(t("chart.zone.archive"))}</button>
+        </div>
+      </div>
+      <p class="zone-ro" id="zoneGeom" data-readonly="geom"></p>
+      <p class="zone-ro" id="zoneCitePreview"></p>
+      <button type="button" class="ind-btn" id="zoneCiteCopy">${esc(t("chart.zone.cite"))}</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button type="button" class="ind-btn" data-zone-list="active">${esc(t("chart.zone.list_active"))}</button>
+      <button type="button" class="ind-btn" data-zone-list="archive">${esc(t("chart.zone.list_archive"))}</button>
+    </div>
+    <ul class="zone-list" id="zoneList"></ul>
+    <p class="muted" id="zoneListEmpty"></p>
+    <div id="zoneToast" class="zone-toast" hidden></div>
+  </aside><!-- ZONE_DETAIL_END -->`;
 }
 function syncDrawChrome(){
+  if(!paperControls && chartTool!=="select"){
+    chartTool = "select";
+    drawDraft = null;
+    drawDrag = null;
+  }
   root.querySelectorAll("[data-tool]").forEach(btn => {
     btn.disabled = drawControlDisabled(btn.dataset.tool);
     btn.classList.toggle("on", chartTool===btn.dataset.tool);
@@ -3119,6 +3636,7 @@ function syncDrawChrome(){
     svg.classList.toggle("picking", chartTool==="select" && !drawState.locked && chartHasBars);
   }
   syncZoneProps();
+  syncZoneDetail();
 }
 function bindChartKeys(){
   if(chartKeysBound) return;
@@ -3144,11 +3662,11 @@ function bindChartKeys(){
   });
 }
 function chartReadyForDraw(){
-  return !!String(symbol||"").trim() && chartHasBars && !drawState.locked;
+  return !!String(symbol||"").trim() && chartHasBars && !drawState.locked && !!paperControls;
 }
 function beginZoneDrag(hit, ev){
   const item = drawState.items.find(it => it.id===hit.id && it.type==="zone");
-  if(!item || drawState.locked) return;
+  if(!item || drawState.locked || !paperControls) return;
   drawSelectedId = item.id;
   drawDraft = null;
   drawDrag = {id: item.id, handle: hit.handle, snapshot: JSON.parse(JSON.stringify(item))};
@@ -3193,6 +3711,11 @@ function endZoneDrag(){
 }
 function finishZoneDraw(ev){
   if(!drawDraft || drawDraft.type!=="zone") return;
+  if(!paperControls || drawState.locked){
+    drawDraft = null;
+    redrawDrawOverlay();
+    return;
+  }
   const pt = eventToPoint(ev) || drawDraft.b;
   const a = drawDraft.a;
   drawDraft = null;
@@ -3212,12 +3735,13 @@ function finishZoneDraw(ev){
 function onStagePointerDown(ev){
   if(page!=="chart") return;
   if(ev.button!=null && ev.button!==0) return;
-  if(!chartReadyForDraw()) return;
+  if(!String(symbol||"").trim() || !chartHasBars) return;
   const loc = overlayPoint(ev);
   if(!loc) return;
   const hit = hitTestZone(loc.x, loc.y, loc.w);
-  if(chartTool==="select"){
-    if(hit && hit.handle){
+  const canMutate = !!paperControls && !drawState.locked;
+  if(chartTool==="select" || !canMutate){
+    if(hit && hit.handle && canMutate){
       ev.preventDefault();
       ev.stopPropagation();
       beginZoneDrag(hit, ev);
@@ -3316,7 +3840,7 @@ function attachDrawOverlay(chart, series, bars, sym){
       redrawDrawOverlay();
     };
     svg.onclick = ev => {
-      if(drawState.locked || chartTool==="select" || chartTool==="zone" || !chartHasBars) return;
+      if(!paperControls || drawState.locked || chartTool==="select" || chartTool==="zone" || !chartHasBars) return;
       const pt = eventToPoint(ev);
       if(!pt) return;
       if(chartTool==="hline"){
@@ -3384,6 +3908,7 @@ function attachDrawOverlay(chart, series, bars, sym){
   }
   syncDrawChrome();
   redrawDrawOverlay();
+  pushZoneSnapshot();
 }
 function chartShell(inner){
   const on = loadChartInd();
@@ -3416,7 +3941,10 @@ function chartShell(inner){
       <span class="muted">${t("chart.panes")}</span>
       ${tog("rsi", t("chart.rsi"))}${tog("macd", t("chart.macd"))}
     </div>
-    ${inner}
+    <div class="chart-with-zone">
+      <div class="chart-main">${inner}</div>
+      ${zoneDetailShell()}
+    </div>
   </div>`;
 }
 function bindChartChrome(){
@@ -3439,6 +3967,7 @@ function bindChartChrome(){
   root.querySelectorAll("#chartDrawBar [data-tool], #chartDrawExtra [data-tool]").forEach(btn => {
     btn.onclick = () => {
       if(btn.disabled) return;
+      if(!paperControls && btn.dataset.tool!=="select") return;
       chartTool = btn.dataset.tool;
       drawDraft = null;
       drawDrag = null;
@@ -3450,6 +3979,7 @@ function bindChartChrome(){
     btn.onclick = () => {
       if(btn.disabled) return;
       const act = btn.dataset.act;
+      if(!paperControls && act!=="hide") return;
       if(act==="magnet"){
         chartMagnet = !chartMagnet;
         localStorage.setItem("cgab.chart.magnet", chartMagnet ? "1" : "0");
@@ -3488,8 +4018,8 @@ function bindChartChrome(){
   root.querySelectorAll("[data-zone-role]").forEach(btn => {
     btn.onclick = () => {
       const item = selectedZone();
-      if(!item || btn.disabled) return;
-      commitZoneEdit(CgabDraw.withZoneRole(item, btn.dataset.zoneRole));
+      if(!item || btn.disabled || !paperControls) return;
+      commitZoneMeta(CgabDraw.withZoneRole(item, btn.dataset.zoneRole));
     };
   });
   root.querySelectorAll("[data-zone-ext]").forEach(btn => {
@@ -3509,10 +4039,85 @@ function bindChartChrome(){
     });
     zoneLab.addEventListener("change", () => {
       const item = selectedZone();
-      if(!item) return;
+      if(!item || zoneLab.disabled || !paperControls) return;
       const next = CgabDraw.withZoneLabel(item, zoneLab.value);
       commitZoneEdit(next);
       if(next && document.activeElement!==zoneLab) zoneLab.value = next.label || "";
+    });
+  }
+  const zoneList = document.getElementById("zoneList");
+  if(zoneList){
+    zoneList.onclick = ev => {
+      const btn = ev.target.closest("[data-zone-pick]");
+      if(!btn) return;
+      drawSelectedId = btn.dataset.zonePick;
+      syncDrawChrome();
+      redrawDrawOverlay();
+    };
+  }
+  root.querySelectorAll("[data-zone-list]").forEach(btn => {
+    btn.onclick = () => {
+      zoneListMode = btn.dataset.zoneList==="archive" ? "archive" : "active";
+      syncZoneDetail();
+    };
+  });
+  root.querySelectorAll("[data-zone-meta-role]").forEach(btn => {
+    btn.onclick = () => {
+      if(btn.disabled || !paperControls) return;
+      const item = selectedZone();
+      if(!item) return;
+      commitZoneMeta(CgabDraw.withZoneRole(item, btn.dataset.zoneMetaRole));
+    };
+  });
+  root.querySelectorAll("[data-zone-meta-status]").forEach(btn => {
+    btn.onclick = () => {
+      if(btn.disabled || !paperControls) return;
+      const item = selectedZone();
+      if(!item) return;
+      commitZoneMeta(CgabDraw.withZoneStatus(item, btn.dataset.zoneMetaStatus));
+    };
+  });
+  const copyId = document.getElementById("zoneCopyId");
+  if(copyId) copyId.onclick = () => {
+    const item = selectedZone();
+    if(!item || !item.id){
+      const miss = document.getElementById("zoneCiteMiss");
+      if(miss) miss.hidden = false;
+      return;
+    }
+    copyZoneText(item.id);
+  };
+  const citeBtn = document.getElementById("zoneCiteCopy");
+  if(citeBtn) citeBtn.onclick = () => {
+    const item = selectedZone();
+    const cite = item ? CgabDraw.citeZone(item) : "";
+    if(!cite){
+      const miss = document.getElementById("zoneCiteMiss");
+      if(miss) miss.hidden = false;
+      return;
+    }
+    copyZoneText(cite);
+  };
+  const clearNotes = document.getElementById("zoneClearNotes");
+  if(clearNotes) clearNotes.onclick = () => {
+    if(clearNotes.disabled || !paperControls) return;
+    const item = selectedZone();
+    if(!item) return;
+    const next = CgabDraw.withZoneNotes(item, "");
+    commitZoneMeta(next);
+    const notesBox = document.getElementById("zoneNotes");
+    if(notesBox && next) notesBox.value = next.notes || "";
+  };
+  const notesBox = document.getElementById("zoneNotes");
+  if(notesBox){
+    notesBox.addEventListener("keydown", e => { e.stopPropagation(); });
+    notesBox.addEventListener("change", () => {
+      if(notesBox.disabled || !paperControls) return;
+      const item = selectedZone();
+      if(!item) return;
+      const next = CgabDraw.withZoneNotes(item, notesBox.value);
+      commitZoneMeta(next);
+      if(next && document.activeElement!==notesBox) notesBox.value = next.notes || "";
     });
   }
   syncDrawChrome();
@@ -3526,8 +4131,8 @@ async function chart(){
   chartHasBars = false;
   chartMeta = {vendor:"—", asof:"—"};
   loadDrawState(want);
-  if(!want) chartTool = "select";
-  else if(drawState.locked) chartTool = "select";
+  if(!want || drawState.locked || !paperControls) chartTool = "select";
+  if(want) scheduleZoneHydrate();
   const period = CHART_PERIODS.includes(chartPeriod) ? chartPeriod : "6mo";
   chartPeriod = period;
   if(!want){

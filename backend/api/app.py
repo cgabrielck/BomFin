@@ -22,7 +22,7 @@ from backend.pathsetup import ensure_backend_on_path
 
 ensure_backend_on_path()
 
-from backend.api import intents as intents_api
+from backend.api import desk_zones, intents as intents_api
 from backend.api import research_jobs, worker_ctl
 from backend.api.desk_auth import is_operator, require_operator
 from backend.api.help_chat import HelpChatIn, answer_help_chat, guide_payload
@@ -87,6 +87,7 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title=APP_NAME, version="1.0.0", lifespan=lifespan)
 app.include_router(intents_api.router)
+app.include_router(desk_zones.router)
 STATIC_DIR = Path(__file__).resolve().parents[2] / "web" / "static"
 app.add_middleware(
     CORSMiddleware,
@@ -171,6 +172,7 @@ class JournalIn(BaseModel):
     symbol: str
     note: str
     side: Optional[str] = None
+    zone_id: Optional[str] = None
 
 
 class WorkerStartIn(BaseModel):
@@ -656,7 +658,21 @@ def journal_entry(log_id: str) -> Dict[str, Any]:
 def add_journal(body: JournalIn) -> Dict[str, Any]:
     from backend.api import trade_journal
 
-    trade_journal.add_note(body.symbol, body.note, body.side)
+    zone_id = str(body.zone_id or "").strip()
+    cite = None
+    if zone_id:
+        zone = desk_zones.get_zone(zone_id)
+        if zone is None:
+            raise HTTPException(status_code=404, detail=desk_zones.UNABLE)
+        zone_id = str(zone.get("zone_id") or "")
+        cite = str(zone.get("cite") or "")
+    trade_journal.add_note(
+        body.symbol,
+        body.note,
+        body.side,
+        zone_id=zone_id or None,
+        zone_cite=cite,
+    )
     return trade_journal.build_journal_response(order_store=_store, limit=100)
 
 
