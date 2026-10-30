@@ -1,13 +1,14 @@
 # ADR-004 — 圖表引擎選型與能力邊界｜Chart Engine & Drawing Boundaries
 
-> **Status:** **Owner-approved pending Accepted** — Gabriel Approve 圖表 P0（2026-10-27 Asia/Hong_Kong）。**未標 Accepted**（等提案 PR／慣例三重閘）；**Merge ≠ Accepted ≠ runtime。**  
-> **Owner lock（卡面，同日）：** ③確認繼續 **lightweight-charts v4.2.3**＋接受無完整內建畫線庫；①**Fib／測量入 P0**（自研 overlay）；②**P1（chat→圖）延後**。①零 order／②畫線只 Desk＝方向 C 已鎖（唔另問）。  
+> **Status:** **Accepted** — Owner Gabriel Accepted 2026-10-30 (Asia/Hong_Kong). 先前 **Owner-approved** 2026-10-27（Gabriel Approve 圖表 P0）；今次升格為決策狀態 **Accepted**。**Merge ≠ Accepted ≠ runtime：** 歷史合入 **#50**（ADR 落庫）、**#53**（Zone／P1 evidence docs sync）本身 **唔** 改 runtime；Accepted 係決策狀態，**唔係** runtime 翻轉。  
+> **路徑（本決策覆蓋）：** chart engine＋Zone P0.5＋P1 zone evidence docs path；**P1 chat→圖仍延後**。本檔此次升格 **docs-only**，零 runtime／code。  
+> **Owner lock（卡面，2026-10-27）：** ③確認繼續 **lightweight-charts v4.2.3**＋接受無完整內建畫線庫；①**Fib／測量入 P0**（自研 overlay）；②**P1（chat→圖）延後**。①零 order／②畫線只 Desk＝方向 C 已鎖（唔另問）。  
 > **Binds under:** [ADR-003 + Addendum A](ADR-003-live-ai-trading-desk.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)（Confirmed 1–5）> [CHARTS_INDICATORS_DESIGN.md](CHARTS_INDICATORS_DESIGN.md)（Draft；GC1 跟本 ADR 引擎確認對齊）。  
 > **Index：** [ARCHITECTURE_DECISION.md](ARCHITECTURE_DECISION.md)。**ADR-002 is VOID.**  
 > **Product direction C（Owner 鎖，2026-10-23）：** 雙殼一資料 — Streamlit 可唯讀鏡像 Desk 瀏覽（含 paper history）；**交易動作只 Desk**。Chat／Streamlit／圖表面：**零 order tools**（唔下單、唔暴露 submit／OrderManager）。  
 > **Does not elevate：** Intent→M8、D7 schema 凍結、Desk flatten、fake verified／live、lab→OrderManager、Confirmed item 6。Issue #10 stays OPEN.  
 > **Does not rewrite：** ADR-003 正文；live Harness／mandate／kill／風險％。**唔改 runtime。**  
-> **Date：** 2026-10-27（Asia/Hong_Kong）  
+> **Date：** Drafted／Owner-approved 2026-10-27；**Accepted 2026-10-30**（Asia/Hong_Kong / HKT）  
 > **Author lane：** Docs Arch（PM 可落 docs）；**唔寫執行碼。**
 
 ---
@@ -16,13 +17,13 @@
 
 - ADR-003 北星：遠端 Desk 要有 TradingView-*style* 睇圖／指標；唔係宣稱已接 TradingView 官方。
 - Desk **已 vendored** [TradingView Lightweight Charts **v4.2.3**](https://github.com/tradingview/lightweight-charts)（PR **#36** ns-1 charts v0）＋閉合經典指標集方向（對齊 CHARTS §7）。**本 ADR 唔係綠地選型**，而係 **確認既有引擎** 同鎖 **畫線／多殼能力邊界**。
-- `CHARTS_INDICATORS_DESIGN`（Draft）**GC1** 原先寫「建議預設 lightweight-charts、未鎖」；程式已採用 **lightweight-charts v4.2.3**。**Gabriel ③ 已確認**（2026-10-27）：Desk 引擎＝既有 LC v4.2.3。本 ADR Status 仍係 **Owner-approved pending Accepted**（未標 Accepted）；CHARTS 頁維持 **Draft ≠ Accepted**。
+- `CHARTS_INDICATORS_DESIGN`（Draft）**GC1** 原先寫「建議預設 lightweight-charts、未鎖」；程式已採用 **lightweight-charts v4.2.3**。**Gabriel ③ 已確認**（2026-10-27）：Desk 引擎＝既有 LC v4.2.3。本 ADR Status＝**Accepted**（Gabriel 2026-10-30；先前 2026-10-27 Owner-approved）。CHARTS 頁維持 **Draft ≠ Accepted**。
 - Vendored 引擎 **唔等於**「完整畫線庫已齊」或「對外可承諾 TradingView 級 drawing tools」。
 - Chat＋圖表／TA 觀察功能要開工前，必須寫清：**既有引擎能做咩、做唔到咩、邊個殼係權威、邊啲係 P0／P0.5／P2**，避免過度承諾（尤其畫線）。
 
 ---
 
-## 2. 決策（Owner-approved — 確認既有引擎＋邊界）｜Decision
+## 2. 決策（Accepted 2026-10-30；先前 Owner-approved 2026-10-27 — 確認既有引擎＋邊界）｜Decision
 
 ### D1. 產品圖表殼（對齊方向 C）
 
@@ -32,9 +33,9 @@
 | **Streamlit** | lab／legacy；方向 C = **唯讀鏡像** | 可鏡像 OHLCV／指標／已保存畫線嘅**唯讀顯示**；**唔**做權威畫線編輯器 | **零** order tools |
 | **Chat／觀察助手** | 解讀／摘要／TA 觀察 | 可引用圖表狀態、指標數值、已保存線；可建議「去 Desk 畫／改」 | **零** order tools；**零** raw size／submit |
 
-**接受陳述（Owner-approved）：** 一資料；雙殼。畫線真相只喺 Desk。Streamlit／Chat 睇得、講得，**落唔到單、改唔到權威線**（除非日後 Owner 另決並 Accepted）。
+**接受陳述（Accepted 2026-10-30；原 Owner-approved 2026-10-27）：** 一資料；雙殼。畫線真相只喺 Desk。Streamlit／Chat 睇得、講得，**落唔到單、改唔到權威線**（除非日後 Owner 另決並再 Accepted）。
 
-### D2. 引擎確認（GC1 — **Owner-approved：確認既有，非綠地**）
+### D2. 引擎確認（GC1 — **Accepted：確認既有，非綠地**；2026-10-27 Owner-approved，2026-10-30 Accepted）
 
 | 事實（repo） | 含義 |
 |--------------|------|
@@ -42,13 +43,13 @@
 | 閉合指標集（SMA／EMA／BB／RSI／MACD 等）沿 CHARTS §7 | 指標＝衍生視圖；唔係畫線庫、唔係下單 |
 | CHARTS GC1／UI UX 建議與現況一致 | Owner **③ 已確認**（2026-10-27）：Desk 引擎＝LC v4.2.3；接受無完整內建畫線庫 |
 
-| 曾並列、現明確降級 | 決定（Owner-approved） |
+| 曾並列、現明確降級 | 決定（Accepted；原 Owner-approved） |
 |--------------------|------------------|
 | Plotly.js 做 Desk 預設 | **否**（lab 可留；CHARTS GC5） |
 | 官方 TradingView Widget／Charting Library | **否**（默認）；另決先要授權／Owner |
 | 為「完整畫線」而換引擎或自研全套 canvas（P0） | **否**；畫線能力另見 D3（P0 最小集／**P0.5 Zone**／P2） |
 
-**③ 已確認（Gabriel 2026-10-27）：** Desk 圖表引擎＝**lightweight-charts v4.2.3**（PR #36）；接受「無完整內建畫線庫」邊界。本 ADR Status＝**Owner-approved pending Accepted**（未標 Accepted 前，唔寫「引擎 ADR 已 Accepted」；實作可寫「Desk 現用 LC v4.2.3」）。
+**③ 已確認（Gabriel 2026-10-27）：** Desk 圖表引擎＝**lightweight-charts v4.2.3**（PR #36）；接受「無完整內建畫線庫」邊界。本 ADR Status＝**Accepted**（Gabriel Accepted 2026-10-30 Asia/Hong_Kong；先前 Owner-approved）。實作可寫「Desk 現用 LC v4.2.3」同「引擎 ADR 已 Accepted」；**Merge ≠ Accepted ≠ runtime**（Accepted 係決策狀態，唔係 runtime 翻轉）。
 
 ### D3. 能力邊界 — 尤其畫線（硬誠實）
 
@@ -62,14 +63,14 @@
 | 數據 provenance（vendor／asof／fallback） | ✅ | Yahoo 扮 Polygon／verified |
 | **完整 TradingView 級畫線庫**（平行通道／任意工具全集等） | ❌ **永不當 LC 內建承諾** | 唔寫「LC 已齊畫線」。價區／矩形價帶見下行 **P0.5**，**唔**計入本列、**唔**等於 TV 庫已齊 |
 | **Desk 畫線 v1 最小集**（趨勢線／水平線／**Fib**／**測量**） | **Owner 已批准 → P0 交付**；實作＝**自研 overlay**（或明確標註之 plugin），**非**宣稱 LC 內建齊；永遠標「最小畫具＝自研 overlay」 | TV 完整畫線庫 |
-| **P0.5 價區 Zone（矩形價帶）** | **P0.5 shipped**（自原 P2「矩形」提前）— PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；實作＝自研 overlay **`kind: zone`**，**非** LC 內建矩形、**非** TV 完整畫線庫。**落碼 ≠ 本 ADR Accepted** | 平行通道／更多工具／進階模板仍 **P2**；唔寫「LC 已有 rectangle」 |
+| **P0.5 價區 Zone（矩形價帶）** | **P0.5 shipped**（自原 P2「矩形」提前）— PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；實作＝自研 overlay **`kind: zone`**，**非** LC 內建矩形、**非** TV 完整畫線庫。**落碼本身 ≠ Accept**（#52 合入時本 ADR 仍 Owner-approved；**今** 由 Gabriel 2026-10-30 標 Accepted；Accepted ≠ runtime） | 平行通道／更多工具／進階模板仍 **P2**；唔寫「LC 已有 rectangle」 |
 | 保存／重載用戶畫線 | 隨畫線 v1（P0）一併；存 Desk 權威 Drawing store | Streamlit／Chat 寫入權威線 |
 | 多 timeframe 同步、bar replay／回放 | **P2**（見 §3） | 當未排期嘅 P0 默認 |
 | 圖表 → 下單／一鍵買入 | **永遠禁止**（本 ADR + 方向 C） | 「觀察＝執行」 |
 
 **過度承諾禁令：** UI／Chat／文件禁止寫「同 TradingView 一樣齊畫線」「完整 drawing tools 已內建於 lightweight-charts」。只可寫「TradingView-*style* 可讀性」＋當前真實能力清單。
 
-**用語對齊（Coding／UI UX）：** P0「最小畫具」＝**自研 overlay** 疊喺 LC 之上，**唔係** LC 產品功能清單。Desk 畫線 v1 最小集（趨勢／水平／Fib／測量）——**Owner 已批准入 P0**；永遠保留「唔承諾＝TV 完整畫線庫」。**P0.5：** Zone（價區／矩形價帶）已落碼（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）——自原 P2 矩形提前；**唔係** LC 內建矩形、**唔係** TV 完整畫線庫；落碼 **唔** Accept ADR-004。**P1（chat→圖）延後**（Gabriel 卡面②）。
+**用語對齊（Coding／UI UX）：** P0「最小畫具」＝**自研 overlay** 疊喺 LC 之上，**唔係** LC 產品功能清單。Desk 畫線 v1 最小集（趨勢／水平／Fib／測量）——**Owner 已批准入 P0**；永遠保留「唔承諾＝TV 完整畫線庫」。**P0.5：** Zone（價區／矩形價帶）已落碼（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）——自原 P2 矩形提前；**唔係** LC 內建矩形、**唔係** TV 完整畫線庫。Zone 落碼本身 **唔** 係 Accept 動作（當時 Status 仍 Owner-approved）；ADR-004 **今** 由 Gabriel Accepted 2026-10-30（決策狀態 ≠ runtime）。**P1（chat→圖）延後**（Gabriel 卡面②）。
 
 ### D4. 權威畫線 vs 唯讀鏡像
 
@@ -94,7 +95,7 @@
 | 層級 | 範圍 | 做 | 不做（推去 P2 或另決） |
 |------|------|----|------------------------|
 | **P0** | 圖表／TA **觀察**＋最小畫具可用、誠實 | Desk：可靠 K 線＋volume＋閉合指標＋provenance；Desk 畫線 v1（趨勢／水平／**Fib**／**測量**）＝**自研 overlay**；Chat：讀價／指標／解釋、**零下單**（chat→圖 **P1 延後**）；Streamlit：唯讀鏡像；文件標清「LC 無完整內建畫線」 | TV 完整畫線庫；多 TF 聯動；replay；官方 TV embed；期權／黃金圖 SKU；把最小畫具寫成「LC 內建」；P1 chat→圖（延後） |
-| **P0.5** | 價區 Zone（矩形價帶）；自原 P2「矩形」提前 | Desk 自研 overlay **`kind: zone`** **已落碼**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`）。**非** LC 內建矩形、**非** TV 完整畫線庫。**Zone 落碼 ≠ 本 ADR Accepted** | 平行通道／更多工具／進階模板（仍 P2）；唔把 Zone 寫成 LC 內建或 TV 全集 |
+| **P0.5** | 價區 Zone（矩形價帶）；自原 P2「矩形」提前 | Desk 自研 overlay **`kind: zone`** **已落碼**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`）。**非** LC 內建矩形、**非** TV 完整畫線庫。Zone 落碼本身唔係 Accept；本 ADR **Accepted** 係 Gabriel 2026-10-30 決策（≠ runtime） | 平行通道／更多工具／進階模板（仍 P2）；唔把 Zone 寫成 LC 內建或 TV 全集 |
 | **P2** | 進階研究體驗 | 見下表 P2 acceptance（矩形價帶已拆去 P0.5） | 用 P2 能力當「引擎已選＝已交付」；P2 完成前對外宣稱齊全 |
 
 **取捨原則：** 先令「睇得清楚、講得明白、落唔到單」穩定，再加「畫得多、回放得多」。唔用 P2／延後嘅 P1 塞進 P0 驗收。
@@ -107,7 +108,7 @@
 | **Drawing templates** | Desk 可存／套用命名模板（一組線／區） | 模板只寫入 Desk 權威 Drawing store；Streamlit／Chat **唔**寫模板 |
 | **Read my drawings** | Chat／觀察助手可呼叫唯讀 API，回傳 **JSON**（座標、類型、symbol、tf、asof） | JSON＝觀察資料，**唔係**下單指令；無 order fields |
 | **多 TF** | 多 timeframe 切換／對齊（若排期） | 唔當 P0；唔暗示引擎內建齊全畫線 |
-| **Zone（價區／矩形價帶）** | **P0.5 shipped**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）。自原 P2「矩形」提前，**不再屬本 P2 列** | **非** LC 內建矩形、**非** TV 完整畫線庫；落碼 **唔** Accept ADR-004 |
+| **Zone（價區／矩形價帶）** | **P0.5 shipped**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）。自原 P2「矩形」提前，**不再屬本 P2 列** | **非** LC 內建矩形、**非** TV 完整畫線庫；落碼本身唔等於 Accept（Accepted 係 2026-10-30 Owner 決策，≠ runtime） |
 | **Desk 畫線超出最小集（仍 P2）** | 平行通道／更多工具／進階模板等（若排期） | 最小集（趨勢／水平／Fib／測量）屬 **P0＋自研 overlay**；Zone 已係 P0.5；LC 仍無完整內建畫線庫 |
 | **P1 chat→圖**（延後） | Chat 驅動圖表焦點／標註聯動（若日後排期） | **Gabriel 卡面②：P1 延後**；唔當 P0；零 order tools 不變 |
 
@@ -126,7 +127,7 @@
 **代價**
 
 - 若用戶期望「開箱齊 TradingView 畫線」，要文案管理預期；P0＝Owner 批准嘅**最小畫具（自研 overlay，含 Fib／測量）**，永遠唔等於完整 TV 畫線庫；P1 chat→圖延後。
-- **價區 Zone（矩形價帶）** 已自原 P2「矩形」提前為 **P0.5 shipped**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）。矩形價帶唔再只屬 P2；平行通道／更多工具／進階模板仍 P2。**Zone 落碼唔 Accept ADR-004**（Status 維持 Owner-approved pending Accepted）。
+- **價區 Zone（矩形價帶）** 已自原 P2「矩形」提前為 **P0.5 shipped**（PR **#52** @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）。矩形價帶唔再只屬 P2；平行通道／更多工具／進階模板仍 P2。Zone 落碼本身唔係 Accept（#52 當時 Status 仍 Owner-approved）。**今** ADR-004 Status＝**Accepted**（Gabriel 2026-10-30）；Accepted ≠ runtime。P1 zone evidence 屬 docs path；**P1 chat→圖仍延後**。
 - Streamlit 現有 Plotly 畫線／互動若存在，要降級或標 lab-only，避免同 Desk 權威衝突。
 
 ---
@@ -141,19 +142,19 @@
 | **卡面① Fib／測量** | Fib／測量是否入 P0（自研 overlay）？ | **是** — Gabriel Approve 圖表 P0 |
 | **卡面② P1** | chat→圖 | **延後** — 唔入今次 P0 |
 
-**Status：** Owner-approved pending Accepted。寫入 ARCHITECTURE_DECISION 索引為 Owner-approved／未 Accepted；**唔改產品預設／runtime。**
+**Status：** **Accepted** — Owner Gabriel Accepted 2026-10-30（Asia/Hong_Kong / HKT）。先前（2026-10-27）為 Owner-approved。寫入 ARCHITECTURE_DECISION 索引為 **Accepted**。**Merge ≠ Accepted ≠ runtime**（#50 ADR 落庫、#53 Zone／P1 evidence docs sync 本身唔改 runtime；Accepted 係決策狀態，唔係 runtime 翻轉）。**唔改產品預設／runtime。** 路徑：chart engine＋Zone P0.5＋P1 zone evidence docs；P1 chat→圖仍延後。
 
 ---
 
 ## 6. 唔得宣稱｜Must not claim
 
-1. Owner-approved＝Accepted／引擎 ADR 已定案（未過提案 PR／慣例三重閘前）。  
+1. 把 2026-10-27 的 Owner-approved 當成當時已 Accepted（當時未過提案 PR／慣例三重閘）。**今** 2026-10-30 Gabriel 已標 **Accepted**。仍不得宣稱：歷史合入 #50／#53 本身等於 Accepted，或 Accepted＝runtime 已翻轉。  
 2. lightweight-charts＝完整 TradingView 畫線庫。  
 3. Chat／Streamlit 可下單或改權威畫線。  
 4. 多 TF／replay／P1 chat→圖 已係 P0 交付。  
 5. ADR-002 仍有效；Confirmed 變成 6 項；Issue #10 已關。  
 6. 本檔合入＝改 runtime／產品預設。
-7. P0.5 Zone 落碼＝本 ADR 已 Accepted，或 lightweight-charts 內建矩形，或 TV 完整畫線庫已齊。
+7. P0.5 Zone 落碼（或 #53 docs sync）＝本 ADR Accepted 的原因，或 lightweight-charts 內建矩形，或 TV 完整畫線庫已齊。Accepted（2026-10-30）係 Owner 決策狀態，唔係 Zone 落碼副作用，亦唔係 runtime 翻轉。
 
 ---
 
@@ -162,7 +163,7 @@
 - 改 runtime、寫前端／worker 執行碼、改產品預設 config。  
 - 改寫 ADR-003；凍結 D7 參考訊號 schema。  
 - 採購官方 Charting Library；期權／黃金圖 SKU。  
-- 實作 P1 chat→圖（已延後）；標本 ADR 為 Accepted（等提案 PR／三重閘）。
+- 實作 P1 chat→圖（仍延後）。本檔 Status 升格為 Accepted 只係 docs 決策狀態（2026-10-30）；**唔**改 runtime／產品預設。
 
 ---
 
@@ -172,13 +173,15 @@
 2. MODULAR_ARCHITECTURE  
 3. AUDIT_REMEDIATION_PLAN（Confirmed 1–5）  
 4. CHARTS_INDICATORS_DESIGN（Draft；圖表產品範圍）  
-5. **本 ADR-004（Owner-approved；Accepted 之後升格）** — 引擎選型＋畫線／殼邊界  
+5. **本 ADR-004（Accepted 2026-10-30；先前 Owner-approved 2026-10-27）** — 引擎選型＋畫線／殼邊界（chart engine＋Zone P0.5＋P1 zone evidence docs；P1 chat→圖仍延後）。Accepted ≠ runtime。  
 6. 舊 roadmap（frozen）；**ADR-002 VOID**
 
-衝突時：Owner 拍板 > ADR-003 > 本 ADR（Owner-approved pending Accepted）。
+衝突時：Owner 拍板 > ADR-003 > 本 ADR（**Accepted** 2026-10-30，圖表引擎邊界；決策狀態 ≠ runtime）。綁定次序不變：ADR-003 > MODULAR > AUDIT > 本 ADR-004。
 
 ---
 
-*Drafted 2026-10-27 by Docs Arch；Owner-approved 2026-10-27（Gabriel：P0＋③ LWC v4.2.3＋Fib／測量入 P0 自研 overlay；P1 延後）。唔承諾 TV 完整畫線庫。Owner-approved ≠ Accepted ≠ runtime。*
+*Drafted 2026-10-27 by Docs Arch；Owner-approved 2026-10-27（Gabriel：P0＋③ LWC v4.2.3＋Fib／測量入 P0 自研 overlay；P1 延後）。當時 Owner-approved ≠ Accepted。唔承諾 TV 完整畫線庫。*
 
-*Docs sync 2026-10-29：價區 Zone＝P0.5 shipped（PR #52 @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）。落碼 ≠ Accepted ≠ runtime。Status 仍 **Owner-approved pending Accepted**。*
+*Docs sync 2026-10-29／#53：價區 Zone＝P0.5 shipped（PR #52 @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`；自研 overlay `kind: zone`）＋P1 zone evidence docs path。當時落碼／docs sync ≠ Accepted ≠ runtime；Status 當時仍 Owner-approved。*
+
+*Accepted 2026-10-30 by Gabriel（Asia/Hong_Kong / HKT）。docs-only；唔改 runtime。**Merge ≠ Accepted ≠ runtime**（#50 ADR 落庫、#53 Zone／P1 evidence docs sync 本身唔改 runtime；Accepted 係決策狀態，唔係 runtime 翻轉）。路徑：chart engine＋Zone P0.5＋P1 zone evidence docs；P1 chat→圖仍延後。*

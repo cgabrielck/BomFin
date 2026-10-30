@@ -156,7 +156,7 @@ Intent→M8／H1–H3 **仍 OPEN**；圖表頁**唔**變成 Intent writer 或 M8
 
 本頁 **Draft** 只建議預設；**全部未鎖**。Accepted 之前唔寫進 runtime／Harness。
 
-**GC1 交叉：** [ADR-004](ADR-004-chart-engine.md) 為 **Owner-approved pending Accepted**（Gabriel 2026-10-27），確認既有 lightweight-charts v4.2.3；本頁與 GC1 仍 **Draft ≠ Accepted**。
+**GC1 交叉：** [ADR-004](ADR-004-chart-engine.md) 為 **Accepted**（Owner Gabriel Accepted 2026-10-30 Asia/Hong_Kong；先前 Owner-approved 2026-10-27），確認既有 lightweight-charts v4.2.3。**本頁與 GC1 仍 Draft ≠ Accepted。** **Merge ≠ Accepted ≠ runtime。**
 
 | ID | 問題 | 建議預設（未鎖） | 若另決會影響 |
 |----|------|------------------|--------------|
@@ -243,11 +243,11 @@ Intent→M8／H1–H3 **仍 OPEN**；圖表頁**唔**變成 Intent writer 或 M8
 
 ## Delivery facts (2026-10-27) — Draft ≠ Accepted
 
-These facts do not change **Status: Draft**, do not accept ADR-004, and are not a product-acceptance claim. **未 Accepted.** Issue #10 stays OPEN.
+These facts do not change **Status: Draft** of this page, and are not a product-acceptance claim for CHARTS. **本頁未 Accepted.** The #52/#54 merges did not themselves Accept ADR-004. ADR-004 decision status is **Accepted** (Owner Gabriel 2026-10-30 Asia/Hong_Kong); that status is not a runtime flip. Issue #10 stays OPEN.
 
 - P0.5 Zone（`kind: zone`）已合入 main via #52 @ `0f8f5d50be68a405cfb954edcdbbddefdaca8a78`。
 - P1 zone evidence（stable id／API／session_card）已合入 main via #54 @ `44d2f4142398e2fd627001e4f642ca6d4c6bea5f`。
-- 呢個 P1 只係 zone-evidence，**唔係** P1 chat→圖（chat→圖仍按 ADR-004 延後）。**Merge ≠ Accepted ≠ runtime。** ADR-004 Status 仍 **Owner-approved pending Accepted**。
+- 呢個 P1 只係 zone-evidence，**唔係** P1 chat→圖（chat→圖仍按 ADR-004 延後）。**Merge ≠ Accepted ≠ runtime。** ADR-004 Status＝**Accepted**（Gabriel 2026-10-30 Asia/Hong_Kong）；**本頁仍 Draft ≠ Accepted。**
 
 - PR #36, on the Desk `web/static` chart, vendored lightweight-charts v4.2.3 and serves real daily OHLCV candles, volume, and the closed indicator set (SMA20/50, EMA20, Bollinger, RSI, MACD) with vendor / as-of / fallback via `desk_chart` → `equity_ohlcv`.
 - Drawing tools (trend, horizontal, Fib, zone, measure, text, plus magnet, undo, and lock) are a custom overlay on that chart. lightweight-charts does not include a full drawing library. The zone tool (`kind: zone`) is a self-built canvas overlay: one context, batched `fillRect` plus stroke, HiDPI-aligned to the pane. It is not the TradingView `rectangle-drawing-tool`, not a lightweight-charts built-in rectangle plugin, and not a reason to move off v4.2.3. The toolbar is Select, Trend, Horizontal, Fib, Zone (價區), Measure, Magnet, Show/hide, Clear. Drawings persist per symbol in browser localStorage (`cgab.chart.draw.{SYMBOL}`, schema v3; v1 and v2 payloads still load item-by-item and keep their ids). Unknown kinds are dropped. Zone tint maps the user role label (neutral / support / resistance) and is not a signal. P1 evidence adds stable ids, notes, and archive on the Desk panel only. The chart path does not place orders.
