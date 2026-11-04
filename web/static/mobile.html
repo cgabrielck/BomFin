@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#071016" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Cgab" />
+  <link rel="manifest" href="/m/manifest.webmanifest" />
+  <title>Cgab · paper desk</title>
+  <style>
+    :root {
+      --bg:#071016; --card:#0e1c22; --line:#1a3d44;
+      --cyan:#2de2c5; --purple:#7c6cff; --mint:#3ee0a0; --rose:#ff6b81;
+      --text:#e8fffb; --muted:#8aa8ae; --warn:#e7c36a;
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; min-height:100%; background:var(--bg); color:var(--text); font-family:"Segoe UI",system-ui,sans-serif; }
+    button { font:inherit; color:inherit; }
+    :focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    .app { max-width:480px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; }
+    .top { display:flex; gap:8px; align-items:center; padding:14px 16px 0; flex-wrap:wrap; }
+    .pill { border:1px solid var(--cyan); color:var(--cyan); border-radius:999px; padding:6px 12px; font-size:11px; font-weight:800; letter-spacing:.08em; }
+    .pill.warn { border-color:var(--warn); color:var(--warn); }
+    .sub { margin:8px 16px 0; color:var(--muted); font-size:13px; }
+    main { flex:1; padding:12px 16px 12px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:16px; margin-bottom:12px; }
+    .lbl { color:var(--muted); font-size:12px; }
+    .equity { font-size:22px; font-weight:700; margin:6px 0 2px; }
+    .warn { color:var(--warn); }
+    .mint { color:var(--mint); }
+    .rose { color:var(--rose); }
+    .muted { color:var(--muted); font-size:13px; }
+    .tiles { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .tile { background:#07141a; border:1px solid var(--line); border-radius:12px; padding:12px; min-height:72px; }
+    .tile b { display:block; margin-top:6px; font-size:15px; }
+    .btn { display:block; width:100%; min-height:48px; margin-top:8px; border-radius:999px; border:0; background:var(--cyan); color:#052226; font-weight:700; cursor:pointer; }
+    .btn.ghost { background:transparent; color:var(--cyan); border:1px solid var(--cyan); }
+    .btn[disabled] { opacity:.45; cursor:wait; }
+    .honest { margin:0 16px 12px; color:var(--muted); font-size:12px; line-height:1.45; }
+    .row { display:flex; gap:8px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--line); }
+    .row:last-child { border-bottom:0; }
+    .dot { width:8px; height:8px; border-radius:50%; margin-top:6px; background:var(--muted); flex:none; }
+    .dot.on { background:var(--mint); }
+    .dot.hold { background:var(--warn); }
+    .item { padding:12px 0; border-bottom:1px solid var(--line); }
+    .item:last-child { border-bottom:0; }
+    .tabs {
+      position:sticky; bottom:0; display:grid; grid-template-columns:1fr 1fr 1fr;
+      background:var(--bg); border-top:1px solid var(--line);
+      padding-bottom:env(safe-area-inset-bottom);
+    }
+    .tabs button { min-height:48px; background:transparent; border:0; color:var(--muted); font-weight:700; cursor:pointer; }
+    .tabs button.on { color:var(--cyan); }
+    .banner { margin:0 0 12px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <span class="pill">PAPER</span>
+      <span class="pill" id="link">…</span>
+      <span class="pill" id="hkt">HKT</span>
+    </header>
+    <p class="sub">Cgab · paper desk (RO)</p>
+    <main id="panel"></main>
+    <p class="honest" id="honest">教學／觀察面 · 不是 verified／live · 手機不會下單或改 live 規則</p>
+    <nav class="tabs" aria-label="晨報 狀態 活動">
+      <button type="button" data-tab="morning" class="on">晨報</button>
+      <button type="button" data-tab="status">狀態</button>
+      <button type="button" data-tab="activity">活動</button>
+    </nav>
+  </div>
+  <script>
+  const UNREACHABLE = "請開啟 Tailscale 後重新整理";
+  const CACHE_KEY = "cgab.mobile.snapshot";
+  let tab = "morning";
+  let snap = null;
+  let busy = false;
+  let paperNote = "";
+  let errorBanner = "";
+
+  function esc(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[ch]));
+  }
+  function money(value) {
+    if (value == null || value === "" || Number.isNaN(Number(value))) return "—";
+    return Number(value).toLocaleString("en-US", { style: "currency", currency: "USD" });
+  }
+  function captureTokens() {
+    const url = new URL(location.href);
+    const op = url.searchParams.get("op") || url.searchParams.get("desk_operator_token");
+    const ro = url.searchParams.get("ro");
+    const secure = location.protocol === "https:" ? "; Secure" : "";
+    if (op) {
+      localStorage.setItem("cgab.operator", op);
+      document.cookie = "DESK_OPERATOR_TOKEN=" + encodeURIComponent(op) + "; path=/; SameSite=Lax" + secure;
+      url.searchParams.delete("op");
+      url.searchParams.delete("desk_operator_token");
+    }
+    if (ro) {
+      localStorage.setItem("cgab.ro", ro);
+      document.cookie = "DESK_RO_TOKEN=" + encodeURIComponent(ro) + "; path=/; SameSite=Lax" + secure;
+      url.searchParams.delete("ro");
+    }
+    if (op || ro) history.replaceState({}, "", url.pathname + url.search + url.hash);
+  }
+  function headers() {
+    const h = { "Content-Type": "application/json", "X-Cgab-Surface": "mobile-ro" };
+    const op = localStorage.getItem("cgab.operator") || "";
+    const ro = localStorage.getItem("cgab.ro") || "";
+    if (op) h["X-Desk-Operator-Token"] = op;
+    if (ro) h["X-Desk-Ro-Token"] = ro;
+    return h;
+  }
+  function tickHkt() {
+    const label = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Hong_Kong", hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+    }).format(new Date());
+    const node = document.getElementById("hkt");
+    if (node) node.textContent = "HKT " + label;
+  }
+  function setLink(text, warn) {
+    const node = document.getElementById("link");
+    node.textContent = text;
+    node.className = "pill" + (warn ? " warn" : "");
+  }
+  function loadCache() {
+    try { return JSON.parse(sessionStorage.getItem(CACHE_KEY) || "null"); }
+    catch (e) { return null; }
+  }
+  function saveCache(data) {
+    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ saved_at: new Date().toISOString(), snap: data })); }
+    catch (e) {}
+  }
+  async function load() {
+    captureTokens();
+    try {
+      const res = await fetch("/api/mobile/snapshot", { credentials: "include", headers: headers() });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const detail = typeof data.detail === "string" ? data.detail : ("HTTP " + res.status);
+        renderError(detail, loadCache());
+        return;
+      }
+      snap = data;
+      errorBanner = "";
+      saveCache(data);
+      const host = location.hostname;
+      const local = host === "localhost" || host === "127.0.0.1" || host === "::1";
+      setLink(local ? "本機 OK" : "Tailscale OK", false);
+      render();
+    } catch (err) {
+      setLink("不可達", true);
+      renderError(UNREACHABLE, loadCache());
+    }
+  }
+  function renderError(message, cached) {
+    const stale = cached && cached.snap ? cached : null;
+    if (stale) snap = stale.snap;
+    const when = stale ? esc(String(stale.saved_at || "").replace("T", " ").slice(0, 19)) : "";
+    const staleLine = when ? `<p class="muted" id="staleNote">上次快照 ${when} · stale</p>` : "";
+    errorBanner = `<p class="card warn banner" id="errorBanner">${esc(message)}</p>` + staleLine;
+    if (!snap) {
+      document.getElementById("panel").innerHTML = errorBanner + `<p class="muted">${esc(UNREACHABLE)}</p>`;
+      return;
+    }
+    render();
+  }
+  function morning(data) {
+    if (data.access === "guest") {
+      return `<section class="card"><p>${esc(data.guest_zh || "此連線只讀。Continue／Pause 已隱藏。")}</p></section>`;
+    }
+    const card = data.session_card;
+    const equity = `<p class="lbl">Equity</p><p class="equity">${esc(money(data.equity))}</p><p class="muted">${esc(data.equity_label || "paper · not live")}</p>`;
+    let session;
+    if (!card) {
+      session = `<p>${esc(data.empty_session_zh || "尚無紙上 session")}</p>`;
+    } else {
+      const alpha = data.alpha_net_of_costs_pct;
+      const vs = (data.claims_allowed && data.seal && alpha != null)
+        ? `vs-SPY ${Number(alpha).toFixed(2)}%`
+        : "vs-SPY n/a";
+      const reason = (!data.seal || !data.claims_allowed)
+        ? `<p class="warn">Seal not met: ${esc(data.seal_reason || "—")}</p>`
+        : "";
+      session = `<p>seal: ${card.seal ? "true" : "false"} · ${esc(vs)}</p>` +
+        `<p class="muted">not_a_seal: ${card.not_a_seal ? "true" : "false"} · claims_beat_spy: ${card.claims_beat_spy ? "true" : "false"}</p>` +
+        reason;
+    }
+    const digest = data.digest || {};
+    const tiles = `<div class="tiles">
+      <div class="tile"><span class="lbl">Scan as_of</span><b>${esc(digest.scan_label || "—")}</b><span class="muted">${esc(digest.scan_as_of || "—")}</span></div>
+      <div class="tile"><span class="lbl">Filled</span><b>${esc(digest.filled_count ?? "—")}</b></div>
+      <div class="tile"><span class="lbl">Working</span><b>${esc(digest.working_count ?? "—")}</b></div>
+      <div class="tile"><span class="lbl">Skips</span><b>${esc(digest.skips || "—")}</b></div>
+    </div><p class="muted">${esc(digest.working_note || "Working ≠ seal · fills only")}</p>`;
+    const controls = (data.operator && data.controls && data.controls.continue_paper)
+      ? `<button type="button" class="btn" id="continuePaper">Continue paper</button>
+         <button type="button" class="btn ghost" id="pausePaper">Pause paper</button>`
+      : "";
+    const review = card ? `<button type="button" class="btn ghost" id="reviewSeals">Review seals</button>
+      <div id="sealDetail" hidden class="muted"></div>` : "";
+    const note = paperNote ? `<p class="muted" id="paperMsg">${esc(paperNote)}</p>` : `<p class="muted" id="paperMsg"></p>`;
+    return `<section class="card">${equity}${session}</section>
+      <section class="card">${tiles}</section>
+      <section class="card">${controls}${review}${note}</section>`;
+  }
+  function status(data) {
+    if (data.access === "guest" || !data.agents) {
+      return `<section class="card"><h2>Agents · 唯讀</h2><p>${esc(data.guest_zh || "此連線只讀。")}</p></section>`;
+    }
+    const agents = data.agents;
+    const scan = agents.scan || {};
+    const score = agents.score || {};
+    const intent = agents.intent || {};
+    const risk = agents.risk || {};
+    const scanDot = scan.state === "running" ? "on" : "";
+    const riskDot = risk.state === "hold" ? "hold" : (risk.state === "pass" ? "on" : "");
+    const top = (scan.top || []).join(", ");
+    return `<section class="card"><h2>Agents · 唯讀</h2>
+      <div class="row"><span class="dot ${scanDot}"></span><div><b>Scan</b> · ${esc(scan.state || "idle")}<div class="muted">as_of ${esc(scan.as_of || "—")}${top ? " · " + esc(top) : ""}</div></div></div>
+      <div class="row"><span class="dot ${score.state === "running" ? "on" : ""}"></span><div><b>Score</b> · ${esc(score.label || "idle")}</div></div>
+      <div class="row"><span class="dot"></span><div><b>Intent</b> · ${esc(intent.pending ?? 0)} proposals<div class="muted">${esc(intent.note || "proposal ≠ 成交 · paper")}</div></div></div>
+      <div class="row"><span class="dot ${riskDot}"></span><div><b>Risk</b> · ${esc(risk.label || "—")}</div></div>
+      <p class="muted">proposal ≠ 成交 · paper fill 為 simulated／paper fill</p>
+    </section>`;
+  }
+  function activity(data) {
+    const rows = data.activity || [];
+    const items = rows.length ? rows.map((row) => {
+      const tone = row.tone === "mint" || row.tone === "rose" ? row.tone : "muted";
+      const symbol = row.symbol ? " " + row.symbol : "";
+      const evidence = row.evidence ? `<div class="muted">${esc(row.evidence)}</div>` : "";
+      return `<article class="item"><div>${esc(row.time || "—")} · ${esc(row.actor || "Desk")} · ${esc(row.action || "NOTE")}${esc(symbol)}</div><p class="${tone}">${esc(row.result || "—")}</p><div class="muted">${esc(row.mode || "paper")}</div>${evidence}</article>`;
+    }).join("") : `<p class="muted">尚無活動</p>`;
+    return `<section class="card"><h2>Activity · paper</h2>${items}<p class="muted">${esc(data.activity_note || "曲線事件釘延後 · 本輪無")}</p></section>`;
+  }
+  function render() {
+    if (!snap) return;
+    const root = document.getElementById("panel");
+    const body = tab === "status" ? status(snap) : (tab === "activity" ? activity(snap) : morning(snap));
+    root.innerHTML = (errorBanner || "") + body;
+    const honest = document.getElementById("honest");
+    if (honest) honest.textContent = snap.honesty_zh || honest.textContent;
+    const cont = document.getElementById("continuePaper");
+    const pause = document.getElementById("pausePaper");
+    const review = document.getElementById("reviewSeals");
+    if (cont) cont.onclick = () => postPaper("/api/mobile/paper/continue", cont, pause);
+    if (pause) pause.onclick = () => postPaper("/api/mobile/paper/pause", cont, pause);
+    if (review) review.onclick = () => {
+      const detail = document.getElementById("sealDetail");
+      if (!detail || !snap.session_card) return;
+      const card = snap.session_card;
+      detail.hidden = !detail.hidden;
+      detail.textContent = [
+        "seal: " + card.seal,
+        "not_a_seal: " + card.not_a_seal,
+        "claims_beat_spy: " + card.claims_beat_spy,
+        snap.seal_reason ? ("seal_reason: " + snap.seal_reason) : "",
+        card.note || ""
+      ].filter(Boolean).join("\n");
+    };
+  }
+  async function postPaper(path, cont, pause) {
+    if (busy) return;
+    busy = true;
+    if (cont) cont.disabled = true;
+    if (pause) pause.disabled = true;
+    const msg = document.getElementById("paperMsg");
+    try {
+      const res = await fetch(path, {
+        method: "POST",
+        credentials: "include",
+        headers: headers(),
+        body: JSON.stringify({ mode: "paper" })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const detail = typeof data.detail === "string" ? data.detail : ("HTTP " + res.status);
+        paperNote = detail;
+        if (msg) msg.textContent = detail;
+        return;
+      }
+      paperNote = data.running ? "paper worker running" : "paper worker paused";
+      await load();
+    } catch (err) {
+      setLink("不可達", true);
+      if (msg) msg.textContent = UNREACHABLE;
+    } finally {
+      busy = false;
+    }
+  }
+  document.querySelectorAll(".tabs button").forEach((button) => {
+    button.onclick = () => {
+      tab = button.dataset.tab;
+      document.querySelectorAll(".tabs button").forEach((node) => node.classList.toggle("on", node === button));
+      render();
+    };
+  });
+  tickHkt();
+  setInterval(tickHkt, 30000);
+  load();
+  </script>
+</body>
+</html>

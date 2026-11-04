@@ -23,7 +23,7 @@ from backend.pathsetup import ensure_backend_on_path
 ensure_backend_on_path()
 
 from backend.api import desk_zones, intents as intents_api
-from backend.api import research_jobs, worker_ctl
+from backend.api import mobile_desk, research_jobs, worker_ctl
 from backend.api.desk_auth import is_operator, require_operator
 from backend.api.help_chat import HelpChatIn, answer_help_chat, guide_payload
 from backend.api.desk_display import compose_performance_kpis, dual_book_envelope, orders_book
@@ -86,8 +86,10 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title=APP_NAME, version="1.0.0", lifespan=lifespan)
+mobile_desk.install_mobile_guard(app)
 app.include_router(intents_api.router)
 app.include_router(desk_zones.router)
+app.include_router(mobile_desk.router)
 STATIC_DIR = Path(__file__).resolve().parents[2] / "web" / "static"
 app.add_middleware(
     CORSMiddleware,
@@ -105,6 +107,7 @@ app.add_middleware(
 
 _broker = AlpacaBroker()
 _store = create_order_store()
+mobile_desk.set_order_store(_store)
 
 
 def _read_json(path: Path, default):
@@ -907,6 +910,24 @@ def health() -> Dict[str, str]:
 @app.get("/")
 def index():
     return FileResponse(STATIC_DIR / "index.html", headers={"Cache-Control": "no-store"})
+
+
+@app.get("/m")
+def mobile_index():
+    """Read-only phone shell. Does not serve the desktop trading desk."""
+    return FileResponse(STATIC_DIR / "mobile.html", headers={"Cache-Control": "no-store"})
+
+
+@app.get("/m/manifest.webmanifest")
+def mobile_manifest():
+    path = STATIC_DIR / "mobile.webmanifest"
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(
+        path,
+        media_type="application/manifest+json",
+        headers={"Cache-Control": "no-store"},
+    )
 
 
 @app.get("/static/vendor/{filename}")

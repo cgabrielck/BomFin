@@ -3,6 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+  (function(){
+    try{
+      if(window.matchMedia("(max-width: 520px)").matches){
+        var path=location.pathname||"/";
+        if(path==="/"||path==="/index.html") location.replace("/m");
+      }
+    }catch(e){}
+  })();
+  </script>
   <meta name="cgab-paper-controls" content="from-/api/meta" />
   <title>Cgab</title>
   <style>
@@ -321,9 +331,23 @@
       .help-fab { right:14px; bottom:14px; }
       .help-panel { right:12px; bottom:70px; width:calc(100vw - 24px); height:min(480px, calc(100vh - 96px)); }
     }
+    .phone-gate{
+      display:none; min-height:100%; padding:28px 20px; flex-direction:column; gap:14px;
+      background:var(--bg); color:var(--text);
+    }
+    .phone-gate a{color:var(--cyan); min-height:48px; display:inline-flex; align-items:center; font-weight:700;}
+    @media (max-width:520px){
+      .shell,.help-fab,.help-panel,.tour-mask,.zone-toast{display:none;}
+      .phone-gate{display:flex;}
+    }
   </style>
 </head>
 <body>
+<div class="phone-gate" id="phoneGate">
+  <p>手機晨報是 Desk 的唯讀面。</p>
+  <p><a href="/m">開啟晨報</a></p>
+  <p>打不開時：請開啟 Tailscale 後重新整理</p>
+</div>
 <div class="shell">
   <aside class="sidebar">
     <div class="brand"><span class="mark"></span> Cgab</div>

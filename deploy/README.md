@@ -126,3 +126,11 @@ sudo systemctl restart alphadesk-worker.service
 The worker refuses to start with non-paper credentials unless `--allow-live` is
 explicitly passed. Keep `--allow-live` out of the systemd unit during the entire
 validation period. Promoting to live is a deliberate, separate change — not a default.
+
+## 11. Phone read-only Desk (Tailscale Serve)
+
+The phone surface is `/m` on the same Desk process (morning / status / activity).
+It does not replace this worker unit and it does not open live trading.
+Setup for the private mesh and Safari Add to Home Screen is
+[`docs/TAILSCALE_SERVE.md`](../docs/TAILSCALE_SERVE.md).
+ADR-005 stays Draft until the Owner accepts it.
