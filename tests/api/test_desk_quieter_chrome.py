@@ -13,7 +13,8 @@ def _style(html: str) -> str:
 
 
 def test_purple_token_stays_unused_on_chrome():
-    style = _style(INDEX.read_text(encoding="utf-8"))
+    html = INDEX.read_text(encoding="utf-8")
+    style = _style(html)
     assert style.count("#7c6cff") == 1
     assert "--purple:#7c6cff" in style.replace(" ", "")
     assert "var(--purple)" not in style
@@ -21,9 +22,17 @@ def test_purple_token_stays_unused_on_chrome():
     assert "linear-gradient" not in style
     assert "box-shadow" not in style
     assert "backdrop-filter" not in style
+    assert "filter:" not in style
+    assert "width:3px" not in style
+    assert "dashed" not in style
+    assert "#e8b86d" not in html
+    assert html.count("#e7c36a") == 1
+    assert "btn purple" not in html
+    assert "nav-ico" not in html
+    assert "RANK #" not in html
     assert "background:var(--bg)" in style.replace(" ", "")
     assert ".mark{width:28px;height:28px;border-radius:9px;background:var(--cyan);}" in style.replace(" ", "").replace("\n", "")
-    assert ".purple{background:var(--cyan);color:#052226;}" in style.replace(" ", "").replace("\n", "")
+    assert ".purple{" not in style.replace(" ", "").replace("\n", "")
     assert ".help-fab" in style
     fab = style[style.find(".help-fab") : style.find(".help-fab .fab-ico")]
     assert "var(--cyan)" in fab

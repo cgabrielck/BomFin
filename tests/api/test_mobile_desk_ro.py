@@ -187,6 +187,9 @@ def test_mobile_template_has_no_order_controls():
     assert "radial-gradient" not in style
     assert "linear-gradient" not in style
     assert "box-shadow" not in style
+    assert "filter:" not in style
+    assert 'class="dock"' in html
+    assert ".dock{flex:none;" in style.replace(" ", "").replace("\n", "")
     assert "Ask Cgab" not in html
     nav = html[html.find("<nav"):html.find("</nav>")]
     nav_labels = [re.sub(r"\s+", " ", body).strip() for _attrs, body in re.findall(r"<button\b([^>]*)>(.*?)</button>", nav, flags=re.S)]
