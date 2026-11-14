@@ -81,6 +81,17 @@ class TestRiskEngine(unittest.TestCase):
         self.assertFalse(decision.approved)
         self.assertIn("concentration", decision.reason)
 
+    def test_auto_path_can_skip_name_concentration(self):
+        """Desk default still rejects. Auto buys pass enforce_name_concentration=False."""
+        self.engine.limits.max_order_notional = 20000.0
+        order = self._create_order(symbol="AAPL", qty=100, limit=110.0)
+        blocked = self.engine.evaluate_order(order, self.base_account)
+        self.assertFalse(blocked.approved)
+        allowed = self.engine.evaluate_order(
+            order, self.base_account, enforce_name_concentration=False
+        )
+        self.assertTrue(allowed.approved)
+
     def test_reject_total_exposure(self):
         account = self.base_account.model_copy()
         # Max exposure is 90% of 100k = $90k; existing = $85k, new order $10k → $95k → reject

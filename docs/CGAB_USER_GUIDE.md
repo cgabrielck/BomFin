@@ -43,7 +43,7 @@ The top bar **AUTO ON** means the worker process is running (live pid evidence, 
 1. `.env` has `APCA_API_KEY_ID`, `APCA_API_SECRET_KEY`, and `APCA_PAPER=true`.
 2. Kill switch on Desk must be **OFF** (Resume) or the bot will not open new buys.
 3. AI Mode → strategy (start with **stable**) → **Start paper auto**.
-4. The worker polls about once a minute. It fetches prices, scores names, then sizes with Kelly and RiskEngine.
+4. The worker polls about once a minute. It fetches prices, scores names, then sizes with ATR / 1R risk units and RiskEngine. Kelly sizing is off on this auto path (the lab Kelly book under `data/` is unchanged).
 5. Fills appear on **Desk → Holdings** and **Orders**. Empty holdings = no fill yet. **More → Trade journal** shows the same local ledger plus risk rejects (reason codes) and audit/provenance links. An empty journal is not a live book.
 
 US regular hours are about **09:30–16:00 ET**. Outside that window the worker stays alive but **does not run strategy cycles**, unless `.env` has `IGNORE_MARKET_HOURS=true`. Auto Scan (while FastAPI is up) defaults to US session slots; for **hourly 24h Scan** set `SCAN_AUTO=1`, `SCAN_INTERVAL_MIN=60`, and `SCAN_OUTSIDE_HOURS=true`.
@@ -117,7 +117,7 @@ Bind the FastAPI Desk so phones on the same Wi-Fi can open the **same** UI as lo
 1. `.env` 要有 Alpaca 金鑰，且 `APCA_PAPER=true`。
 2. 工作台上的緊急停止必須是關閉（Resume），否則不會開新倉。
 3. AI 模式 → 選策略（建議先用 **stable**）→ **啟動紙上自動交易**。
-4. 行程約每分鐘掃描一次：抓行情、評分、凱利倉位、風控，通過才下單。
+4. 行程約每分鐘掃描一次：抓行情、評分、以 ATR／1R 風險單位計張數、風控，通過才下單。自動路徑唔再用凱利決定張數（`data/` 的凱利實驗帳不變）。
 5. 成交後出現在 **工作台持倉** 與 **訂單**。空白 = 還沒成交。**更多 → 交易日誌** 顯示同一本機帳本，加上風控拒絕（原因碼）與 audit／provenance 連結。日誌空白不是即時成交。
 
 美股正規交易約 **美東 09:30–16:00**。盤外行程仍在，但 **不跑策略迴圈**，除非 `.env` 設 `IGNORE_MARKET_HOURS=true`。自動 Scan（FastAPI 開著時）預設跟美東盤中時段；若要 **全日每小時掃一次**，設 `SCAN_AUTO=1`、`SCAN_INTERVAL_MIN=60`、`SCAN_OUTSIDE_HOURS=true`。

@@ -97,10 +97,18 @@ def test_invalid_stop_does_not_invent_five_percent_risk():
     ) == 0
 
 
-def test_kelly_cap_is_tighter_than_wide_stop_risk_qty():
-    """Wide stop → large 1R size; Kelly (half of 25% cap) should be the min."""
-    from backend.trading.risk.position_sizer import shares_to_buy
+def test_auto_path_does_not_min_with_kelly_when_risk_is_larger():
+    """Helpers still exist. Default auto qty is the 1R leg, not min(Kelly, 1R)."""
+    from backend.trading.risk.position_sizer import (
+        kelly_fraction,
+        position_size_dollars,
+        quantity_after_kelly_gate,
+        shares_to_buy,
+    )
 
+    assert callable(kelly_fraction)
+    assert callable(position_size_dollars)
+    assert callable(shares_to_buy)
     kelly = shares_to_buy(
         portfolio_value=100_000,
         current_price=100,
@@ -112,10 +120,20 @@ def test_kelly_cap_is_tighter_than_wide_stop_risk_qty():
         min_shares=1,
     )
     risk = size_shares_by_risk(
+        equity=100_000,
+        cash=80_000,
+        fill_price=100,
+        stop_price=99.5,
+        risk_pct=0.01,
+        max_position_pct=None,
+    )
+    capped = size_shares_by_risk(
         equity=100_000, cash=80_000, fill_price=100, stop_price=99.5, risk_pct=0.01
     )
-    assert kelly > 0 and risk > 0
-    assert min(kelly, risk) == kelly
+    assert kelly > 0 and risk > kelly
+    assert capped == min(risk, 250)
+    assert quantity_after_kelly_gate(risk, kelly, use_kelly=False) == risk
+    assert quantity_after_kelly_gate(risk, kelly, use_kelly=True) == kelly
 
 
 def test_trend_generates_on_stage2_pullback():

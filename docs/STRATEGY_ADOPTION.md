@@ -12,11 +12,13 @@
 我哋係 **regime-aware long-only**：
 
 - **質素／成長複合選股** + **上升趨勢內均值回歸（Stable）** + **VCP／突破（Aggressive）**
-- 執行層用 **半 Kelly + 硬風控閘**（倉位帽、相關、日虧、殺開關、mandate、bracket）
+- 執行層用 **硬風控閘**（相關、日虧、殺開關、mandate、bracket、ATR／1R）。半 Kelly 公式仍在程式裡，**自動路徑預設唔再用佢決定張數**（見下方 Owner 2026-11-14）
 - **下一步**：P0–P2 已落地（訊號統一、真 RS filter、ATR 1R）。**Wave 2 是 P3 的編碼切片**（Polygon 主路徑 + 美股 session calendar；無 key 則 Yahoo 標成 fallback，**唔改對外敘事／唔當 live**）。多月 paper vs SPY 封印仍係 P3 運維剩餘。見 [`PAID_DATA_PIT_PLAN.md`](PAID_DATA_PIT_PLAN.md)。  
 - **唔係**：FF 多空因子書、CTA／TSMOM 期貨盤、做市／HFT、端到端 RL／深度學習下單機
 
 任何新策略／模型若**不能**寫成「可審計規則 + 風控硬閘 + OOS／shadow 封印」，**禁止**進入主交易路徑。
+
+**Owner 2026-11-14（Gabriel，經 Internet Bot）：** 自動路徑（worker 與 harness 買入）停用 Kelly／半 Kelly 決定張數；`kelly_fraction`／`shares_to_buy`／`position_size_dollars`、`data/` 凱利實驗帳、Streamlit、`portfolio_manager`、回測可選 `calibrated_kelly` **保留**。同一條自動路徑不再把 25% 單名上限（`max_position_concentration=0.25`／`MAX_KELLY_FRACTION` 當硬帽）當綁定限制。仍保留：總曝險 0.90、單筆名目上限、日虧 3%、相關閘、殺開關、mandate、體制 target_allocation（牛 0.90／中 0.70／熊或高波 0.40）、ATR／1R 與 VIX 乘數。`CGAB_AUTO_KELLY_SIZER=1` 先至恢復 `min(Kelly, 1R)`。公平策略回測維持 `risk_pct`（本身唔用 Kelly）；佢嘅 `max_position_pct=0.25` 係該腳本研究旋鈕，唔係呢條自動閘。預設紙上／shadow，不開 live。Merge ≠ runtime。
 
 ---
 
@@ -32,7 +34,7 @@
 | 體制（SPY SMA + VIX → 曝險／權重） | **已引用** | 高 | 規則體制；**非** HMM |
 | 情緒（VADER 類新聞分 ± 細權重；LLM 軟混） | **已引用** | 高 | FinBERT **未做**；Scan 快取 `llm_key_signal` 可進 worker 否決；`WORKER_SENTIMENT_VETO` 預設關；LLM **不可**下單 |
 | 事件（業績衝突降權／黑窗） | **部分** | 中 | 有防護；**無** PEAD 交易規則 |
-| 風險鐵則（半 Kelly、25%/90%、相關、日虧、殺開關、mandate、β／ATR、bracket） | **已引用** | 高 | 產品最大優勢層；worker 倉位 = min(Kelly, 權益 1%／1R ATR) |
+| 風險鐵則（半 Kelly 代碼保留、總曝險 90%、相關、日虧、殺開關、mandate、β／ATR、bracket） | **已引用** | 高 | 自動路徑倉位 = 權益 1%／1R ATR（2026-11-14 停用 Kelly 決定張數，並放開 25% 單名硬帽）。Lab `calibrated_kelly` 仍可選 |
 | 驗證（walk-forward、成本、filing lag、校準閘 Kelly、PIT 宇宙） | **已引用／加強中** | 高 | 仍非機構 CRSP／purged CV |
 | 組合（Kelly／等權 + 板塊帽） | **已引用** | 高 | **無** risk parity／Black–Litterman |
 | 執行（Alpaca shadow／paper、bracket） | **已引用** | 高 | live 需人類閘 |
@@ -118,7 +120,7 @@ Lab 對照（唔搶 P3）：見 [`LAB_CITATION_TRY.md`](LAB_CITATION_TRY.md)／[
 ```text
 Read docs/STRATEGY_ADOPTION.md before changing strategy code.
 Product DNA: regime-aware long-only quality/growth + MR-in-uptrend (Stable)
-+ VCP breakout (Aggressive) + half-Kelly hard risk shell.
++ VCP breakout (Aggressive) + hard risk shell (ATR/1R on the auto path; Kelly code retained, not the default sizer — Owner 2026-11-14).
 DO: unify signals, real relative strength, ATR risk units, paid bars, shadow seal.
 DO NOT: HFT/MM, market-neutral stat-arb, VRP selling, end-to-end DL/RL orders,
 full FF long-short, risk-parity global macro, or third-party scanners as core alpha.
@@ -132,6 +134,7 @@ No live trading without paper/shadow seal per PAPER_VALIDATION_RUNBOOK.md.
 
 | 日期 | 變更 |
 |------|------|
+| 2026-11-14 | Owner 停用自動路徑 Kelly sizing（代碼保留）並放開該路徑 25% 單名硬帽。唔刪實驗帳／i18n／`calibrated_kelly`。 |
 | 2026-09-16 | Wave 5：具名 `defensive_gld`（RED／PANIC 轉 GLD）+ 操作員週頻節奏開關；預設仍 `research_list`／現況全日 demo，唔搶主策略。 |
 | 2026-09-16 | Wave 2 編碼切片：Polygon 主路徑 + 美股 session calendar。無 `POLYGON_API_KEY` 維持 Yahoo fallback 敘事。見 PAID_DATA_PIT_PLAN。 |
 | 2026-09-14 | Lab citation-try：可選 Instructor／FinBERT／QuantStats／Advisory（預設關）；主線仍 P3 paper／shadow 封印。見 LAB_CITATION_TRY / CITATION_REFUSALS。 |

@@ -412,7 +412,7 @@ def test_consume_forwards_risk_extras_to_process_signal(tmp_path):
         now=NOW,
         risk_extras=extras,
     )
-    assert seen == [extras]
+    assert seen == [{**extras, "enforce_name_concentration": False}]
 
 
 def test_sell_zero_position_does_not_open_short(tmp_path):
@@ -430,6 +430,51 @@ def test_sell_zero_position_does_not_open_short(tmp_path):
     assert results[0].action == "skipped_no_long"
     assert results[0].qty == 0
     assert store.get("no-short").status is IntentStatus.ACTIVE
+
+
+def test_buy_qty_is_risk_units_not_kelly(monkeypatch):
+    """Helpers remain. Default H1 buy qty is 1R, and is not min()'d with Kelly."""
+    from backend.trading.risk.position_sizer import (
+        kelly_fraction,
+        position_size_dollars,
+        shares_to_buy,
+    )
+
+    assert callable(kelly_fraction)
+    assert callable(position_size_dollars)
+    assert callable(shares_to_buy)
+    monkeypatch.delenv("CGAB_AUTO_KELLY_SIZER", raising=False)
+
+    def _boom(*_a, **_k):
+        raise AssertionError("default harness buy must not call shares_to_buy")
+
+    monkeypatch.setattr(
+        "backend.trading.engine.harness_realtime.shares_to_buy",
+        _boom,
+    )
+    limits = RiskLimits(max_order_notional=100_000.0)
+    qty = size_intent_qty(
+        parse_intent(_buy(conviction_tier="high", stop={"type": "pct", "value": 0.02})),
+        price=100.0,
+        equity=100_000,
+        limits=limits,
+        account_summary=SimpleNamespace(portfolio_value=100_000, cash=100_000),
+    )
+    # 1% of $100k / $2 stop = 500. Half-Kelly on the retained helper is smaller.
+    kelly = shares_to_buy(
+        portfolio_value=100_000,
+        current_price=100,
+        win_rate=0.55,
+        avg_win_pct=0.08,
+        avg_loss_pct=0.04,
+        kelly_fraction_scale=limits.kelly_scale,
+        max_fraction=limits.max_position_concentration,
+        min_shares=1,
+    )
+    assert kelly > 0
+    assert qty == 500
+    assert qty != kelly
+    assert qty > int(100_000 * limits.max_position_concentration / 100)
 
 
 def test_sell_flatten_uses_long_qty_not_kelly():

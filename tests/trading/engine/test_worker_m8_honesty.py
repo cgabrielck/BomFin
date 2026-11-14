@@ -184,4 +184,57 @@ def test_stop_above_entry_does_not_submit(tmp_path, monkeypatch):
     assert store.get_recent_orders() == []
     actions = {row.get("action") for row in worker.last_signal_summary}
     assert "BUY" not in actions
-    assert worker.last_skip_counts.get("kelly_zero", 0) >= 1
+    assert worker.last_skip_counts.get("risk_size_zero", 0) >= 1
+    assert worker.last_skip_counts.get("kelly_zero", 0) == 0
+
+
+def test_auto_buy_uses_risk_qty_not_min_kelly(tmp_path, monkeypatch):
+    """Tight stop would be Kelly-smaller and over 25% of book. Auto path keeps 1R."""
+    from backend.trading.risk.position_sizer import kelly_fraction, shares_to_buy
+
+    assert callable(kelly_fraction)
+    assert callable(shares_to_buy)
+    _isolate(monkeypatch, tmp_path)
+    monkeypatch.delenv("CGAB_AUTO_KELLY_SIZER", raising=False)
+
+    def _boom(*_a, **_k):
+        raise AssertionError("default auto path must not call shares_to_buy")
+
+    monkeypatch.setattr("backend.trading.engine.worker.shares_to_buy", _boom)
+    worker, broker, _store, account = _worker(
+        TradingMandate(max_notional_per_order=100_000.0)
+    )
+    _force_buy(worker, stop_mult=0.98)
+    _run(worker, account, _bars(100.0))
+
+    broker.submit_order.assert_called_once()
+    sent = broker.submit_order.call_args[0][0]
+    # 1% of $100k / $2 stop = 500 shares ($50k). 25% name cap would be 250.
+    assert sent.quantity == 500
+    assert worker.last_skip_counts.get("kelly_zero", 0) == 0
+
+
+def test_kelly_opt_in_still_mins_with_risk(tmp_path, monkeypatch):
+    """CGAB_AUTO_KELLY_SIZER=1 keeps the old min(); default stays off."""
+    from backend.trading.risk.position_sizer import shares_to_buy
+
+    _isolate(monkeypatch, tmp_path)
+    monkeypatch.setenv("CGAB_AUTO_KELLY_SIZER", "1")
+    worker, broker, _store, account = _worker(
+        TradingMandate(max_notional_per_order=100_000.0)
+    )
+    _force_buy(worker, stop_mult=0.98)
+    kelly = shares_to_buy(
+        portfolio_value=100_000,
+        current_price=100,
+        win_rate=worker.strategy.expected_win_rate,
+        avg_win_pct=0.08,
+        avg_loss_pct=0.04,
+        kelly_fraction_scale=worker.risk_engine.limits.kelly_scale,
+        max_fraction=worker.risk_engine.limits.max_position_concentration,
+        min_shares=1,
+    )
+    assert 0 < kelly < 500
+    _run(worker, account, _bars(100.0))
+    broker.submit_order.assert_called_once()
+    assert broker.submit_order.call_args[0][0].quantity == kelly

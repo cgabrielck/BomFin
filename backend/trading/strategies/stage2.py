@@ -195,9 +195,14 @@ def size_shares_by_risk(
     fill_price: float,
     stop_price: float,
     risk_pct: float = 0.01,
-    max_position_pct: float = 0.25,
+    max_position_pct: Optional[float] = 0.25,
 ) -> int:
-    """Van Tharp: shares = (equity * risk_pct) / (entry - stop), capped by cash and concentration.
+    """Van Tharp: shares = (equity * risk_pct) / (entry - stop), capped by cash.
+
+    ``max_position_pct`` is an optional per-name concentration cap (default
+    0.25, used by lab / strategy-backtest callers). Pass ``None`` to skip
+    that cap. The auto buy path does that: Owner 2026-11-14 lifted the 25%
+    name cap there. Cash and the 1R budget still apply.
 
     The stop must be a positive price strictly below entry. A missing, zero,
     or stop-at-or-above-entry does not define long risk — return 0. Do not
@@ -209,10 +214,20 @@ def size_shares_by_risk(
         book = float(equity)
         purse = float(cash)
         risk = float(risk_pct)
-        conc = float(max_position_pct)
     except (TypeError, ValueError):
         return 0
-    if px <= 0 or book <= 0 or purse < 0 or risk <= 0 or conc <= 0:
+    uncapped = max_position_pct is None
+    conc: Optional[float]
+    if uncapped:
+        conc = None
+    else:
+        try:
+            conc = float(max_position_pct)
+        except (TypeError, ValueError):
+            return 0
+    if px <= 0 or book <= 0 or purse < 0 or risk <= 0:
+        return 0
+    if conc is not None and conc <= 0:
         return 0
     # Stop must sit strictly below entry. <= 0 or stop >= entry is not 1R.
     if not (0 < stop < px):
@@ -220,7 +235,10 @@ def size_shares_by_risk(
     risk_per_share = px - stop
     budget = book * risk
     qty = int(budget / risk_per_share)
-    max_by_conc = int((book * conc) / px)
     max_by_cash = int(purse / px)
-    qty = max(0, min(qty, max_by_conc, max_by_cash))
+    if conc is None:
+        qty = max(0, min(qty, max_by_cash))
+    else:
+        max_by_conc = int((book * conc) / px)
+        qty = max(0, min(qty, max_by_conc, max_by_cash))
     return qty

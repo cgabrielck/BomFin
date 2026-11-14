@@ -73,6 +73,7 @@ class RiskEngine:
         vix_level: Optional[float] = None,
         price_history: Optional[Dict[str, pd.DataFrame]] = None,  # ticker → OHLCV df
         cooldown_tickers: Optional[List[str]] = None,
+        enforce_name_concentration: bool = True,
     ) -> RiskDecision:
         """
         Evaluate *order* against all risk limits.
@@ -84,6 +85,11 @@ class RiskEngine:
             price_history:    Dict of recent OHLCV DataFrames keyed by ticker symbol,
                               used for correlation check.
             cooldown_tickers: Tickers that are in cool-down (sold recently); block re-entry.
+            enforce_name_concentration: When False, Gate 4 (per-name %) does not
+                reject. Desk keeps the default True. The auto buy path passes
+                False (Owner 2026-11-14 lifted the 25% name cap there).
+                ``max_position_concentration`` stays on RiskLimits for that
+                retained check and for the unused Kelly helper.
         """
         if account_summary.portfolio_value <= 0:
             return RiskDecision(approved=False, reason="Portfolio value is zero or negative.")
@@ -128,19 +134,21 @@ class RiskEngine:
                            f"have ${account_summary.buying_power:,.0f}.",
                 )
 
-            # Gate 4: Position concentration
-            existing_val = sum(
-                p.quantity * p.average_entry_price
-                for p in account_summary.positions
-                if p.symbol == order.symbol
-            )
-            new_concentration = (existing_val + order_notional) / account_summary.portfolio_value
-            if new_concentration > self.limits.max_position_concentration:
-                return RiskDecision(
-                    approved=False,
-                    reason=f"Position concentration {new_concentration*100:.1f}% exceeds "
-                           f"{self.limits.max_position_concentration*100:.1f}% limit.",
+            # Gate 4: Position concentration.
+            # Auto buys pass enforce_name_concentration=False. Desk does not.
+            if enforce_name_concentration:
+                existing_val = sum(
+                    p.quantity * p.average_entry_price
+                    for p in account_summary.positions
+                    if p.symbol == order.symbol
                 )
+                new_concentration = (existing_val + order_notional) / account_summary.portfolio_value
+                if new_concentration > self.limits.max_position_concentration:
+                    return RiskDecision(
+                        approved=False,
+                        reason=f"Position concentration {new_concentration*100:.1f}% exceeds "
+                               f"{self.limits.max_position_concentration*100:.1f}% limit.",
+                    )
 
             # Gate 5: Total exposure
             total_invested = sum(p.quantity * p.average_entry_price for p in account_summary.positions)

@@ -1,6 +1,6 @@
 # Architecture Decisions
 
-**Current decision: ADR-003 + Addendum A (Accepted, 2026-10-21).**  
+**Current decision: ADR-003 + Addendum A (Accepted, 2026-10-21) + Addendum B (Accepted, 2026-11-14: auto path does not size with Kelly; 25% name cap lifted there; Kelly code retained).**  
 **ADR-002 is VOID.** ADR-001 remains history only.
 
 This file is the **index**. Canonical ADR-003 text lives in its own file. This file does **not** change live RiskEngine / Kelly / mandate / kill settings or trading runtime code.
@@ -9,7 +9,7 @@ This file is the **index**. Canonical ADR-003 text lives in its own file. This f
 
 ## Index (binding order, highest first)
 
-1. **[`ADR-003-live-ai-trading-desk.md`](ADR-003-live-ai-trading-desk.md)** — **Accepted** by Gabriel (chat) 2026-10-21, including **Addendum A** (Proposal-governed self-upgrade: Learn → Proposal → Approve → Merge; L1 may auto; L2 only after Approve).
+1. **[`ADR-003-live-ai-trading-desk.md`](ADR-003-live-ai-trading-desk.md)** — **Accepted** by Gabriel (chat) 2026-10-21, including **Addendum A** (Proposal-governed self-upgrade: Learn → Proposal → Approve → Merge; L1 may auto; L2 only after Approve) and **Addendum B** (2026-11-14: auto-path sizing is ATR/1R, not Kelly; 25% name cap is not binding there; Kelly code retained).
 2. **[`MODULAR_ARCHITECTURE.md`](MODULAR_ARCHITECTURE.md)** — M1–M13, dual-clock H1–H3, L1/L2, `HarnessProposal`, Intent v0.
 3. **[`AUDIT_REMEDIATION_PLAN_2026-10-21.md`](AUDIT_REMEDIATION_PLAN_2026-10-21.md)** — **Confirmed by Gabriel 2026-10-21** (Hong Kong time). Next-doc work under ADR-003. **Confirmed P0 order:** user-visible journal / provenance first; IntentStore (H1/H3 split) after.
    - **Draft** (pending Owner/PM; not yet Accepted): [`BOUNDED_INTELLIGENCE_ACCEPTANCE.md`](BOUNDED_INTELLIGENCE_ACCEPTANCE.md) — AUDIT item 5 / plan-14 bounded-intelligence acceptance one-pager.

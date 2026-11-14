@@ -165,5 +165,17 @@ Harness／AI **可以**自我升級，但必須走用戶治理路徑：
 
 *Addendum A locked 2026-10-21 from owner decision on proposal-governed self-upgrade.*
 
+---
 
-*ADR-003 drafted 2026-10-21 from PM session. Accepted by Gabriel in chat on 2026-10-21. Addendum A accepted 2026-10-21.*
+## Addendum B — Kelly off on the auto path (2026-11-14)
+
+**Accepted:** Gabriel, 2026-11-14 (HKT), via Internet Bot. **Merge ≠ runtime.** No live. No data purchase.
+
+Auto buys (worker and harness) size with ATR / 1R (`size_shares_by_risk`) plus the order notional cap and the remaining hard gates. Kelly / half-Kelly does **not** set that quantity unless `CGAB_AUTO_KELLY_SIZER=1`. The 25% per-name cap is not a binding limit on that path.
+
+Kept, not deleted: Kelly helpers, `data/` Kelly experiment book, Streamlit / `portfolio_manager` / optional backtest `calibrated_kelly`, and the skip label `kelly_zero` (logged only if the opt-in Kelly leg is what returned 0). Still binding on the auto path: total exposure 0.90, max order notional, daily loss 3%, correlation, kill switch, mandate, regime `target_allocation`, VIX size multiplier. Desk manual orders still use the concentration gate unless a caller turns it off. `RiskLimits` field defaults are unchanged.
+
+*Addendum B recorded 2026-11-14. It does not rewrite the half-Kelly research notes as if the functions were removed.*
+
+
+*ADR-003 drafted 2026-10-21 from PM session. Accepted by Gabriel in chat on 2026-10-21. Addendum A accepted 2026-10-21. Addendum B accepted 2026-11-14.*

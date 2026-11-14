@@ -19,6 +19,7 @@ the journal TradeLogEntry (status=risk_rejected, intent_id set).
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
@@ -28,16 +29,23 @@ from backend.trading.intents.models import Intent, IntentSide, IntentStatus
 from backend.trading.intents.store import JSONIntentStore
 from backend.trading.models import Order, OrderSide, OrderType
 from backend.trading.risk.gates import RiskLimits
-from backend.trading.risk.position_sizer import cap_shares_to_notional, shares_to_buy
+from backend.trading.risk.position_sizer import (
+    auto_kelly_sizer_enabled,
+    cap_shares_to_notional,
+    quantity_after_kelly_gate,
+    shares_to_buy,
+)
+from backend.trading.strategies.stage2 import size_shares_by_risk
 
 logger = logging.getLogger(__name__)
 
-# Conviction selects a fraction of the M8 RiskLimits envelope. It cannot
-# raise size above max_order_notional / max_position_concentration.
+# Conviction selects a fraction of equity for the 1R budget. It cannot
+# raise size above max_order_notional. The 25% name cap is not a buy limit
+# on this path (Owner 2026-11-14).
 TIER_ENVELOPE_SCALE = {"low": 0.50, "med": 0.75, "high": 1.00}
 
-# Kelly inputs used only as the existing StrategyBase defaults so H1 does
-# not invent a new risk% constitution. Caps still come from RiskLimits.
+# Retained Kelly inputs. Used only when CGAB_AUTO_KELLY_SIZER=1 so H1 does
+# not invent a new win-rate. Default auto buys ignore them.
 _DEFAULT_WIN_RATE = 0.55
 _DEFAULT_AVG_WIN_PCT = 0.08
 _DEFAULT_AVG_LOSS_PCT = 0.04
@@ -123,6 +131,31 @@ def _long_position_qty(account: Any, symbol: str) -> float:
     return total
 
 
+def _sizing_cash(account: Any, equity: float) -> float:
+    """Cash for the 1R cap. Missing cash falls back to equity (tests often omit it)."""
+    if account is None:
+        return max(0.0, float(equity))
+    for name in ("cash", "buying_power"):
+        raw = getattr(account, name, None)
+        if raw is None and isinstance(account, dict):
+            raw = account.get(name)
+        if raw is None or raw == "":
+            continue
+        try:
+            return max(0.0, float(raw))
+        except (TypeError, ValueError):
+            continue
+    return max(0.0, float(equity))
+
+
+def _worker_risk_pct() -> float:
+    try:
+        value = float(os.getenv("WORKER_RISK_PCT", "0.01") or 0.01)
+    except (TypeError, ValueError):
+        return 0.01
+    return value if value > 0 else 0.01
+
+
 def size_intent_qty(
     intent: Intent,
     *,
@@ -134,8 +167,10 @@ def size_intent_qty(
 ) -> int:
     """M8 sizer.
 
-    Buys: conviction_tier picks a fraction of the RiskLimits envelope (Kelly).
-    Sells: flatten-only from actual long qty. Never Kelly-buy math; never open a short.
+    Buys: ATR / 1R via size_shares_by_risk. Conviction scales equity.
+    Kelly runs only when auto_kelly_sizer_enabled() (default off) and then
+    still does not apply the 25% name cap on the risk leg.
+    Sells: flatten-only from actual long qty. Never open a short.
     """
     if intent.side == IntentSide.SELL:
         held = _long_position_qty(account_summary, intent.symbol)
@@ -152,16 +187,33 @@ def size_intent_qty(
         vix_mult = 1.0
     if vix_mult <= 0:
         vix_mult = 1.0
-    qty = shares_to_buy(
-        portfolio_value=float(equity) * scale * vix_mult,
-        current_price=float(price),
-        win_rate=_DEFAULT_WIN_RATE,
-        avg_win_pct=_DEFAULT_AVG_WIN_PCT,
-        avg_loss_pct=_DEFAULT_AVG_LOSS_PCT,
-        kelly_fraction_scale=float(limits.kelly_scale),
-        max_fraction=float(limits.max_position_concentration),
-        min_shares=1,
+    use_kelly = auto_kelly_sizer_enabled()
+    qty_kelly = 0
+    if use_kelly:
+        qty_kelly = shares_to_buy(
+            portfolio_value=float(equity) * scale * vix_mult,
+            current_price=float(price),
+            win_rate=_DEFAULT_WIN_RATE,
+            avg_win_pct=_DEFAULT_AVG_WIN_PCT,
+            avg_loss_pct=_DEFAULT_AVG_LOSS_PCT,
+            kelly_fraction_scale=float(limits.kelly_scale),
+            max_fraction=float(limits.max_position_concentration),
+            min_shares=1,
+        )
+    stop_px = stop_price_from_intent(intent, float(price))
+    try:
+        stop_for_risk = float(stop_px) if stop_px is not None else 0.0
+    except (TypeError, ValueError):
+        stop_for_risk = 0.0
+    qty_risk = size_shares_by_risk(
+        equity=float(equity) * scale * vix_mult,
+        cash=_sizing_cash(account_summary, float(equity)),
+        fill_price=float(price),
+        stop_price=stop_for_risk,
+        risk_pct=_worker_risk_pct(),
+        max_position_pct=None,
     )
+    qty = quantity_after_kelly_gate(qty_risk, qty_kelly, use_kelly=use_kelly)
     return cap_shares_to_notional(
         qty,
         float(price),
@@ -378,7 +430,7 @@ def _consume_one_intent(
             reason="no_reference_price",
         )
 
-    # Same MandateGate as the strategy scan path — before Kelly/flatten size.
+    # Same MandateGate as the strategy scan path — before 1R / flatten size.
     blocked = _mandate_blocks(mandate_gate, intent, qty=1, price=px)
     if blocked:
         return ConsumeResult(
@@ -461,11 +513,14 @@ def _consume_one_intent(
         )
 
     try:
+        forwarded = dict(risk_extras or {})
+        if intent.side == IntentSide.BUY:
+            forwarded["enforce_name_concentration"] = False
         try:
             order = process_signal(
                 signal,
                 account_summary=account_summary,
-                risk_extras=risk_extras or {},
+                risk_extras=forwarded,
             )
         except TypeError:
             order = process_signal(signal)

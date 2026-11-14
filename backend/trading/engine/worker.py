@@ -4,7 +4,9 @@ TradingWorker 2.0 — full auto-trading signal polling loop.
 Upgrade from 1.0:
   - Replaces the `pass` stub _run_reconciliation with real position sync
   - Adds _run_strategy_signals() — the core auto-trading loop
-  - Integrates StrategyBase, Kelly sizer, RiskEngine 2.0, and price_history
+  - Integrates StrategyBase, ATR/1R sizer, RiskEngine 2.0, and price_history
+  - Kelly helpers stay importable. Default auto buys do not size with them
+    (Owner 2026-11-14; CGAB_AUTO_KELLY_SIZER=1 restores the old min).
   - Tracks trailing stops per position
   - Tracks cooldown tickers (24h cool-down after sell)
   - Market-hours gate: only trade during US market hours (9:30–16:00 ET)
@@ -44,7 +46,12 @@ from backend.trading.risk.shared_state import (
     active_cooldown_tickers,
     mark_cooldown,
 )
-from backend.trading.risk.position_sizer import cap_shares_to_notional, shares_to_buy
+from backend.trading.risk.position_sizer import (
+    auto_kelly_sizer_enabled,
+    cap_shares_to_notional,
+    quantity_after_kelly_gate,
+    shares_to_buy,
+)
 from backend.trading.strategies.base import StrategyBase
 from backend.trading.strategies.experimental import experimental_strategies_enabled
 from backend.trading.strategies.registry import get_strategy, strategy_choices
@@ -678,20 +685,25 @@ class TradingWorker:
                 note(ticker, "mandate")
                 continue
 
-            # Kelly cap, then ATR / 1R risk units (same formula as backtest).
+            # ATR / 1R risk units, then the order notional cap.
+            # Owner 2026-11-14: Kelly does not set qty unless
+            # CGAB_AUTO_KELLY_SIZER=1. The 25% name cap is not applied here.
             # Invalid stop (missing, <=0, or >= entry) sizes to 0 — do not
             # invent a 5% stop and submit anyway.
             vix_mult = self.risk_engine.vix_size_multiplier(vix_level)
-            qty_kelly = shares_to_buy(
-                portfolio_value=account.portfolio_value * vix_mult,
-                current_price=signal.entry_price,
-                win_rate=self.strategy.expected_win_rate,
-                avg_win_pct=signal.avg_win_pct,
-                avg_loss_pct=signal.avg_loss_pct,
-                kelly_fraction_scale=self.risk_engine.limits.kelly_scale,
-                max_fraction=self.risk_engine.limits.max_position_concentration,
-                min_shares=1,
-            )
+            use_kelly = auto_kelly_sizer_enabled()
+            qty_kelly = 0
+            if use_kelly:
+                qty_kelly = shares_to_buy(
+                    portfolio_value=account.portfolio_value * vix_mult,
+                    current_price=signal.entry_price,
+                    win_rate=self.strategy.expected_win_rate,
+                    avg_win_pct=signal.avg_win_pct,
+                    avg_loss_pct=signal.avg_loss_pct,
+                    kelly_fraction_scale=self.risk_engine.limits.kelly_scale,
+                    max_fraction=self.risk_engine.limits.max_position_concentration,
+                    min_shares=1,
+                )
             cash_now = float(getattr(account, "cash", 0.0) or getattr(account, "buying_power", 0.0) or 0.0)
             try:
                 stop_for_risk = float(signal.stop_loss_price)
@@ -703,9 +715,9 @@ class TradingWorker:
                 fill_price=float(signal.entry_price),
                 stop_price=stop_for_risk,
                 risk_pct=float(os.getenv("WORKER_RISK_PCT", "0.01") or 0.01),
-                max_position_pct=float(self.risk_engine.limits.max_position_concentration),
+                max_position_pct=None,
             )
-            qty = min(qty_kelly, qty_risk) if qty_kelly > 0 and qty_risk > 0 else 0
+            qty = quantity_after_kelly_gate(qty_risk, qty_kelly, use_kelly=use_kelly)
             if entry_px is not None:
                 qty = cap_shares_to_notional(
                     qty,
@@ -716,7 +728,11 @@ class TradingWorker:
                 qty = 0
 
             if qty <= 0:
-                note(ticker, "kelly_zero")
+                # kelly_zero only when the opt-in Kelly leg is what zeroed the order.
+                if use_kelly and qty_kelly <= 0:
+                    note(ticker, "kelly_zero")
+                else:
+                    note(ticker, "risk_size_zero")
                 continue
 
             # Real qty × entry. A cap that 1 share slips under must still
@@ -875,6 +891,7 @@ class TradingWorker:
                     "vix_level": vix_level,
                     "price_history": price_history,
                     "cooldown_tickers": cooldown_tickers,
+                    "enforce_name_concentration": False,
                 },
                 next_bars=next_bars,
             )
@@ -1191,6 +1208,7 @@ class TradingWorker:
                     "vix_level": vix_level,
                     "price_history": price_history,
                     "cooldown_tickers": cooldown_tickers,
+                    "enforce_name_concentration": False,
                 },
                 vix_multiplier=vix_mult,
             )

@@ -4,8 +4,15 @@ Kelly Criterion position sizer.
 References:
   - Edward O. Thorp, "Beat the Dealer" / "The Mathematics of Gambling"
   - Optimal f (Ralph Vince) as alternative
+
+Owner 2026-11-14: these helpers stay in the repo (lab / explicit opt-in).
+The default worker and harness auto-buy path does not call them to set qty.
+Set ``CGAB_AUTO_KELLY_SIZER=1`` to restore ``min(qty_kelly, qty_risk)``.
+That flag does not enable live trading.
 """
 from __future__ import annotations
+
+import os
 
 
 def kelly_fraction(
@@ -81,6 +88,35 @@ def shares_to_buy(
     )
     shares = int(dollars / current_price)
     return max(shares, min_shares) if dollars > 0 else 0
+
+
+def auto_kelly_sizer_enabled() -> bool:
+    """True only when the auto path is explicitly opted back into Kelly.
+
+    Default is off. Owner closed Kelly (and half-Kelly) for live position
+    sizing on the worker / harness auto-buy path. The functions above remain.
+    """
+    raw = os.getenv("CGAB_AUTO_KELLY_SIZER", "").strip().lower()
+    return raw in {"1", "true", "yes", "on"}
+
+
+def quantity_after_kelly_gate(qty_risk: int, qty_kelly: int, *, use_kelly: bool) -> int:
+    """Combine 1R size with the retained Kelly size.
+
+    Default (``use_kelly=False``): return the risk-unit quantity. Kelly is
+    not a ``min()`` input. Opt-in keeps the previous ``min(kelly, risk)``
+    and still returns 0 when either leg is 0.
+    """
+    try:
+        risk = int(qty_risk)
+        kelly = int(qty_kelly)
+    except (TypeError, ValueError):
+        return 0
+    if not use_kelly:
+        return max(0, risk)
+    if kelly > 0 and risk > 0:
+        return min(kelly, risk)
+    return 0
 
 
 def cap_shares_to_notional(shares: float, price: float, max_notional: float) -> int:

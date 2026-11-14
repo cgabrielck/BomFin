@@ -105,7 +105,11 @@ class SignalProcessor:
         logger.info("Processing Signal: %s %s %s", side.value, draft_order.quantity, symbol)
 
         summary = account_summary if account_summary is not None else self.broker.get_account_summary()
-        extras = risk_extras or {}
+        extras = dict(risk_extras or {})
+        # Auto path (worker strategy buys and H1 consume) does not treat the
+        # 25% per-name cap as binding. Desk place_desk_order never comes here.
+        if side == OrderSide.BUY:
+            extras.setdefault("enforce_name_concentration", False)
         risk_decision = self.risk_engine.evaluate_order(draft_order, summary, **extras)
 
         if not risk_decision.approved:

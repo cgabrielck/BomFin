@@ -109,6 +109,11 @@ def run_strategy_backtest(
     sizing_mode:
       - ``fixed_pct``: legacy cash * fixed_cash_pct per entry (old Stable runs).
       - ``risk_pct``: Van Tharp shares = equity*risk_pct / |entry-stop|.
+
+    This default is not Kelly. ``calibrated_kelly`` stays an optional mode on
+    the portfolio backtest (``backend/backtesting/engine.py``). ``max_position_pct``
+    here is this backtest's own knob (default 0.25), not the auto-path name cap
+    Owner lifted on the worker / harness (2026-11-14).
     """
     strategy = get_strategy(strategy_id, **(strategy_params or {}))
     result = StrategyBacktestResult()

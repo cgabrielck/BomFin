@@ -26,8 +26,8 @@ from backend.trading.safety.mandate import MandateGate, TradingMandate
 class FakeAccount:
     """Mock Alpaca account object.
 
-    portfolio_value kept modest so Kelly-sized orders stay under the
-    mandate gate's $10k notional cap in this test harness.
+    portfolio_value kept modest so 1R-sized orders stay near the
+    mandate / notional cap in this test harness. Kelly is not the sizer.
     """
     portfolio_value = 40000.0
     cash = 40000.0
@@ -145,7 +145,7 @@ class TestWorkerIntegration(unittest.TestCase):
             worker._safe_get_account = lambda: FakeAccount()
 
             # Named-strategy signal (not Scan top-5). Inject so this test covers
-            # worker Kelly ∩ 1R sizing + shadow fill, not Connors Stage-2 timing.
+            # worker 1R sizing + shadow fill, not Connors Stage-2 timing.
             from backend.trading.strategies.base import Signal
 
             def _test_signal(ticker, df, fundamental_score, llm_signal, current_positions):
@@ -167,7 +167,7 @@ class TestWorkerIntegration(unittest.TestCase):
             worker.strategy.generate_signal = _test_signal
             worker.strategy.diagnose_entry = lambda *a, **k: None
 
-            # Run one cycle — injected signal should size via min(Kelly, 1R) and fill
+            # Run one cycle — injected signal should size via 1R (not Kelly) and fill
             worker._run_strategy_signals(FakeAccount())
 
             # Verify order was created and filled
@@ -176,7 +176,7 @@ class TestWorkerIntegration(unittest.TestCase):
 
             order = orders[0]
             self.assertEqual(order.symbol, "AAPL")
-            self.assertGreater(order.quantity, 0, "Order should have positive quantity from Kelly sizing")
+            self.assertGreater(order.quantity, 0, "Order should have positive quantity from 1R sizing")
             self.assertEqual(order.status, OrderStatus.FILLED, "Shadow engine should have filled the order")
             self.assertIsNotNone(order.filled_avg_price, "Filled order should have avg price")
             self.assertIsNotNone(order.filled_at, "Filled order should have timestamp")

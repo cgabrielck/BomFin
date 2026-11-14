@@ -46,6 +46,8 @@ MAX_POSITIONS = 10
 INITIAL_CAPITAL = STARTING_CAPITAL
 SIZING_MODE = "risk_pct"
 RISK_PCT = 0.01
+# Research knob for this locked fair script only. Not Kelly, and not the
+# auto-path name cap (Owner lifted that on worker/harness, 2026-11-14).
 MAX_POSITION_PCT = 0.25
 STRATEGIES = ("stable", "aggressive", "hybrid")
 
