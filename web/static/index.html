@@ -89,6 +89,9 @@
     .bars { display:flex; align-items:flex-end; gap:2px; height:140px; }
     .bar { flex:1; background:var(--cyan); border-radius:3px 3px 0 0; min-height:4px; }
     .chart-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+    .interval-row .tab { padding:6px 10px; font-size:12px; font-weight:700; }
+    .synth-tag { font-weight:500; font-size:12px; color:var(--warn); margin-left:4px; }
+    .tab.on .synth-tag { color:#052226; }
     .chart-legend { font-size:12px; font-variant-numeric:tabular-nums; color:var(--text); min-height:18px; margin:6px 0 8px; }
     .chart-legend span { color:var(--muted); margin-right:10px; }
     .chart-host { background:#07141a; border:1px solid var(--line); border-radius:12px; padding:8px; }
@@ -513,6 +516,19 @@ const I18N = {
     "chart.mode.draw":"Draw",
     "chart.mode.measure":"Measure",
     "chart.tf.1d":"1D",
+    "chart.interval":"Interval",
+    "chart.observe.separate":"OpenD series. Separate from the daily snapshot. Not an order.",
+    "chart.series.note":"One series at a time. Period is the daily snapshot. Interval is OpenD.",
+    "chart.observe.prov":"{vendor} · {interval} · {origin} · as-of {asof} · {bars} bars",
+    "chart.synthesized.short":"synthesized",
+    "chart.synthesized.from":"synthesized from {kl}, not a Futu KLType",
+    "chart.observe.last":"last {last} · as-of {asof} · futu_opend",
+    "chart.observe.no_last":"no last · {reason}",
+    "chart.err.opend_unreachable":"OpenD is not reachable. No price was filled in.",
+    "chart.err.permission_denied":"OpenD has no permission for this symbol. No price was filled in.",
+    "chart.err.quota_exhausted":"OpenD quota is exhausted. No price was filled in.",
+    "chart.err.empty":"OpenD returned no bars.",
+    "chart.err.unmapped_symbol":"This symbol is not on the US map.",
     "chart.status":"{symbol} · {tf} · {mode} · {vendor} / {asof}",
     "page.aimode":"AI Mode",
     "page.strategies":"Strategies",
@@ -814,6 +830,19 @@ const I18N = {
     "chart.mode.draw":"畫線",
     "chart.mode.measure":"測量",
     "chart.tf.1d":"1D",
+    "chart.interval":"時框",
+    "chart.observe.separate":"OpenD 序列。與日線快照分開。不是下單。",
+    "chart.series.note":"一次一個序列。期間是日線快照。時框是 OpenD。",
+    "chart.observe.prov":"{vendor} · {interval} · {origin} · as-of {asof} · {bars} 根",
+    "chart.synthesized.short":"合成",
+    "chart.synthesized.from":"由 {kl} 合成，不是官方 KLType",
+    "chart.observe.last":"最新 {last} · as-of {asof} · futu_opend",
+    "chart.observe.no_last":"沒有最新價 · {reason}",
+    "chart.err.opend_unreachable":"連不上 OpenD。沒有填入價格。",
+    "chart.err.permission_denied":"OpenD 對此代碼沒有權限。沒有填入價格。",
+    "chart.err.quota_exhausted":"OpenD 額度已用盡。沒有填入價格。",
+    "chart.err.empty":"OpenD 沒有回傳 K 線。",
+    "chart.err.unmapped_symbol":"此代碼不在美股對照裡。",
     "chart.status":"{symbol} · {tf} · {mode} · {vendor} / {asof}",
     "page.aimode":"AI 模式",
     "page.strategies":"策略",
@@ -1034,6 +1063,11 @@ let page = "desk", symbol = "AAPL", account = null, worker = null, tourStep = 0,
 let paperControls = false, metaState = null;
 let helpOpen = false, helpBusy = false, helpMessages = [];
 let chartPeriod = localStorage.getItem("cgab.chart.period") || "6mo";
+let chartInterval = localStorage.getItem("cgab.chart.interval") || "";
+let chartLive = null;
+let observeWs = null;
+let observePoll = null;
+let observeActive = false;
 let chartInd = null;
 let _deskCharts = [];
 let _lwChartsPromise = null;
@@ -1060,6 +1094,17 @@ let chartKeysBound = false;
 const DRAW_TOOL_ORDER = ["select","trend","hline","fib","zone","measure"];
 const FIB_RATIOS = [-0.272, 0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272];
 const CHART_PERIODS = ["1mo","3mo","6mo","1y","2y"];
+const OBSERVE_INTERVALS = [
+  {tf:"1m"},{tf:"3m"},{tf:"5m"},{tf:"10m"},{tf:"15m"},{tf:"30m"},
+  {tf:"1h"},{tf:"2h"},{tf:"3h"},{tf:"4h"},
+  {tf:"5h", synthesized:true},
+  {tf:"1d"},
+  {tf:"3d", synthesized:true},
+  {tf:"5d", synthesized:true},
+  {tf:"1w"},{tf:"1mo"},{tf:"1q"},{tf:"1y"}
+];
+const OBSERVE_TFS = OBSERVE_INTERVALS.map(item => item.tf);
+if(!OBSERVE_TFS.includes(chartInterval)) chartInterval = "";
 const CHART_IND_DEFAULT = {sma20:true,sma50:true,ema20:true,bb:true,rsi:true,macd:true};
 const t = (k, vars) => {
   let s = (I18N[lang] && I18N[lang][k]) || I18N.en[k] || k;
@@ -1237,6 +1282,7 @@ async function loadWorker(){
 }
 function navTo(p){
   if(!paperControls && (p==="orders" || p==="aimode")) p = "desk";
+  if(page==="chart" && p!=="chart") stopObserveStream(true);
   page=p;
   $$(".nav-btn[data-page]").forEach(b=>b.classList.toggle("on", b.dataset.page===p));
   closeMobileNav();
@@ -2310,6 +2356,7 @@ function clearDrawPointer(){
   drawPointerBind = null;
 }
 function wipeDeskCharts(){
+  chartLive = null;
   _deskCharts.forEach(c => { try { c.remove(); } catch(e){} });
   _deskCharts = [];
   drawCtx = null;
@@ -2410,6 +2457,7 @@ function paintDeskChart(d){
   candleSeries.setData(candles);
   const volSeries = main.addHistogramSeries({ priceFormat:{type:"volume"}, priceScaleId:"volume" });
   volSeries.setData(volumes);
+  chartLive = {gen: chartReq, series: candleSeries, vol: volSeries};
   main.priceScale("volume").applyOptions({ scaleMargins:{ top:0.78, bottom:0 } });
   main.priceScale("right").applyOptions({ scaleMargins:{ top:0.08, bottom:0.22 } });
   const overlay = {
@@ -2941,13 +2989,22 @@ function chartModeKey(){
   if(chartTool==="select") return "chart.mode.observe";
   return "chart.mode.draw";
 }
+function activeObserveTf(){
+  return OBSERVE_TFS.includes(chartInterval) ? chartInterval : "";
+}
+function chartTfLabel(){
+  const tf = activeObserveTf();
+  if(!tf) return t("chart.tf.1d");
+  const item = OBSERVE_INTERVALS.find(row => row.tf===tf);
+  return item && item.synthesized ? tf+" "+t("chart.synthesized.short") : tf;
+}
 function chartStatusLine(){
   const sym = String(symbol||"").trim() || "—";
   const vendor = chartMeta && chartMeta.vendor ? chartMeta.vendor : "—";
   const asof = chartMeta && chartMeta.asof ? chartMeta.asof : "—";
   return t("chart.status", {
     symbol: sym,
-    tf: t("chart.tf.1d"),
+    tf: chartTfLabel(),
     mode: t(chartModeKey()),
     vendor: String(vendor),
     asof: String(asof)
@@ -3926,17 +3983,32 @@ function attachDrawOverlay(chart, series, bars, sym){
   redrawDrawOverlay();
   pushZoneSnapshot();
 }
+function intervalBtn(item){
+  const on = chartInterval===item.tf ? " on" : "";
+  const synth = item.synthesized ? " synth" : "";
+  const tag = item.synthesized ? `<span class="synth-tag">${t("chart.synthesized.short")}</span>` : "";
+  const pressed = chartInterval===item.tf ? "true" : "false";
+  return `<button type="button" class="tab${synth}${on}" data-tf="${item.tf}" aria-pressed="${pressed}">${item.tf}${tag}</button>`;
+}
 function chartShell(inner){
   const on = loadChartInd();
-  const periods = CHART_PERIODS.map(p => `<button type="button" class="tab ${chartPeriod===p?"on":""}" data-p="${p}">${t("chart.period."+p)}</button>`).join("");
+  const intervalOn = OBSERVE_TFS.includes(chartInterval);
+  const periods = CHART_PERIODS.map(p => `<button type="button" class="tab ${!intervalOn && chartPeriod===p?"on":""}" data-p="${p}">${t("chart.period."+p)}</button>`).join("");
+  const intervals = OBSERVE_INTERVALS.map(intervalBtn).join("");
   const tog = (key, label) => `<button type="button" class="ind-btn ${on[key]?"on":""}" data-ind="${key}">${label}</button>`;
+  const lead = intervalOn ? t("chart.observe.separate") : t("chart.lead");
   return `<div class="card"><h3>${t("page.chart")} ${esc(symbol)||"—"}</h3>
-    <p class="muted">${t("chart.lead")}</p>
+    <p class="muted" id="chartLead">${lead}</p>
     <div class="chart-toolbar">
       <input id="chartSym" value="${esc(symbol)}" style="width:110px" />
       <span class="muted">${t("chart.period")}</span>
       <div class="row" id="chartPeriods">${periods}</div>
     </div>
+    <div class="chart-toolbar interval-row" id="chartIntervals">
+      <span class="muted">${t("chart.interval")}</span>
+      <div class="row" role="group" aria-label="${esc(t("chart.interval"))}">${intervals}</div>
+    </div>
+    <p class="muted" id="chartSeriesNote">${t("chart.series.note")}</p>
     <div class="chart-toolbar" id="chartDrawBar">${DRAW_TOOL_ORDER.map(drawToolBtn).join("")}${drawAct("magnet")}${drawAct("hide")}${drawAct("clear")}</div>
     <div class="chart-toolbar" id="chartDrawExtra">${drawToolBtn("text")}${drawAct("undo")}${drawAct("lock")}<input id="drawText" maxlength="80" placeholder="${esc(t("chart.tool.text_prompt"))}" style="width:140px;display:${chartTool==="text"?"":"none"}" /></div>
     <div class="chart-toolbar zone-props" id="zoneProps" style="display:none">
@@ -3975,8 +4047,17 @@ function bindChartChrome(){
   }
   root.querySelectorAll("#chartPeriods .tab").forEach(b => {
     b.onclick = () => {
+      chartInterval = "";
+      localStorage.setItem("cgab.chart.interval", "");
       chartPeriod = b.dataset.p;
       localStorage.setItem("cgab.chart.period", chartPeriod);
+      chart();
+    };
+  });
+  root.querySelectorAll("#chartIntervals .tab").forEach(b => {
+    b.onclick = () => {
+      chartInterval = b.dataset.tf;
+      localStorage.setItem("cgab.chart.interval", chartInterval);
       chart();
     };
   });
@@ -4138,31 +4219,235 @@ function bindChartChrome(){
   }
   syncDrawChrome();
   bindChartKeys();
+  const status = document.getElementById("chartStatus");
+  if(status) status.dataset.gen = String(chartReq);
 }
+function observeReason(code){
+  const key = "chart.err."+String(code||"");
+  const text = t(key);
+  return text===key ? t("chart.err.empty") : text;
+}
+function observeOrigin(d){
+  if(d && d.bar_origin==="synthesized") return t("chart.synthesized.from", {kl: d.synthesized_from || "—"});
+  return d && d.kl_type ? d.kl_type : "native";
+}
+function chartBarsOk(bars){
+  return Array.isArray(bars) && bars.length>0 && bars.every(b => b && b.c!=null && Number(b.c)>0);
+}
+function stopObserveStream(leave){
+  if(observePoll){ clearInterval(observePoll); observePoll = null; }
+  const ws = observeWs;
+  observeWs = null;
+  if(ws){ try { ws.close(); } catch(e){} }
+  if(leave && observeActive){
+    observeActive = false;
+    try {
+      if(navigator.sendBeacon) navigator.sendBeacon("/api/observe/leave");
+      else fetch("/api/observe/leave", {method:"POST", keepalive:true, credentials:"include"});
+    } catch(e){}
+  }
+}
+function showObserveFailure(reason){
+  const text = reason || t("chart.err.empty");
+  chartHasBars = false;
+  chartMeta.asof = "—";
+  chartMeta.vendor = "futu_opend";
+  if(chartLive && chartLive.series){
+    try { chartLive.series.setData([]); } catch(e){}
+    if(chartLive.vol){ try { chartLive.vol.setData([]); } catch(e){} }
+  }
+  wipeDeskCharts();
+  ["tvPrice","tvRsi","tvMacd"].forEach(id => {
+    const node = document.getElementById(id);
+    if(node) node.replaceChildren();
+  });
+  const prov = document.getElementById("chartProv");
+  if(prov) prov.textContent = "";
+  const legend = document.getElementById("chartLegend");
+  if(legend) legend.textContent = "";
+  const last = document.getElementById("chartLast");
+  if(last) last.textContent = t("chart.observe.no_last", {reason: text});
+  const host = document.querySelector(".chart-main");
+  let warn = document.getElementById("chartObserveWarn");
+  if(!warn && host){
+    warn = document.createElement("p");
+    warn.id = "chartObserveWarn";
+    host.insertBefore(warn, host.firstChild);
+  }
+  if(warn){
+    warn.className = "err";
+    warn.hidden = false;
+    warn.textContent = text;
+  }
+  const status = document.getElementById("chartStatus");
+  if(status) status.textContent = chartStatusLine();
+}
+function applyObserveQuote(frame){
+  if(!frame || frame.source!=="futu_opend" || frame.verified===true || frame.live===true) return;
+  if(frame.degraded || frame.error || frame.last==null){
+    showObserveFailure(observeReason(frame.error || "empty"));
+    return;
+  }
+  if(document.getElementById("chartObserveWarn")) return;
+  const node = document.getElementById("chartLast");
+  if(node) node.textContent = t("chart.observe.last", {last: fmtPx(frame.last), asof: frame.asof || "—"});
+  if(frame.asof){
+    chartMeta.asof = frame.asof;
+    chartMeta.vendor = "futu_opend";
+    const status = document.getElementById("chartStatus");
+    if(status) status.textContent = chartStatusLine();
+  }
+}
+function startObserveStream(gen, want){
+  stopObserveStream(false);
+  observeActive = true;
+  const proto = location.protocol==="https:" ? "wss" : "ws";
+  let ws = null;
+  try { ws = new WebSocket(proto+"//"+location.host+"/api/observe/stream"); }
+  catch(e){ ws = null; }
+  observeWs = ws;
+  if(ws){
+    ws.onopen = () => { if(gen===chartReq && observeWs===ws) ws.send(JSON.stringify({symbol: want})); };
+    ws.onmessage = (ev) => {
+      if(gen!==chartReq || page!=="chart") return;
+      let frame = null;
+      try { frame = JSON.parse(ev.data); } catch(e){ return; }
+      if(!frame || frame.verified===true || frame.live===true) return;
+      applyObserveQuote(frame);
+    };
+    ws.onclose = () => { if(observeWs===ws) observeWs = null; };
+  }
+}
+async function refreshObserveBars(gen, want, tf){
+  if(gen!==chartReq || page!=="chart") return;
+  try {
+    const d = await api("/api/observe/bars/"+encodeURIComponent(want)+"?tf="+encodeURIComponent(tf));
+    if(gen!==chartReq || page!=="chart") return;
+    if(!d || d.source!=="futu_opend" || d.verified===true || d.live===true){
+      showObserveFailure(t("chart.err.opend_unreachable"));
+      return;
+    }
+    const bars = chartBarsOk(d.bars) ? d.bars : [];
+    if(d.degraded || d.error || !bars.length){
+      showObserveFailure(observeReason(d.error || "empty"));
+      return;
+    }
+    if(!chartLive || !chartLive.series || chartLive.gen!==gen){
+      renderObserveChart(gen, want, tf, d);
+      return;
+    }
+    const prior = document.getElementById("chartObserveWarn");
+    if(prior) prior.remove();
+    chartHasBars = true;
+    chartLive.series.setData(bars.map(b => ({time:b.t, open:b.o, high:b.h, low:b.l, close:b.c})));
+    if(chartLive.vol) chartLive.vol.setData(toVolume(bars));
+    const prov = document.getElementById("chartProv");
+    if(prov){
+      prov.textContent = t("chart.observe.prov", {
+        vendor: "futu_opend",
+        interval: d.interval || tf,
+        origin: observeOrigin(d),
+        asof: d.asof || "—",
+        bars: String(bars.length)
+      });
+    }
+    chartMeta.asof = d.asof || chartMeta.asof;
+    chartMeta.vendor = "futu_opend";
+    const status = document.getElementById("chartStatus");
+    if(status) status.textContent = chartStatusLine();
+  } catch(e){
+    if(gen!==chartReq || page!=="chart") return;
+    showObserveFailure(t("chart.err.opend_unreachable"));
+  }
+}
+function renderObserveChart(gen, want, tf, d){
+  const bars = chartBarsOk(d && d.bars) ? d.bars : [];
+  const reason = d && d.error ? observeReason(d.error) : "";
+  const synth = d && d.bar_origin==="synthesized";
+  chartMeta = {
+    vendor: "futu_opend",
+    asof: (d && d.asof) || "—",
+    tfLabel: tf + (synth ? " "+t("chart.synthesized.short") : "")
+  };
+  if(!bars.length){
+    chartHasBars = false;
+    wipeDeskCharts();
+    root.innerHTML = chartShell(`<p class="err">${esc(reason || t("chart.empty"))}</p>
+      <p class="muted">${t("chart.not_live")}</p>
+      <p class="muted">${t("chart.not_order")}</p>`);
+    bindChartChrome();
+    startObserveStream(gen, want);
+    return;
+  }
+  const prov = t("chart.observe.prov", {
+    vendor: "futu_opend",
+    interval: (d && d.interval) || tf,
+    origin: observeOrigin(d),
+    asof: d.asof || "—",
+    bars: String(bars.length)
+  });
+  const warn = d && d.degraded && reason ? `<p class="cue" id="chartObserveWarn">${esc(reason)}</p>` : "";
+  root.innerHTML = chartShell(`
+      <p class="muted" id="chartProv">${esc(prov)}</p>
+      ${warn}
+      <p class="muted" id="chartLast"></p>
+      <div class="chart-legend" id="chartLegend"></div>
+      <div class="chart-host">
+        <div class="chart-stage" id="chartStage">
+          <div id="tvPrice" class="tvchart"></div>
+          <canvas id="drawZoneCanvas" class="draw-overlay zone-canvas" width="2" height="2"></canvas>
+          <svg id="drawSvg" class="draw-overlay"></svg>
+        </div>
+        <div id="tvRsi" class="tvchart-pane"></div>
+        <div id="tvMacd" class="tvchart-pane"></div>
+      </div>
+      <p class="muted">${t("chart.not_tv")}</p>
+      <p class="muted">${t("chart.not_live")}</p>
+      <p class="muted">${t("chart.not_order")}</p>`);
+  bindChartChrome();
+  paintDeskChart({symbol: want, bars: bars, indicators: {}});
+  startObserveStream(gen, want);
+  observePoll = setInterval(() => { refreshObserveBars(gen, want, tf); }, 20000);
+}
+window.addEventListener("pagehide", () => stopObserveStream(true));
 async function chart(){
   const gen = ++chartReq;
   wipeDeskCharts();
   const want = String(symbol||"").trim().toUpperCase();
   symbol = want;
   chartHasBars = false;
-  chartMeta = {vendor:"—", asof:"—"};
   loadDrawState(want);
   if(!want || drawState.locked || !paperControls) chartTool = "select";
   if(want) scheduleZoneHydrate();
   const period = CHART_PERIODS.includes(chartPeriod) ? chartPeriod : "6mo";
   chartPeriod = period;
+  const observeTf = OBSERVE_TFS.includes(chartInterval) ? chartInterval : "";
+  if(!observeTf) chartInterval = "";
+  chartMeta = {vendor:"—", asof:"—", tfLabel: chartTfLabel()};
   if(!want){
+    stopObserveStream(true);
     root.innerHTML = chartShell(`<p class="err">${t("chart.empty_symbol")}</p>
       <p class="muted">${t("chart.not_live")}</p>
       <p class="muted">${t("chart.not_order")}</p>`);
     bindChartChrome();
     return;
   }
-  root.innerHTML = chartShell(`<p class="muted">${t("chart.lead")}</p>`);
+  root.innerHTML = chartShell("");
   bindChartChrome();
   try {
     await loadLwCharts();
     if(gen!==chartReq || page!=="chart") return;
+    if(observeTf){
+      stopObserveStream(false);
+      const observed = await api("/api/observe/bars/"+encodeURIComponent(want)+"?tf="+encodeURIComponent(observeTf));
+      if(gen!==chartReq || page!=="chart") return;
+      if(!observed || observed.source!=="futu_opend" || observed.verified===true || observed.live===true){
+        throw new Error(t("chart.load_error"));
+      }
+      renderObserveChart(gen, want, observeTf, observed);
+      return;
+    }
+    stopObserveStream(true);
     const d = await api("/api/chart/"+encodeURIComponent(want)+"?period="+encodeURIComponent(period));
     if(gen!==chartReq || page!=="chart") return;
     const got = String(d.symbol||"").toUpperCase();
@@ -4199,6 +4484,7 @@ async function chart(){
     paintDeskChart(d);
   } catch(e) {
     if(gen!==chartReq || page!=="chart") return;
+    stopObserveStream(true);
     chartHasBars = false;
     wipeDeskCharts();
     const msg = (e && e.message) ? e.message : t("chart.load_error");

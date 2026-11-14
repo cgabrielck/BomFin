@@ -7,6 +7,7 @@
 > **ADR-005** 維持 **Draft**，主題是行動端唯讀（mobile RO），**不同主題**。本檔不升格它，也 **不得** 把它寫成高於本 Accepted。  
 > **ADR-002 is VOID.** Issue **#10 stays OPEN.**  
 > **Merge ≠ Accepted ≠ runtime。** **no live。** **paper only。** 本輪 **docs-only**；不改 runtime／`web/static`／backend／config／risk／mandate／kill／`OrderManager`／券商 adapter。不實作觀察 adapter。  
+> **Implementation pointer (not §5):** the Desk observe adapter, GET/WS routes, and chart interval picker are in a separate draft. That draft is not runtime on `main` until it is gated and merged. The §5 checklist below stays unchecked until a real OpenD session on the owner's machine. `verified` / `live` stay false. No Futu order tools. No account identifiers.  
 > **Index：** [ARCHITECTURE_DECISION.md](ARCHITECTURE_DECISION.md)。  
 > **Author lane：** Docs Arch。不寫執行碼。Status 由 Gabriel 於 2026-11-10（Asia/Hong_Kong / HKT）標為 Accepted。  
 > **對齊：** Option C 雙殼。**Desk**（FastAPI + `web/static`）＝產品面；**Streamlit ≠ 本路徑主面**（lab／legacy）。  
@@ -203,7 +204,7 @@ Desk 側 `tf` 與上表的對照（含合成）見 §4。`1h` 與 `60m` 是同�
 
 ## 4. 介面草圖｜Interface sketch
 
-以下路徑與欄位仍是 **草圖，未實作、未掛載**。決策已 **Accepted**，邊界已鎖：獨立於 `/api/chart`，只讀觀察，來源必為 `futu_opend`，零 order。`tf` 閉集與原生／合成標籤已鎖。實作不得把合成時框改稱官方 KLType，也不得增刪本表以外的時框。路由字串本身不是已上線的 API。
+以下路徑與欄位的閉集仍以這份草圖為準。決策已 **Accepted**，邊界已鎖：獨立於 `/api/chart`，只讀觀察，來源必為 `futu_opend`，零 order。`tf` 閉集與原生／合成標籤已鎖。實作不得把合成時框改稱官方 KLType，也不得增刪本表以外的時框。若實作草稿已進庫，那仍不是 §5 驗收，也不是已在 `main` 上執行的 runtime。路由字串在過閘並合併之前不是已上線的 API。
 
 ### 4.1 Adapter 邊界
 

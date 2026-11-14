@@ -22,7 +22,7 @@ from backend.pathsetup import ensure_backend_on_path
 
 ensure_backend_on_path()
 
-from backend.api import desk_zones, intents as intents_api
+from backend.api import desk_observe, desk_zones, intents as intents_api
 from backend.api import mobile_desk, research_jobs, worker_ctl
 from backend.api.desk_auth import is_operator, require_operator
 from backend.api.help_chat import HelpChatIn, answer_help_chat, guide_payload
@@ -81,6 +81,7 @@ async def lifespan(_app: FastAPI):
     try:
         yield
     finally:
+        desk_observe.shutdown()
         stop_scan()
         stop_inbox()
 
@@ -90,6 +91,7 @@ mobile_desk.install_mobile_guard(app)
 app.include_router(intents_api.router)
 app.include_router(desk_zones.router)
 app.include_router(mobile_desk.router)
+app.include_router(desk_observe.router)
 STATIC_DIR = Path(__file__).resolve().parents[2] / "web" / "static"
 app.add_middleware(
     CORSMiddleware,
