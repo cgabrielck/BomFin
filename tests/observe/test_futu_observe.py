@@ -79,8 +79,12 @@ class FakeGateway:
         if self.fail.get("cur"):
             raise self.fail["cur"]
         if (code, kl_type) in self.current:
-            return list(self.current[(code, kl_type)])
-        return list(self.history.get((code, kl_type), []))
+            rows = list(self.current[(code, kl_type)])
+        else:
+            rows = list(self.history.get((code, kl_type), []))
+        if num is None:
+            return rows
+        return rows[-int(num) :]
 
     def close(self):
         self.closed = True
@@ -287,9 +291,8 @@ def test_each_degrade_path_is_empty_and_still_futu():
         ("snapshot", "opend_unreachable", "quote"),
         ("snapshot", "permission_denied", "quote"),
         ("snapshot", "quota_exhausted", "quote"),
-        ("history", "permission_denied", "bars"),
-        ("history", "quota_exhausted", "bars"),
-        ("history", "opend_unreachable", "bars"),
+        ("cur", "opend_unreachable", "bars"),
+        ("cur", "quota_exhausted", "bars"),
     )
     for method, code, kind in cases:
         gateway = FakeGateway()
@@ -307,6 +310,19 @@ def test_each_degrade_path_is_empty_and_still_futu():
         assert body["error"] == code
         assert body["source"] == "futu_opend"
         assert body["vendor"] == "futu_opend"
+        assert body["verified"] is False
+        assert body["live"] is False
+
+    # History page failure must not blank the chart when cur_kline still works.
+    for code in ("permission_denied", "quota_exhausted", "opend_unreachable"):
+        gateway = FakeGateway()
+        gateway.fail["history"] = ObserveFailure(code)
+        gateway.current[("US.AAPL", "K_1M")] = [_hour(0, 50)]
+        body = _adapter(gateway).bars("AAPL", "1m")
+        assert body["bars"]
+        assert body["bars"][0]["c"] == 50
+        assert body["error"] is None
+        assert body["source"] == "futu_opend"
         assert body["verified"] is False
         assert body["live"] is False
 
@@ -383,15 +399,21 @@ def test_unreachable_and_quota_do_not_replay_last_price_or_bars():
     assert blocked["bars"] == []
 
 
-def test_history_rate_limit_is_quota_exhausted_without_a_fallback_price():
+def test_history_rate_limit_keeps_cur_window_and_blocks_empty_cur():
     gateway = FakeGateway()
-    gateway.history[("US.AAPL", "K_1M")] = [_hour(0, 8)]
+    gateway.current[("US.AAPL", "K_1M")] = [_hour(0, 8)]
     adapter = _adapter(gateway, history_limit=0)
     body = adapter.bars("AAPL", "1m")
-    assert body["error"] == "quota_exhausted"
-    assert body["bars"] == []
-    assert body["last"] is None
+    assert body["error"] is None
+    assert body["bars"][0]["c"] == 8
     assert gateway.history_calls == []
+
+    empty = FakeGateway()
+    blocked = _adapter(empty, history_limit=0).bars("AAPL", "1m")
+    assert blocked["error"] == "quota_exhausted"
+    assert blocked["bars"] == []
+    assert blocked["last"] is None
+    assert empty.history_calls == []
 
 
 def test_public_host_is_refused_and_defaults_stay_local():
@@ -411,6 +433,107 @@ def test_public_host_is_refused_and_defaults_stay_local():
     assert body["error"] == "opend_unreachable"
     assert body["last"] is None
     assert body["source"] == "futu_opend"
+
+
+def test_year_gap_history_page_is_dropped_for_recent_window():
+    gateway = FakeGateway()
+    gateway.history[("US.NVDA", "K_10M")] = [
+        {
+            "time_key": "2025-12-23 10:00:00",
+            "open": 180,
+            "high": 181,
+            "low": 179,
+            "close": 180.5,
+            "volume": 1000,
+        },
+        {
+            "time_key": "2025-12-23 10:10:00",
+            "open": 180.5,
+            "high": 182,
+            "low": 180,
+            "close": 181,
+            "volume": 1000,
+        },
+    ]
+    gateway.current[("US.NVDA", "K_10M")] = [
+        {
+            "time_key": f"2026-11-13 {10 + i // 6:02d}:{(i % 6) * 10:02d}:00",
+            "open": 160 + i * 0.1,
+            "high": 161 + i * 0.1,
+            "low": 159 + i * 0.1,
+            "close": 160.5 + i * 0.1,
+            "volume": 2000 + i,
+        }
+        for i in range(30)
+    ]
+    body = _adapter(gateway).bars("NVDA", "10m", limit=30)
+    times = [int(bar["t"]) for bar in body["bars"]]
+    assert len(body["bars"]) == 30
+    assert times == sorted(times)
+    assert body["degraded"] is False
+    assert body["error"] is None
+    first = datetime.fromtimestamp(times[0], timezone.utc)
+    assert first.year == 2026
+    assert first.month == 11
+    for left, right in zip(times, times[1:]):
+        assert right - left < 4 * 24 * 3600
+
+
+def test_weekend_gap_still_merges_history_and_recent():
+    gateway = FakeGateway()
+    gateway.history[("US.AAPL", "K_1M")] = [
+        {
+            "time_key": "2026-11-06 15:59:00",
+            "open": 10,
+            "high": 11,
+            "low": 9,
+            "close": 10.5,
+            "volume": 100,
+        }
+    ]
+    gateway.current[("US.AAPL", "K_1M")] = [
+        {
+            "time_key": "2026-11-09 09:30:00",
+            "open": 10.6,
+            "high": 11,
+            "low": 10,
+            "close": 10.8,
+            "volume": 100,
+        },
+        {
+            "time_key": "2026-11-09 09:31:00",
+            "open": 10.8,
+            "high": 11,
+            "low": 10,
+            "close": 10.9,
+            "volume": 100,
+        },
+    ]
+    body = _adapter(gateway).bars("AAPL", "1m", limit=10)
+    assert len(body["bars"]) == 3
+    assert body["bars"][0]["c"] == 10.5
+    assert body["bars"][-1]["c"] == 10.9
+
+
+def test_intraday_indicators_keep_unix_bar_times():
+    gateway = FakeGateway()
+    gateway.current[("US.AAPL", "K_10M")] = [
+        {
+            "time_key": f"2026-11-13 {9 + i // 6:02d}:{(i % 6) * 10:02d}:00",
+            "open": 100 + i,
+            "high": 101 + i,
+            "low": 99 + i,
+            "close": 100.5 + i,
+            "volume": 1000,
+        }
+        for i in range(60)
+    ]
+    body = _adapter(gateway).bars("AAPL", "10m", limit=60)
+    assert body["indicators"]["sma20"]
+    bar_times = {bar["t"] for bar in body["bars"]}
+    for point in body["indicators"]["sma20"]:
+        assert isinstance(point["t"], int)
+        assert point["t"] in bar_times
 
 
 def test_observe_package_has_no_order_or_other_feed_api():
@@ -453,6 +576,8 @@ def test_chart_interval_picker_labels_synthesized_and_stays_read_only():
     assert "unlock_trade" not in html
     assert "/api/observe/bars/" in html
     assert "/api/observe/leave" in html
+    assert 'proto+"://"+location.host+"/api/observe/stream"' in html
+    assert 'proto+"//"+location.host+"/api/observe/stream"' not in html
     assert "verified: true" not in html
     assert "live: true" not in html
     chart_fn = html[html.find("async function chart(") : html.find("async function aimode(")]

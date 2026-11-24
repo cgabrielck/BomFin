@@ -45,11 +45,37 @@ def _points(index: pd.Index, series: pd.Series, *, ndigits: int) -> List[Dict[st
     return out
 
 
+def _points_aligned(times: List[Any], series: pd.Series, *, ndigits: int) -> List[Dict[str, Any]]:
+    """Keep each point's ``t`` identical to the source bar (unix seconds or date)."""
+    out: List[Dict[str, Any]] = []
+    for stamp, raw in zip(times, series):
+        value = _finite(raw)
+        if value is None:
+            continue
+        out.append({"t": stamp, "v": round(value, ndigits)})
+    return out
+
+
 def _bar_date(idx: Any) -> str:
     ts = pd.Timestamp(idx)
     if ts.tzinfo is not None:
         ts = ts.tz_convert("America/New_York")
     return ts.strftime("%Y-%m-%d")
+
+
+def _empty_closed_set() -> Dict[str, List[Dict[str, Any]]]:
+    return {
+        "sma20": [],
+        "sma50": [],
+        "ema20": [],
+        "bb_upper": [],
+        "bb_middle": [],
+        "bb_lower": [],
+        "rsi14": [],
+        "macd": [],
+        "macd_signal": [],
+        "macd_hist": [],
+    }
 
 
 def sma(close: pd.Series, length: int) -> pd.Series:
@@ -91,18 +117,7 @@ def macd(close: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9) -> D
 def compute_closed_set(frame: pd.DataFrame) -> Dict[str, List[Dict[str, Any]]]:
     """Return sparse {t,v} series for the GC7 closed indicator set."""
     if frame is None or frame.empty or "Close" not in frame.columns:
-        return {
-            "sma20": [],
-            "sma50": [],
-            "ema20": [],
-            "bb_upper": [],
-            "bb_middle": [],
-            "bb_lower": [],
-            "rsi14": [],
-            "macd": [],
-            "macd_signal": [],
-            "macd_hist": [],
-        }
+        return _empty_closed_set()
     close = pd.to_numeric(frame["Close"], errors="coerce")
     index = frame.index
     bb = bollinger(close, **INDICATOR_PARAMS["bb"])
@@ -118,4 +133,39 @@ def compute_closed_set(frame: pd.DataFrame) -> Dict[str, List[Dict[str, Any]]]:
         "macd": _points(index, macd_s["macd"], ndigits=6),
         "macd_signal": _points(index, macd_s["signal"], ndigits=6),
         "macd_hist": _points(index, macd_s["hist"], ndigits=6),
+    }
+
+
+def compute_closed_set_from_bars(bars: List[Dict[str, Any]]) -> Dict[str, List[Dict[str, Any]]]:
+    """Same formulas as ``compute_closed_set``, with ``t`` copied from each bar.
+
+    Observe intraday bars use unix seconds; daily bars use ``YYYY-MM-DD``.
+    Do not collapse intraday points onto a calendar date.
+    """
+    if not bars:
+        return _empty_closed_set()
+    times: List[Any] = []
+    closes: List[Optional[float]] = []
+    for bar in bars:
+        stamp = bar.get("t")
+        if stamp is None:
+            continue
+        times.append(stamp)
+        closes.append(_finite(bar.get("c")))
+    if not times:
+        return _empty_closed_set()
+    close = pd.Series(closes, dtype="float64")
+    bb = bollinger(close, **INDICATOR_PARAMS["bb"])
+    macd_s = macd(close, **INDICATOR_PARAMS["macd"])
+    return {
+        "sma20": _points_aligned(times, sma(close, 20), ndigits=4),
+        "sma50": _points_aligned(times, sma(close, 50), ndigits=4),
+        "ema20": _points_aligned(times, ema(close, 20), ndigits=4),
+        "bb_upper": _points_aligned(times, bb["upper"], ndigits=4),
+        "bb_middle": _points_aligned(times, bb["middle"], ndigits=4),
+        "bb_lower": _points_aligned(times, bb["lower"], ndigits=4),
+        "rsi14": _points_aligned(times, rsi_wilder(close, 14), ndigits=4),
+        "macd": _points_aligned(times, macd_s["macd"], ndigits=6),
+        "macd_signal": _points_aligned(times, macd_s["signal"], ndigits=6),
+        "macd_hist": _points_aligned(times, macd_s["hist"], ndigits=6),
     }

@@ -16,6 +16,7 @@ from backend.observe.errors import DEGRADE_CODES, ObserveFailure
 from backend.observe.opend_config import MAX_WATCHLIST, OpenDConfig, load_config
 from backend.observe.symbols import parse_internal, to_vendor
 from backend.observe.timeframes import Timeframe, resolve_timeframe, synthesize
+from backend.utils.desk_indicators import compute_closed_set_from_bars
 
 SOURCE = "futu_opend"
 # D6: these failures return an empty price and empty bars. Do not replay the last read.
@@ -27,6 +28,8 @@ TAIL_MIN_SECONDS = 15
 HISTORY_MAX_CALLS = 60
 HISTORY_WINDOW_SECONDS = 30
 POSITION_REFRESH_SECONDS = 60
+# Overnight and a long weekend stay mergeable; a multi-month hole does not.
+MAX_MERGE_GAP_SECONDS = 4 * 24 * 3600
 _ET = ZoneInfo("America/New_York")
 
 PositionProvider = Callable[[], Sequence[str]]
@@ -319,7 +322,7 @@ class FutuObserveAdapter:
             return self._fail(internal, vendor, spec.token, self._boot_error, spec=spec)
         try:
             self._set_chart_locked(internal, spec.token)
-            native, tail_error = self._native_bars_locked(vendor, spec.source_kl)
+            native, tail_error = self._native_bars_locked(vendor, spec.source_kl, limit)
         except ObserveFailure as exc:
             if exc.code in _EMPTY_ON_FAIL:
                 self._drop_series_locked(internal, vendor, spec.source_kl)
@@ -336,36 +339,63 @@ class FutuObserveAdapter:
             error=tail_error,
         )
 
-    def _native_bars_locked(self, vendor: str, kl_type: str) -> tuple[list[dict], str | None]:
+    def _native_bars_locked(self, vendor: str, kl_type: str, limit: int) -> tuple[list[dict], str | None]:
+        """Chart window is ``get_cur_kline(num=limit)``. History extends only when contiguous."""
         key = (vendor, kl_type)
         now = self._clock()
+        need = max(1, min(int(limit or 300), HIST_PAGE))
         cached = self._fresh_cache(vendor, kl_type)
-        if cached is None:
-            if not self._history.allow():
-                raise ObserveFailure("quota_exhausted")
-            rows = self.gateway.history_kline(vendor, kl_type, max_count=HIST_PAGE)
-            cached = [bar for bar in (_clean_bar(row) for row in rows) if bar is not None]
-            self._cache[key] = (now, list(cached))
         tail_at = self._tail_at.get(key, -1e12)
-        if now - tail_at < self._tail_min:
-            return list(cached), None
-        self._tail_at[key] = now
+        if cached is not None and now - tail_at < self._tail_min:
+            return list(cached)[-need:], None
+
         try:
-            tail_rows = self.gateway.cur_kline(vendor, kl_type, num=min(120, HIST_PAGE))
+            tail_rows = self.gateway.cur_kline(vendor, kl_type, num=need)
         except ObserveFailure as exc:
             if exc.code in _EMPTY_ON_FAIL:
                 self._cache.pop(key, None)
                 self._tail_at.pop(key, None)
                 raise
             if cached:
-                return list(cached), exc.code
+                return list(cached)[-need:], exc.code
             raise
-        tail = [bar for bar in (_clean_bar(row) for row in tail_rows) if bar is not None]
-        if tail:
-            cached = _merge_bars(cached, tail)
-            stored_at = self._cache.get(key, (now, cached))[0]
-            self._cache[key] = (stored_at, list(cached))
-        return list(cached), None
+        recent = [bar for bar in (_clean_bar(row) for row in tail_rows) if bar is not None]
+        self._tail_at[key] = now
+
+        hist: list[dict] = []
+        if cached is None:
+            if self._history.allow():
+                try:
+                    rows = self.gateway.history_kline(vendor, kl_type, max_count=HIST_PAGE)
+                    hist = [bar for bar in (_clean_bar(row) for row in rows) if bar is not None]
+                except ObserveFailure as exc:
+                    if not recent:
+                        if exc.code in _EMPTY_ON_FAIL:
+                            self._cache.pop(key, None)
+                            self._tail_at.pop(key, None)
+                        raise
+                    hist = []
+            elif not recent:
+                raise ObserveFailure("quota_exhausted")
+        else:
+            hist = list(cached)
+
+        if recent and hist:
+            if _contiguous_enough(hist, recent):
+                merged = _merge_bars(hist, recent)
+                stored_at = now if cached is None else self._cache.get(key, (now, merged))[0]
+            else:
+                merged = list(recent)
+                stored_at = now
+        elif recent:
+            merged = list(recent)
+            stored_at = now if cached is None else self._cache.get(key, (now, merged))[0]
+        else:
+            merged = list(hist)
+            stored_at = now if cached is None else self._cache.get(key, (now, merged))[0]
+
+        self._cache[key] = (stored_at, list(merged))
+        return list(merged)[-need:], None
 
     def _drop_series_locked(self, internal: str, vendor: str, kl_type: str | None = None) -> None:
         """Forget the last quote and cached bars so a failure cannot be served later."""
@@ -410,6 +440,7 @@ class FutuObserveAdapter:
                 "degraded": degraded,
                 "error": error,
                 "bars": public,
+                "indicators": compute_closed_set_from_bars(public),
             }
         )
         if spec.span_trading_days is not None:
@@ -580,6 +611,30 @@ def _merge_bars(cached: list[dict], tail: list[dict]) -> list[dict]:
     for bar in tail:
         by_time[bar["time"]] = bar
     return [by_time[key] for key in sorted(by_time)]
+
+
+def _bar_epoch(bar: dict) -> float | None:
+    parsed = _parse_et(str(bar.get("time") or ""))
+    if parsed is None:
+        return None
+    return parsed.timestamp()
+
+
+def _contiguous_enough(older: list[dict], newer: list[dict]) -> bool:
+    """True when the newer window abuts or overlaps the older page.
+
+    A weekend gap is fine. A multi-month hole between a history first page
+    and ``get_cur_kline`` is not — keep only the recent window.
+    """
+    if not older or not newer:
+        return True
+    left = _bar_epoch(older[-1])
+    right = _bar_epoch(newer[0])
+    if left is None or right is None:
+        return False
+    if right <= left:
+        return True
+    return (right - left) <= MAX_MERGE_GAP_SECONDS
 
 
 class _ClosedGateway:

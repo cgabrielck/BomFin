@@ -3,7 +3,15 @@ from __future__ import annotations
 
 import pandas as pd
 
-from backend.utils.desk_indicators import bollinger, compute_closed_set, ema, macd, rsi_wilder, sma
+from backend.utils.desk_indicators import (
+    bollinger,
+    compute_closed_set,
+    compute_closed_set_from_bars,
+    ema,
+    macd,
+    rsi_wilder,
+    sma,
+)
 
 
 def _close_frame(values):
@@ -79,3 +87,16 @@ def test_compute_closed_set_skips_warmup_and_does_not_invent_empty():
     dates = {p["t"] for p in series["sma20"]}
     assert series["sma20"][0]["t"] == frame.index[19].strftime("%Y-%m-%d")
     assert frame.index[0].strftime("%Y-%m-%d") not in dates
+
+
+def test_compute_closed_set_from_bars_keeps_unix_seconds():
+    bars = [
+        {"t": 1_700_000_000 + i * 600, "o": 10 + i, "h": 11 + i, "l": 9 + i, "c": 10.5 + i, "v": 100}
+        for i in range(60)
+    ]
+    series = compute_closed_set_from_bars(bars)
+    assert series["sma20"]
+    assert isinstance(series["sma20"][0]["t"], int)
+    assert series["sma20"][0]["t"] == bars[19]["t"]
+    assert all(isinstance(point["t"], int) for point in series["sma20"])
+    assert compute_closed_set_from_bars([])["sma20"] == []

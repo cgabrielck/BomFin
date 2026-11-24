@@ -11,11 +11,16 @@ This module does not fetch bars and does not change Kelly / M8 size.
 """
 from __future__ import annotations
 
-import fcntl
 import json
 import logging
 import os
+import sys
 import threading
+
+if sys.platform == "win32":
+    import msvcrt
+else:
+    import fcntl
 from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -43,12 +48,22 @@ def _exclusive(path: Path):
         def __enter__(self_inner):
             _thread.acquire()
             self_inner.fd = os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o644)
-            fcntl.flock(self_inner.fd, fcntl.LOCK_EX)
+            if sys.platform == "win32":
+                if os.fstat(self_inner.fd).st_size == 0:
+                    os.write(self_inner.fd, b"\0")
+                os.lseek(self_inner.fd, 0, os.SEEK_SET)
+                msvcrt.locking(self_inner.fd, msvcrt.LK_LOCK, 1)
+            else:
+                fcntl.flock(self_inner.fd, fcntl.LOCK_EX)
             return self_inner
 
         def __exit__(self_inner, exc_type, exc, tb):
             try:
-                fcntl.flock(self_inner.fd, fcntl.LOCK_UN)
+                if sys.platform == "win32":
+                    os.lseek(self_inner.fd, 0, os.SEEK_SET)
+                    msvcrt.locking(self_inner.fd, msvcrt.LK_UNLCK, 1)
+                else:
+                    fcntl.flock(self_inner.fd, fcntl.LOCK_UN)
             finally:
                 os.close(self_inner.fd)
                 _thread.release()

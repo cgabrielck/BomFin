@@ -2377,8 +2377,23 @@ function loadLwCharts(){
   }).catch(err => { _lwChartsPromise = null; throw err; });
   return _lwChartsPromise;
 }
+function formatBarTime(time){
+  if(time==null) return "";
+  if(typeof time==="number" && isFinite(time)){
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/New_York",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hour12: false
+    }).formatToParts(new Date(time * 1000));
+    const get = (type) => (parts.find(p => p.type===type) || {}).value || "";
+    return get("year")+"-"+get("month")+"-"+get("day")+" "+get("hour")+":"+get("minute");
+  }
+  if(typeof time==="string") return time.length >= 16 ? time.slice(0,16).replace("T"," ") : time.slice(0,10);
+  return chartTimeStr(time);
+}
 function chartTimeStr(time){
   if(time==null) return "";
+  if(typeof time==="number" && isFinite(time)) return String(time);
   if(typeof time==="string") return time.slice(0,10);
   if(typeof time==="object" && time.year){
     const m = String(time.month).padStart(2,"0");
@@ -2402,10 +2417,10 @@ function indMap(series){
   return m;
 }
 function toLine(series){
-  return (series||[]).filter(p => p && p.t && p.v!=null).map(p => ({time:p.t, value:Number(p.v)}));
+  return (series||[]).filter(p => p && p.t!=null && p.v!=null).map(p => ({time:p.t, value:Number(p.v)}));
 }
 function toVolume(bars){
-  return (bars||[]).filter(b => b && b.t && b.v!=null && isFinite(Number(b.v))).map(b => ({
+  return (bars||[]).filter(b => b && b.t!=null && b.v!=null && isFinite(Number(b.v))).map(b => ({
     time:b.t, value:Number(b.v),
     color: b.c>=b.o ? "rgba(62,224,160,.45)" : "rgba(255,107,129,.45)",
   }));
@@ -2417,18 +2432,21 @@ function chartErrorTitle(err){
   if(status === 404 || /^No chart data$/i.test(msg)) return t("chart.empty");
   return t("chart.load_error");
 }
-function chartTheme(){
+function chartTheme(opts){
+  const timeVisible = !!(opts && opts.timeVisible);
   return {
     layout: { background: { color: "#07141a" }, textColor: "#8aa8ae" },
     grid: { vertLines: { color: "#1a3d44" }, horzLines: { color: "#1a3d44" } },
     rightPriceScale: { borderColor: "#1a3d44" },
-    timeScale: { borderColor: "#1a3d44", timeVisible: false },
+    timeScale: { borderColor: "#1a3d44", timeVisible: timeVisible, secondsVisible: false },
     crosshair: { mode: (window.LightweightCharts && window.LightweightCharts.CrosshairMode && window.LightweightCharts.CrosshairMode.Normal) || 0 },
   };
 }
 function makeDeskChart(el, extra){
   const LW = window.LightweightCharts;
-  const chart = LW.createChart(el, Object.assign({ autoSize: true, width: el.clientWidth || 640 }, chartTheme(), extra||{}));
+  const opts = extra || {};
+  const theme = chartTheme({ timeVisible: !!opts.timeVisible });
+  const chart = LW.createChart(el, Object.assign({ autoSize: true, width: el.clientWidth || 640 }, theme, opts));
   _deskCharts.push(chart);
   return chart;
 }
@@ -2449,7 +2467,8 @@ function paintDeskChart(d){
   const rsiEl = $("#tvRsi");
   const macdEl = $("#tvMacd");
   if(!priceEl) return;
-  const main = makeDeskChart(priceEl, { height: 420 });
+  const intraday = bars.some(b => typeof b.t === "number");
+  const main = makeDeskChart(priceEl, { height: 420, timeVisible: intraday });
   const candleSeries = main.addCandlestickSeries({
     upColor:"#3ee0a0", downColor:"#ff6b81", borderVisible:false,
     wickUpColor:"#3ee0a0", wickDownColor:"#ff6b81",
@@ -2474,7 +2493,7 @@ function paintDeskChart(d){
   overlay.bb_lower.setData(toLine(ind.bb_lower));
   let rsiChart = null, rsiSeries = null;
   if(rsiEl){
-    rsiChart = makeDeskChart(rsiEl, { height: 110 });
+    rsiChart = makeDeskChart(rsiEl, { height: 110, timeVisible: intraday });
     rsiSeries = rsiChart.addLineSeries({ color:"#a78bfa", lineWidth:1, title:"RSI(14)" });
     rsiSeries.setData(toLine(ind.rsi14));
     rsiSeries.createPriceLine({ price:70, color:"#ff6b81", lineWidth:1, lineStyle:1, axisLabelVisible:true, title:"70" });
@@ -2483,9 +2502,9 @@ function paintDeskChart(d){
   }
   let macdChart = null, macdLine = null, macdSig = null, macdHist = null;
   if(macdEl){
-    macdChart = makeDeskChart(macdEl, { height: 110 });
+    macdChart = makeDeskChart(macdEl, { height: 110, timeVisible: intraday });
     macdHist = macdChart.addHistogramSeries({ title:"MACD Hist" });
-    macdHist.setData((ind.macd_hist||[]).filter(p=>p&&p.t&&p.v!=null).map(p => ({
+    macdHist.setData((ind.macd_hist||[]).filter(p=>p&&p.t!=null&&p.v!=null).map(p => ({
       time:p.t, value:Number(p.v), color: Number(p.v)>=0 ? "rgba(62,224,160,.55)" : "rgba(255,107,129,.55)",
     })));
     macdLine = macdChart.addLineSeries({ color:"#60a5fa", lineWidth:1, title:"MACD" });
@@ -2514,11 +2533,12 @@ function paintDeskChart(d){
   const legend = $("#chartLegend");
   const writeLegend = (time) => {
     if(!legend) return;
-    const key = time ? chartTimeStr(time) : (bars.length ? bars[bars.length-1].t : "");
-    const b = byT[key];
+    const raw = time!=null ? time : (bars.length ? bars[bars.length-1].t : null);
+    const b = raw==null ? null : (byT[raw] != null ? byT[raw] : byT[chartTimeStr(raw)]);
     if(!b){ legend.textContent = ""; return; }
+    const key = b.t;
     const on = loadChartInd();
-    const bits = [`<b>${d.symbol}</b> <span>${b.t}</span><span>O ${fmtPx(b.o)}</span><span>H ${fmtPx(b.h)}</span><span>L ${fmtPx(b.l)}</span><span>C ${fmtPx(b.c)}</span><span>V ${fmtVol(b.v)}</span>`];
+    const bits = [`<b>${d.symbol}</b> <span>${formatBarTime(b.t)}</span><span>O ${fmtPx(b.o)}</span><span>H ${fmtPx(b.h)}</span><span>L ${fmtPx(b.l)}</span><span>C ${fmtPx(b.c)}</span><span>V ${fmtVol(b.v)}</span>`];
     if(on.sma20 && maps.sma20[key]!=null) bits.push(`<span>SMA20 ${fmtPx(maps.sma20[key])}</span>`);
     if(on.sma50 && maps.sma50[key]!=null) bits.push(`<span>SMA50 ${fmtPx(maps.sma50[key])}</span>`);
     if(on.ema20 && maps.ema20[key]!=null) bits.push(`<span>EMA20 ${fmtPx(maps.ema20[key])}</span>`);
@@ -2577,19 +2597,21 @@ const CgabDraw = (function(){
 
   function chartTimeStr(time){
     if(time==null) return "";
+    if(typeof time==="number" && isFinite(time)) return String(time);
     if(typeof time==="string") return time.slice(0,10);
     if(typeof time==="object" && time.year){
       const m = String(time.month).padStart(2,"0");
       const d = String(time.day).padStart(2,"0");
       return time.year+"-"+m+"-"+d;
     }
-    return String(time).slice(0,10);
+    return String(time);
   }
   function numOrNull(v){
     const n = Number(v);
     return Number.isFinite(n) ? n : null;
   }
   function timeNum(time){
+    if(typeof time==="number" && isFinite(time)) return time * 1000;
     const s = chartTimeStr(time);
     const ms = Date.parse(s+"T00:00:00Z");
     return Number.isFinite(ms) ? ms : 0;
@@ -4303,7 +4325,7 @@ function startObserveStream(gen, want){
   observeActive = true;
   const proto = location.protocol==="https:" ? "wss" : "ws";
   let ws = null;
-  try { ws = new WebSocket(proto+"//"+location.host+"/api/observe/stream"); }
+  try { ws = new WebSocket(proto+"://"+location.host+"/api/observe/stream"); }
   catch(e){ ws = null; }
   observeWs = ws;
   if(ws){
@@ -4405,7 +4427,7 @@ function renderObserveChart(gen, want, tf, d){
       <p class="muted">${t("chart.not_live")}</p>
       <p class="muted">${t("chart.not_order")}</p>`);
   bindChartChrome();
-  paintDeskChart({symbol: want, bars: bars, indicators: {}});
+  paintDeskChart({symbol: want, bars: bars, indicators: (d && d.indicators) || {}});
   startObserveStream(gen, want);
   observePoll = setInterval(() => { refreshObserveBars(gen, want, tf); }, 20000);
 }
