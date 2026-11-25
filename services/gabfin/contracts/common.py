@@ -37,6 +37,18 @@ ExactDecimal = Annotated[
     WithJsonSchema({"type": "string", "format": "decimal"}),
 ]
 
+PositiveDecimal = Annotated[
+    ExactDecimal,
+    Field(gt=Decimal("0")),
+    WithJsonSchema({"type": "string", "format": "decimal", "x-exclusiveMinimum": "0"}),
+]
+
+NonNegativeDecimal = Annotated[
+    ExactDecimal,
+    Field(ge=Decimal("0")),
+    WithJsonSchema({"type": "string", "format": "decimal", "x-minimum": "0"}),
+]
+
 Ratio = Annotated[
     ExactDecimal,
     Field(ge=Decimal("0"), le=Decimal("1")),
@@ -71,6 +83,17 @@ UtcTimestamp = Annotated[
 
 NonEmptyText = Annotated[str, StringConstraints(strict=True, strip_whitespace=True, min_length=1)]
 CurrencyCode = Annotated[str, StringConstraints(strict=True, pattern=r"^[A-Z]{3}$")]
+
+
+def _opaque_key(value: object) -> object:
+    if not isinstance(value, str) or not value or value != value.strip():
+        raise ValueError("Opaque keys must be nonempty strings without edge whitespace")
+    if any(ord(character) < 32 or ord(character) == 127 for character in value):
+        raise ValueError("Opaque keys cannot contain control characters")
+    return value
+
+
+OpaqueKey = Annotated[str, BeforeValidator(_opaque_key), StringConstraints(strict=True, min_length=1)]
 
 
 class ContractModel(BaseModel):
