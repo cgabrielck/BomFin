@@ -19,6 +19,9 @@ def _validate(result,operation="metadata"):
     if operation=='options_smoke':
         from gabfin.providers.futu.options import validate_smoke
         validate_smoke(m);return result
+    if operation=='history_smoke':
+        from gabfin.providers.futu.history import validate_smoke
+        validate_smoke(m);return result
     if not isinstance(m,dict) or set(m)!=FIELDS:raise ValueError()
     if m['status'] not in ('metadata_available','metadata_incomplete','quote_not_logged_in'):raise ValueError()
     if m['quote_logged_in'] is not None and type(m['quote_logged_in']) is not bool:raise ValueError()
@@ -37,11 +40,12 @@ def _validate(result,operation="metadata"):
 def run_probe(python:Path,*,host:str,port:int,timeout:float,encrypted=False,rsa_file=None,operation="metadata",_worker=None):
     def failure(status):return {'status':status,'metadata':None}
     try:
-        if operation not in ("metadata","equity_smoke","options_smoke"):raise ValueError()
+        if operation not in ("metadata","equity_smoke","options_smoke","history_smoke"):raise ValueError()
         ip=ipaddress.ip_address(host)
         if ip.is_unspecified or ip.is_multicast or type(port) is not int or not 1<=port<=65535:raise ValueError()
         if type(timeout) not in (int,float) or not math.isfinite(timeout) or not 0<timeout<=120:raise ValueError()
         if operation=='options_smoke' and timeout<90:raise ValueError()
+        if operation=='history_smoke' and timeout<70:raise ValueError()
         if type(encrypted) is not bool or (not ip.is_loopback and not encrypted):raise ValueError()
         key=str(Path(rsa_file).resolve(strict=True)) if rsa_file is not None else None
         if encrypted and key is None:raise ValueError()
@@ -67,9 +71,13 @@ def main():
     import argparse
     p=argparse.ArgumentParser(description='Bounded quote-only OpenD metadata probe')
     p.add_argument('--python',required=True,type=Path);p.add_argument('--host',required=True);p.add_argument('--port',required=True,type=int);p.add_argument('--timeout',type=float,default=None)
-    p.add_argument('--operation',choices=['metadata','equity_smoke','options_smoke'],default='metadata')
+    p.add_argument('--operation',choices=['metadata','equity_smoke','options_smoke','history_smoke'],default='metadata')
     p.add_argument('--encrypted',action='store_true');p.add_argument('--rsa-file',type=Path)
-    a=p.parse_args();deadline=a.timeout if a.timeout is not None else (110 if a.operation=='options_smoke' else 10)
+    a=p.parse_args();deadline=a.timeout if a.timeout is not None else {'options_smoke':110,'history_smoke':110}.get(a.operation,10)
     r=run_probe(a.python,host=a.host,port=a.port,timeout=deadline,encrypted=a.encrypted,rsa_file=a.rsa_file,operation=a.operation)
-    print(json.dumps(r,indent=2));return 0 if r['status']=='ok' and (r['metadata'].get('status')=='metadata_available' or (r['metadata'].get('kind') in ('equity_smoke','options_smoke') and not r['metadata']['errors'] and r['metadata']['cleanup']=='unsubscribed')) else 2
+    print(json.dumps(r,indent=2))
+    if r['status']=='ok' and r['metadata'].get('kind')=='history_smoke':
+        from gabfin.providers.futu.history import successful
+        return 0 if successful(r['metadata']) else 2
+    return 0 if r['status']=='ok' and (r['metadata'].get('status')=='metadata_available' or (r['metadata'].get('kind') in ('equity_smoke','options_smoke') and not r['metadata']['errors'] and r['metadata']['cleanup']=='unsubscribed')) else 2
 if __name__=='__main__':raise SystemExit(main())
