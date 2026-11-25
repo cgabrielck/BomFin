@@ -1,0 +1,98 @@
+{
+  "base_head": "2dba0be7adf1f74a489031a1774edd5fd4dd15d4",
+  "current_head": "24ae093b7b8cbf7a4263faaf1a9e0a616f8d5c35",
+  "source_paths": [
+    "pyproject.toml",
+    "services/gabfin/__init__.py",
+    "services/gabfin/contracts/__init__.py",
+    "services/gabfin/contracts/common.py",
+    "services/gabfin/contracts/intent.py",
+    "tests/gabfin/test_contracts.py"
+  ],
+  "protected_legacy_files": 477,
+  "legacy_files_unchanged": true,
+  "lockfile_preserved": true,
+  "baseline_evidence_preserved": true,
+  "results": {
+    "common-red": {
+      "tests": 41,
+      "failures": 41,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 0,
+      "seconds": 2.275
+    },
+    "common-green": {
+      "tests": 41,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 41,
+      "seconds": 1.707
+    },
+    "intent-red": {
+      "tests": 83,
+      "failures": 42,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 41,
+      "seconds": 2.418
+    },
+    "contracts-green": {
+      "tests": 83,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 83,
+      "seconds": 1.789
+    },
+    "full-regression": {
+      "tests": 1295,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "passed": 1291,
+      "seconds": 69.196
+    },
+    "epoch-string-red": {
+      "tests": 9,
+      "failures": 3,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 6,
+      "seconds": 1.892
+    },
+    "contracts-final": {
+      "tests": 86,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 86,
+      "seconds": 1.887
+    },
+    "full-final": {
+      "tests": 1298,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "passed": 1294,
+      "seconds": 64.499
+    }
+  },
+  "full_regression_console_seconds": 65.49,
+  "wheel_sha256": "4f467254e5759bd75e68ed71ba58ca439bf0df36ed5af936f70a5965862ecb26",
+  "wheel_matches_current_source": true,
+  "known_warning": "Pandas4Warning: backend/research/comps.py:26",
+  "known_skips": "4 optional Postgres cases: psycopg is not installed",
+  "user_decision": "StrategyIntent uses long/short plus open/reduce/close position_effect",
+  "journal_side_effect_archived": true,
+  "worker_pid_present": false,
+  "source_sha256": {
+    "pyproject.toml": "00d95d653c8f910aa633bdaf7bed1d8bb940f95ea25b8fd1a80e07a9ebd737e6",
+    "services/gabfin/__init__.py": "d23b6e61093d84d8541691b42c0a4cfbdc03976c734c87e4f34f2eb75004da53",
+    "services/gabfin/contracts/__init__.py": "58964b0743d1eeb3ac0d815121f2752f25e2ee90e9ba0cfcd4225085f9c1a134",
+    "services/gabfin/contracts/common.py": "a48255883c0c2145269f10f2b10f0ab51fffa5d06a495b3fa62dd058f5134feb",
+    "services/gabfin/contracts/intent.py": "0901c56b83ab590ef235868c22d3648236e9f0f6c4cfa22b91bb0a47d05a4a23",
+    "tests/gabfin/test_contracts.py": "c23402d4798168ee5a3fcac5abecc8fa5e413c64c68861889e33e3b20e59e770"
+  }
+}

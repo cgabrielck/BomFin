@@ -1,0 +1,109 @@
+import sys
+from pathlib import Path
+
+import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
+
+from utils import chart_utils
+
+
+def _history() -> pd.DataFrame:
+    index = pd.DatetimeIndex([
+        pd.Timestamp("2026-07-21 08:00", tz="America/New_York"),
+        pd.Timestamp("2026-07-21 09:30", tz="America/New_York"),
+        pd.Timestamp("2026-07-21 10:00", tz="America/New_York"),
+        pd.Timestamp("2026-07-21 16:30", tz="America/New_York"),
+    ])
+    return pd.DataFrame({
+        "Open": [99, 100, 101, 102], "High": [100, 102, 103, 104],
+        "Low": [98, 99, 100, 101], "Close": [99.5, 101, 102, 103],
+        "Volume": [10, 20, 30, 40],
+    }, index=index)
+
+
+def test_normalize_chart_frame_filters_extended_hours() -> None:
+    frame = chart_utils.normalize_chart_frame(_history(), is_intraday=True, extended_hours=False)
+
+    assert len(frame) == 2
+    assert str(frame.index.tz) == "America/New_York"
+    assert frame.index[0].strftime("%H:%M") == "09:30"
+
+
+def test_normalize_chart_frame_keeps_extended_hours() -> None:
+    frame = chart_utils.normalize_chart_frame(_history(), is_intraday=True, extended_hours=True)
+
+    assert len(frame) == 4
+
+
+def test_fetch_chart_data_falls_back_to_http(monkeypatch) -> None:
+    class EmptyTicker:
+        def __init__(self, ticker):
+            self.ticker = ticker
+
+        def history(self, **kwargs):
+            return pd.DataFrame()
+
+    repeated = pd.concat([_history()] * 3).sort_index()
+    repeated.index = pd.date_range("2026-07-21 09:30", periods=len(repeated), freq="5min", tz="America/New_York")
+    monkeypatch.setattr(chart_utils.yf, "Ticker", EmptyTicker)
+    monkeypatch.setattr(chart_utils, "_fetch_yahoo_chart_http", lambda *args, **kwargs: repeated)
+    chart_utils.fetch_chart_data.clear()
+
+    result = chart_utils.fetch_chart_data("AAPL", "5m", False)
+
+    assert result["provider"] == "yahoo_chart_http"
+    assert len(result["data"]) == 12
+
+
+def test_empty_symbol_does_not_fetch_or_invent_bars(monkeypatch) -> None:
+    def boom(*_args, **_kwargs):
+        raise AssertionError("empty symbol must not fetch")
+
+    monkeypatch.setattr(chart_utils.yf, "Ticker", boom)
+    monkeypatch.setattr(chart_utils, "fetch_daily_adjusted", boom)
+    monkeypatch.setattr(chart_utils, "_fetch_yahoo_chart_http", boom)
+    chart_utils.fetch_chart_data.clear()
+
+    result = chart_utils.fetch_chart_data("   ", "1d", False)
+
+    assert result["error"] == "empty symbol"
+    assert result["stage"] == "symbol"
+    assert "data" not in result
+
+
+def test_invalid_ohlcv_returns_empty_frame() -> None:
+    frame = chart_utils.normalize_chart_frame(pd.DataFrame({"Close": [100]}), False, False)
+
+    assert frame.empty
+
+
+def test_daily_chart_uses_alpha_vantage_before_yahoo_http(monkeypatch) -> None:
+    class EmptyTicker:
+        def __init__(self, ticker):
+            self.ticker = ticker
+
+        def history(self, **kwargs):
+            return pd.DataFrame()
+
+    history = pd.DataFrame({
+        "Open": [100 + i for i in range(12)],
+        "High": [101 + i for i in range(12)],
+        "Low": [99 + i for i in range(12)],
+        "Close": [100.5 + i for i in range(12)],
+        "Volume": [1000 + i for i in range(12)],
+    }, index=pd.date_range("2026-01-01", periods=12, freq="B"))
+    monkeypatch.setattr(chart_utils.yf, "Ticker", EmptyTicker)
+    monkeypatch.setattr(chart_utils, "fetch_daily_adjusted", lambda *args, **kwargs: {
+        "data": history, "provider": "alpha_vantage", "as_of": "2026-01-16",
+    })
+    monkeypatch.setattr(
+        chart_utils, "_fetch_yahoo_chart_http",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("Yahoo HTTP should not run")),
+    )
+    chart_utils.fetch_chart_data.clear()
+
+    result = chart_utils.fetch_chart_data("TEST", "1d", False)
+
+    assert result["provider"] == "alpha_vantage"
+    assert result["adjusted"] is True

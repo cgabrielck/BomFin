@@ -1,0 +1,30 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 494 items
+
+tests\gabfin\test_contracts.py ......................................... [  8%]
+.............................................                            [ 17%]
+tests\gabfin\test_identity_contracts.py ................................ [ 23%]
+.......................                                                  [ 28%]
+tests\gabfin\test_job_contracts.py ..................................... [ 36%]
+...................                                                      [ 39%]
+tests\gabfin\test_market_contracts.py .................................. [ 46%]
+...............................................                          [ 56%]
+tests\gabfin\test_market_events.py ..................................... [ 63%]
+                                                                         [ 63%]
+tests\gabfin\test_migrations.py ..                                       [ 64%]
+tests\gabfin\test_order_policy_contracts.py ............................ [ 69%]
+........................................                                 [ 77%]
+tests\gabfin\test_research_contracts.py ................................ [ 84%]
+...................                                                      [ 88%]
+tests\gabfin\test_schema_artifact.py .                                   [ 88%]
+tests\gabfin\test_session_auth.py ....                                   [ 89%]
+tests\gabfin\test_subscription_contracts.py ............................ [ 94%]
+.................                                                        [ 98%]
+tests\gabfin\test_support_contracts.py ........                          [100%]
+
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-completion\targeted.xml -
+============================= 494 passed in 4.43s =============================

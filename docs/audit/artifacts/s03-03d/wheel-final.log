@@ -1,0 +1,13 @@
+Processing .\.
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: gabfin
+  Building wheel for gabfin (pyproject.toml): started
+  Building wheel for gabfin (pyproject.toml): finished with status 'done'
+  Created wheel for gabfin: filename=gabfin-0.1.0-py3-none-any.whl size=35556 sha256=1233edfee8feeccf5f544caab91f5f1323e04f28ba560fd379932c80c039fa7b
+  Stored in directory: C:\Users\001\AppData\Local\Temp\pip-ephem-wheel-cache-39km_vnb\wheels\1a\4f\61\4c8e04eca59b976ac83896658e543c976a0d4f834e0a20f113
+Successfully built gabfin

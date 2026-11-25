@@ -1,0 +1,265 @@
+{
+  "repository": "mattpocock/skills",
+  "revision": "d65391149dbb5fe76478e76fa8d5122b2aa5a70e",
+  "files": [
+    {
+      "skill": "code-review",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/code-review/SKILL.md",
+      "sha": "83183e0ad36fd0eef25d37c7e483284b7e34c1f0",
+      "size": 6721
+    },
+    {
+      "skill": "code-review",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/code-review/agents/openai.yaml",
+      "sha": "9076774ba327f49068db9273feceda03bfe940fa",
+      "size": 100
+    },
+    {
+      "skill": "codebase-design",
+      "relative": "DEEPENING.md",
+      "upstream_path": "skills/engineering/codebase-design/DEEPENING.md",
+      "sha": "cd94075cfd754d147555c5d747a16431ed4c7dd8",
+      "size": 2553
+    },
+    {
+      "skill": "codebase-design",
+      "relative": "DESIGN-IT-TWICE.md",
+      "upstream_path": "skills/engineering/codebase-design/DESIGN-IT-TWICE.md",
+      "sha": "aebdc9f8c05b40d7832de38e2fd8380e1e5507ac",
+      "size": 2699
+    },
+    {
+      "skill": "codebase-design",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/codebase-design/SKILL.md",
+      "sha": "3f63c8146dd2604b419c929e9876b90c30d410e9",
+      "size": 6446
+    },
+    {
+      "skill": "codebase-design",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/codebase-design/agents/openai.yaml",
+      "sha": "3180715edb37f6e96bec42f92f00169faa8886ef",
+      "size": 102
+    },
+    {
+      "skill": "domain-modeling",
+      "relative": "ADR-FORMAT.md",
+      "upstream_path": "skills/engineering/domain-modeling/ADR-FORMAT.md",
+      "sha": "d7e61f30a9fd8ca70d9ee68f019c2a9ebf2d13f7",
+      "size": 2733
+    },
+    {
+      "skill": "domain-modeling",
+      "relative": "GLOSSARY-FORMAT.md",
+      "upstream_path": "skills/engineering/domain-modeling/GLOSSARY-FORMAT.md",
+      "sha": "9c0b4c7a2e8507c23cbb5e0baa66d81699321cc6",
+      "size": 2300
+    },
+    {
+      "skill": "domain-modeling",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/domain-modeling/SKILL.md",
+      "sha": "a4438c6879c517d1a08e2b5fbca049b632688dfe",
+      "size": 3346
+    },
+    {
+      "skill": "domain-modeling",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/domain-modeling/agents/openai.yaml",
+      "sha": "7f1522d2f11506ee205275ab7c282aa52366ecf6",
+      "size": 101
+    },
+    {
+      "skill": "implement",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/implement/SKILL.md",
+      "sha": "bd49e472984c7b99aac40286fdae749bb955a842",
+      "size": 622
+    },
+    {
+      "skill": "implement",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/implement/agents/openai.yaml",
+      "sha": "f8794dc153b409052a9167baf10858cf01b36175",
+      "size": 139
+    },
+    {
+      "skill": "improve-codebase-architecture",
+      "relative": "HTML-REPORT.md",
+      "upstream_path": "skills/engineering/improve-codebase-architecture/HTML-REPORT.md",
+      "sha": "e39e8255b8797cf8257d014fb6658fb533f3a399",
+      "size": 6641
+    },
+    {
+      "skill": "improve-codebase-architecture",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "sha": "f1eabb568464f03ae79a3346fc1918fdde6d8285",
+      "size": 6028
+    },
+    {
+      "skill": "improve-codebase-architecture",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/improve-codebase-architecture/agents/openai.yaml",
+      "sha": "706fdca096da5937fe57875a9154017d50668c42",
+      "size": 166
+    },
+    {
+      "skill": "setup-matt-pocock-skills",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/setup-matt-pocock-skills/SKILL.md",
+      "sha": "2df0b07981718fa5d9a51526dfbcaee87e3a543d",
+      "size": 7526
+    },
+    {
+      "skill": "setup-matt-pocock-skills",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/setup-matt-pocock-skills/agents/openai.yaml",
+      "sha": "65a0da8128c98051183235e490767a8065310868",
+      "size": 152
+    },
+    {
+      "skill": "setup-matt-pocock-skills",
+      "relative": "domain.md",
+      "upstream_path": "skills/engineering/setup-matt-pocock-skills/domain.md",
+      "sha": "4032de016c1e91119d33d477633e2b8f265f4195",
+      "size": 2042
+    },
+    {
+      "skill": "setup-matt-pocock-skills",
+      "relative": "issue-tracker-github.md",
+      "upstream_path": "skills/engineering/setup-matt-pocock-skills/issue-tracker-github.md",
+      "sha": "dc806f5655ae34c1701170f98208e5fb5dba7045",
+      "size": 5082
+    },
+    {
+      "skill": "setup-matt-pocock-skills",
+      "relative": "issue-tracker-gitlab.md",
+      "upstream_path": "skills/engineering/setup-matt-pocock-skills/issue-tracker-gitlab.md",
+      "sha": "1aeb5d04fadd9b7240e3f70dff20a758a1c729ea",
+      "size": 3979
+    },
+    {
+      "skill": "setup-matt-pocock-skills",
+      "relative": "issue-tracker-local.md",
+      "upstream_path": "skills/engineering/setup-matt-pocock-skills/issue-tracker-local.md",
+      "sha": "0209a19af92c9c485cf3acc3d9e253171517ea17",
+      "size": 1810
+    },
+    {
+      "skill": "setup-matt-pocock-skills",
+      "relative": "triage-labels.md",
+      "upstream_path": "skills/engineering/setup-matt-pocock-skills/triage-labels.md",
+      "sha": "5276464244857a3cc29890ff4a978a197b21f3fc",
+      "size": 1057
+    },
+    {
+      "skill": "tdd",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/tdd/SKILL.md",
+      "sha": "01eadaa34e7c9a63a67d6dc3cce1cc81b0e49985",
+      "size": 3629
+    },
+    {
+      "skill": "tdd",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/tdd/agents/openai.yaml",
+      "sha": "651b838a7663e027b1b8884491e867f26bb9a021",
+      "size": 87
+    },
+    {
+      "skill": "tdd",
+      "relative": "mocking.md",
+      "upstream_path": "skills/engineering/tdd/mocking.md",
+      "sha": "71cbfee674d93244ce81d1830b930ca9a69200bd",
+      "size": 1481
+    },
+    {
+      "skill": "tdd",
+      "relative": "tests.md",
+      "upstream_path": "skills/engineering/tdd/tests.md",
+      "sha": "7ab86479f925a1f9e8ba680af33cb3b12e015381",
+      "size": 2214
+    },
+    {
+      "skill": "to-spec",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/to-spec/SKILL.md",
+      "sha": "3f52599ae2a4347aee5a07432c2707518e691a7f",
+      "size": 3043
+    },
+    {
+      "skill": "to-spec",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/to-spec/agents/openai.yaml",
+      "sha": "549e6f76f020a1b9ba65f52ccda336566ee6222a",
+      "size": 135
+    },
+    {
+      "skill": "to-tickets",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/engineering/to-tickets/SKILL.md",
+      "sha": "9b77a01db9460c99c22d03c910c349f890f12c0e",
+      "size": 5812
+    },
+    {
+      "skill": "to-tickets",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/engineering/to-tickets/agents/openai.yaml",
+      "sha": "24605a5db64e4fc750b999aa94aea126bee814ee",
+      "size": 146
+    },
+    {
+      "skill": "grill-me",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/productivity/grill-me/SKILL.md",
+      "sha": "3947ff9c4ad980d14fc07fccbf659d47c114e81d",
+      "size": 157
+    },
+    {
+      "skill": "grill-me",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/productivity/grill-me/agents/openai.yaml",
+      "sha": "4d6fb0c746c5d21364dce5d0cf8c51eab9712e7b",
+      "size": 137
+    },
+    {
+      "skill": "grilling",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/productivity/grilling/SKILL.md",
+      "sha": "d2f09a18e6a6c65c55f1271ba08dfeaf06f0bed3",
+      "size": 2077
+    },
+    {
+      "skill": "grilling",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/productivity/grilling/agents/openai.yaml",
+      "sha": "ddbdb96139c0c1dfe6bca698f39d0465674b8a39",
+      "size": 113
+    },
+    {
+      "skill": "writing-for-agents",
+      "relative": "SKILL-MECHANICS.md",
+      "upstream_path": "skills/productivity/writing-for-agents/SKILL-MECHANICS.md",
+      "sha": "9cdbdb22aadc438755392216e75ad9a14cc9832e",
+      "size": 2629
+    },
+    {
+      "skill": "writing-for-agents",
+      "relative": "SKILL.md",
+      "upstream_path": "skills/productivity/writing-for-agents/SKILL.md",
+      "sha": "a37608daf6e835e767deecfb498facecaaba82ba",
+      "size": 10886
+    },
+    {
+      "skill": "writing-for-agents",
+      "relative": "agents/openai.yaml",
+      "upstream_path": "skills/productivity/writing-for-agents/agents/openai.yaml",
+      "sha": "079c933b75743dec18b5d0c01006def20b6aad26",
+      "size": 102
+    }
+  ]
+}

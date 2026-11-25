@@ -1,0 +1,3 @@
+{
+  "tests/api/test_mobile_desk_ro.py::test_serve_doc_is_private_mesh_and_adr_stays_draft": true
+}

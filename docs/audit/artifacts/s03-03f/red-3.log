@@ -1,0 +1,233 @@
+.........F.....................F........F.FFFFF.FF                       [100%]
+================================== FAILURES ===================================
+_________ test_equity_cannot_claim_a_recognizable_futu_option_symbol __________
+
+    def test_equity_cannot_claim_a_recognizable_futu_option_symbol():
+        from gabfin.providers.futu.symbols import InstrumentCatalog
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE ValueError
+
+tests\gabfin\test_symbols.py:83: Failed
+_ test_empty_demand_set_freezes_when_affected_quota_or_capability_is_unknown __
+
+    def test_empty_demand_set_freezes_when_affected_quota_or_capability_is_unknown():
+        result = plan([], current=[key()], equity_slots=None, option_slots=None,
+                      capability=caps(checked_at=NOW - timedelta(days=1)))
+>       assert not result.apply_allowed and not result.unsubscribe and not result.subscribe
+E       AssertionError: assert (not True)
+E        +  where True = SubscriptionSchedule(plan=SubscriptionPlan(schema_version='1.0', source='futu', as_of=datetime.datetime(2026, 11, 25, ...Key(channel='quote', timeframe=None, instrument_id=UUID('11111111-1111-4111-8111-111111111111')),), apply_allowed=True).apply_allowed
+
+tests\gabfin\test_subscription_planner.py:185: AssertionError
+___________ test_foreign_current_key_and_implicit_ttl_are_rejected ____________
+
+    def test_foreign_current_key_and_implicit_ttl_are_rejected():
+>       result = plan([], current=[key(CALL)])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\gabfin\test_subscription_planner.py:209: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\gabfin\test_subscription_planner.py:34: in plan
+    return plan_subscriptions(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+demands = []
+caps = FeedCapabilities(schema_version='1.0', source='futu', asset_classes=(<AssetClass.EQUITY: 'equity'>, <AssetClass.OPTION...story_limits=(), checked_at=datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc), permission_errors=())
+catalog = <gabfin.providers.futu.symbols.InstrumentCatalog object at 0x0000022AFDD7FFB0>
+as_of = datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc)
+session = <MarketSession.REGULAR: 'regular'>
+max_snapshot_age = datetime.timedelta(seconds=180)
+budget = QuotaBudget(equity_slots=1, option_chain_slots=1, checked_at=datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc))
+supported = [ChannelSupport(channel='quote', timeframe=None)]
+current = [SubscriptionKey(channel='quote', timeframe=None, instrument_id=UUID('33333333-3333-4333-8333-333333333333'))]
+
+    def plan_subscriptions(demands, caps: FeedCapabilities, catalog: InstrumentCatalog, *,
+                           as_of: datetime, session: MarketSession, max_snapshot_age: timedelta,
+                           budget: QuotaBudget, supported, current=()) -> SubscriptionSchedule:
+        """Plan only. Caller authenticates demands and supplies only its owned current keys."""
+        now = TypeAdapter(UtcTimestamp).validate_python(as_of)
+        caps = FeedCapabilities.model_validate(caps.model_dump(mode='python'))
+        if caps.source != 'futu':
+            raise ValueError('Quota grouping is implemented only for Futu')
+        if not isinstance(max_snapshot_age, timedelta) or max_snapshot_age <= timedelta(0):
+            raise ValueError('A positive explicit snapshot TTL is required')
+        session = MarketSession(session)
+        support = {item.identity for item in supported}
+        owned = {}
+        for value in current:
+            key = SubscriptionKey.model_validate(value.model_dump(mode='python'))
+            instrument = catalog.get(key.instrument_id)
+            if instrument is None or not instrument.vendor_symbols.get('futu', '').startswith('US.'):
+>               raise ValueError('Current keys must belong to the supplied Futu US catalog')
+E               ValueError: Current keys must belong to the supplied Futu US catalog
+
+services\gabfin\market\subscriptions.py:76: ValueError
+_ test_no_live_demands_still_requires_reliable_manifest_for_release[change0] __
+
+change = {'checked_at': datetime.datetime(2026, 11, 24, 15, 0, tzinfo=datetime.timezone.utc)}
+
+    @pytest.mark.parametrize('change', [{'checked_at': NOW - timedelta(days=1)},
+                                     {'checked_at': NOW + timedelta(seconds=1)}, {'permission_errors': ('denied',)}])
+    def test_no_live_demands_still_requires_reliable_manifest_for_release(change):
+        result = plan([], capability=caps(**change), current=[key()])
+>       assert not result.apply_allowed and not result.unsubscribe and result.blocked_reasons
+E       AssertionError: assert (not True)
+E        +  where True = SubscriptionSchedule(plan=SubscriptionPlan(schema_version='1.0', source='futu', as_of=datetime.datetime(2026, 11, 25, ...Key(channel='quote', timeframe=None, instrument_id=UUID('11111111-1111-4111-8111-111111111111')),), apply_allowed=True).apply_allowed
+
+tests\gabfin\test_subscription_planner.py:229: AssertionError
+_ test_no_live_demands_still_requires_reliable_manifest_for_release[change1] __
+
+change = {'checked_at': datetime.datetime(2026, 11, 25, 15, 0, 1, tzinfo=datetime.timezone.utc)}
+
+    @pytest.mark.parametrize('change', [{'checked_at': NOW - timedelta(days=1)},
+                                     {'checked_at': NOW + timedelta(seconds=1)}, {'permission_errors': ('denied',)}])
+    def test_no_live_demands_still_requires_reliable_manifest_for_release(change):
+        result = plan([], capability=caps(**change), current=[key()])
+>       assert not result.apply_allowed and not result.unsubscribe and result.blocked_reasons
+E       AssertionError: assert (not True)
+E        +  where True = SubscriptionSchedule(plan=SubscriptionPlan(schema_version='1.0', source='futu', as_of=datetime.datetime(2026, 11, 25, ...Key(channel='quote', timeframe=None, instrument_id=UUID('11111111-1111-4111-8111-111111111111')),), apply_allowed=True).apply_allowed
+
+tests\gabfin\test_subscription_planner.py:229: AssertionError
+_ test_no_live_demands_still_requires_reliable_manifest_for_release[change2] __
+
+change = {'permission_errors': ('denied',)}
+
+    @pytest.mark.parametrize('change', [{'checked_at': NOW - timedelta(days=1)},
+                                     {'checked_at': NOW + timedelta(seconds=1)}, {'permission_errors': ('denied',)}])
+    def test_no_live_demands_still_requires_reliable_manifest_for_release(change):
+        result = plan([], capability=caps(**change), current=[key()])
+>       assert not result.apply_allowed and not result.unsubscribe and result.blocked_reasons
+E       AssertionError: assert (not True)
+E        +  where True = SubscriptionSchedule(plan=SubscriptionPlan(schema_version='1.0', source='futu', as_of=datetime.datetime(2026, 11, 25, ...Key(channel='quote', timeframe=None, instrument_id=UUID('11111111-1111-4111-8111-111111111111')),), apply_allowed=True).apply_allowed
+
+tests\gabfin\test_subscription_planner.py:229: AssertionError
+_____ test_current_pool_is_checked_even_if_only_other_asset_is_requested ______
+
+    def test_current_pool_is_checked_even_if_only_other_asset_is_requested():
+        result = plan([demand(CALL)], instruments=[equity(), option()], current=[key(AAPL)], equity_slots=None)
+>       assert not result.apply_allowed and not result.subscribe and not result.unsubscribe
+E       AssertionError: assert (not True)
+E        +  where True = SubscriptionSchedule(plan=SubscriptionPlan(schema_version='1.0', source='futu', as_of=datetime.datetime(2026, 11, 25, ...Key(channel='quote', timeframe=None, instrument_id=UUID('11111111-1111-4111-8111-111111111111')),), apply_allowed=True).apply_allowed
+
+tests\gabfin\test_subscription_planner.py:234: AssertionError
+______ test_missing_current_catalog_binding_is_frozen_instead_of_dropped ______
+
+    def test_missing_current_catalog_binding_is_frozen_instead_of_dropped():
+>       result = plan([demand(MSFT)], current=[key(AAPL)], instruments=[equity(MSFT, 'US.MSFT')])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\gabfin\test_subscription_planner.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\gabfin\test_subscription_planner.py:34: in plan
+    return plan_subscriptions(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+demands = [Demand(schema_version='1.0', demand_id=UUID('54baa02a-7808-449e-b081-931c05b4d7a2'), key=SubscriptionKey(channel='quo...999999-9999-4999-8999-999999999999'), expires_at=datetime.datetime(2026, 11, 25, 15, 5, tzinfo=datetime.timezone.utc))]
+caps = FeedCapabilities(schema_version='1.0', source='futu', asset_classes=(<AssetClass.EQUITY: 'equity'>, <AssetClass.OPTION...story_limits=(), checked_at=datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc), permission_errors=())
+catalog = <gabfin.providers.futu.symbols.InstrumentCatalog object at 0x0000022AFDDFA840>
+as_of = datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc)
+session = <MarketSession.REGULAR: 'regular'>
+max_snapshot_age = datetime.timedelta(seconds=180)
+budget = QuotaBudget(equity_slots=1, option_chain_slots=1, checked_at=datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc))
+supported = [ChannelSupport(channel='quote', timeframe=None)]
+current = [SubscriptionKey(channel='quote', timeframe=None, instrument_id=UUID('11111111-1111-4111-8111-111111111111'))]
+
+    def plan_subscriptions(demands, caps: FeedCapabilities, catalog: InstrumentCatalog, *,
+                           as_of: datetime, session: MarketSession, max_snapshot_age: timedelta,
+                           budget: QuotaBudget, supported, current=()) -> SubscriptionSchedule:
+        """Plan only. Caller authenticates demands and supplies only its owned current keys."""
+        now = TypeAdapter(UtcTimestamp).validate_python(as_of)
+        caps = FeedCapabilities.model_validate(caps.model_dump(mode='python'))
+        if caps.source != 'futu':
+            raise ValueError('Quota grouping is implemented only for Futu')
+        if not isinstance(max_snapshot_age, timedelta) or max_snapshot_age <= timedelta(0):
+            raise ValueError('A positive explicit snapshot TTL is required')
+        session = MarketSession(session)
+        support = {item.identity for item in supported}
+        owned = {}
+        for value in current:
+            key = SubscriptionKey.model_validate(value.model_dump(mode='python'))
+            instrument = catalog.get(key.instrument_id)
+            if instrument is None or not instrument.vendor_symbols.get('futu', '').startswith('US.'):
+>               raise ValueError('Current keys must belong to the supplied Futu US catalog')
+E               ValueError: Current keys must belong to the supplied Futu US catalog
+
+services\gabfin\market\subscriptions.py:76: ValueError
+__________________ test_empty_vendor_ticker_is_not_allocated __________________
+
+    def test_empty_vendor_ticker_is_not_allocated():
+        result = plan([demand()], instruments=[equity(symbol='US.')])
+>       assert result.plan.rejected[0].reason_codes == ('vendor_symbol_invalid',)
+               ^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: tuple index out of range
+
+tests\gabfin\test_subscription_planner.py:251: IndexError
+_________ test_non_us_option_is_registered_and_rejected_individually __________
+
+    def test_non_us_option_is_registered_and_rejected_individually():
+        hk_stock = equity(MSFT, 'HK.00700')
+        hk_option = option(PUT).model_copy(update={
+            'vendor_symbols': {'futu': 'HK.TCH261218C350000'},
+            'option': option(PUT).option.model_copy(update={'underlying_id': MSFT})})
+>       result = plan([demand(AAPL), demand(PUT)], instruments=[equity(), hk_stock, hk_option])
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\gabfin\test_subscription_planner.py:259: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\gabfin\test_subscription_planner.py:35: in plan
+    demands, capability or caps(), InstrumentCatalog([equity(), equity(MSFT, 'US.MSFT')] if instruments is None else instruments),
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <gabfin.providers.futu.symbols.InstrumentCatalog object at 0x0000022AFDCEADE0>
+instruments = [Instrument(schema_version='1.0', instrument_id=UUID('11111111-1111-4111-8111-111111111111'), asset_class=<AssetClass....piry=datetime.date(2026, 12, 18), right=<OptionRight.CALL: 'call'>, strike=Decimal('350'), multiplier=Decimal('100')))]
+
+    def __init__(self, instruments):
+        self._instruments = {}
+        self._symbols = {}
+        economic_options = set()
+        for value in instruments:
+            instrument = Instrument.model_validate(value.model_dump(mode='python'))
+            identifier = instrument.instrument_id
+            if identifier in self._instruments:
+                raise ValueError('Duplicate canonical instrument')
+            for source, symbol in instrument.vendor_symbols.items():
+                if (source, symbol) in self._symbols:
+                    raise ValueError('Ambiguous source symbol')
+                self._symbols[source, symbol] = identifier
+            self._instruments[identifier] = instrument
+        for instrument in self._instruments.values():
+            terms = instrument.option
+            if terms is None:
+                continue
+            underlying = self._instruments.get(terms.underlying_id)
+            if underlying is None or underlying.asset_class != AssetClass.EQUITY:
+                raise ValueError('Option requires a registered equity underlying')
+            identity = (terms.underlying_id, terms.expiry, terms.right, terms.strike,
+                        terms.multiplier, instrument.currency)
+            if identity in economic_options:
+                raise ValueError('Duplicate canonical option terms')
+            economic_options.add(identity)
+            symbol = instrument.vendor_symbols.get('futu')
+            if symbol is not None:
+                root = underlying.vendor_symbols.get('futu', '')
+                prefix = root + terms.expiry.strftime('%y%m%d') + ('C' if terms.right == 'call' else 'P')
+                suffix = symbol[len(prefix):] if symbol.startswith(prefix) else ''
+                if (not root.startswith('US.') or not re.fullmatch(r'[0-9]{1,12}', suffix)
+                        or Decimal(suffix) / 1000 != terms.strike):
+>                   raise ValueError('Futu US option symbol conflicts with canonical terms')
+E                   ValueError: Futu US option symbol conflicts with canonical terms
+
+services\gabfin\providers\futu\symbols.py:43: ValueError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_symbols.py::test_equity_cannot_claim_a_recognizable_futu_option_symbol
+FAILED tests/gabfin/test_subscription_planner.py::test_empty_demand_set_freezes_when_affected_quota_or_capability_is_unknown
+FAILED tests/gabfin/test_subscription_planner.py::test_foreign_current_key_and_implicit_ttl_are_rejected
+FAILED tests/gabfin/test_subscription_planner.py::test_no_live_demands_still_requires_reliable_manifest_for_release[change0]
+FAILED tests/gabfin/test_subscription_planner.py::test_no_live_demands_still_requires_reliable_manifest_for_release[change1]
+FAILED tests/gabfin/test_subscription_planner.py::test_no_live_demands_still_requires_reliable_manifest_for_release[change2]
+FAILED tests/gabfin/test_subscription_planner.py::test_current_pool_is_checked_even_if_only_other_asset_is_requested
+FAILED tests/gabfin/test_subscription_planner.py::test_missing_current_catalog_binding_is_frozen_instead_of_dropped
+FAILED tests/gabfin/test_subscription_planner.py::test_empty_vendor_ticker_is_not_allocated
+FAILED tests/gabfin/test_subscription_planner.py::test_non_us_option_is_registered_and_rejected_individually
+10 failed, 40 passed in 2.30s

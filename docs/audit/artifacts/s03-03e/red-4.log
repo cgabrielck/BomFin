@@ -1,0 +1,68 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+____ test_single_page_wire_does_not_inherit_prices_or_follow_token[False] _____
+
+missing = False
+
+    @pytest.mark.parametrize('missing', [False, True])
+    def test_single_page_wire_does_not_inherit_prices_or_follow_token(missing):
+        from gabfin.providers.futu.history import inspect_history
+        from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+    
+        raw = QuoteContext()
+        wire_calls = []
+        def query(pack, unpack, **kwargs):
+            wire_calls.append(kwargs)
+            row1 = Proto(time='2026-11-24 09:31:00', isBlank=False, openPrice=100, highPrice=102, lowPrice=99, closePrice=101)
+            row2 = Proto(time='2026-11-24 09:32:00', isBlank=False, highPrice=102, lowPrice=99, closePrice=101)
+            if not missing:
+                row2.openPrice = 100
+            response = Proto(retType=0, s2c=Proto(security=Proto(market=11, code='AAPL'), klList=[row1, row2], nextReqKey=b'PRIVATE'))
+            return unpack(response)
+        raw._query_sync = query
+        raw.get_sync_conn_id = lambda: 1
+        raw.get_security_firm = lambda: 'N/A'
+        context = SinglePageHistoryContext(raw, pack_request=object(), us_market=11)
+        result = inspect_history(context, SDK, checked_at=NOW)
+        assert len(wire_calls) == 2
+        assert all(c['max_num'] == 2 and c['next_req_key'] is None for c in wire_calls)
+>       assert all(c['start_date'] == '2026-11-24 00:00:00' and c['end_date'] == '2026-11-24 23:59:59' for c in wire_calls)
+E       assert False
+E        +  where False = all(<generator object test_single_page_wire_does_not_inherit_prices_or_follow_token.<locals>.<genexpr> at 0x000001EE4A5B7370>)
+
+tests\gabfin\test_history_smoke.py:294: AssertionError
+_____ test_single_page_wire_does_not_inherit_prices_or_follow_token[True] _____
+
+missing = True
+
+    @pytest.mark.parametrize('missing', [False, True])
+    def test_single_page_wire_does_not_inherit_prices_or_follow_token(missing):
+        from gabfin.providers.futu.history import inspect_history
+        from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+    
+        raw = QuoteContext()
+        wire_calls = []
+        def query(pack, unpack, **kwargs):
+            wire_calls.append(kwargs)
+            row1 = Proto(time='2026-11-24 09:31:00', isBlank=False, openPrice=100, highPrice=102, lowPrice=99, closePrice=101)
+            row2 = Proto(time='2026-11-24 09:32:00', isBlank=False, highPrice=102, lowPrice=99, closePrice=101)
+            if not missing:
+                row2.openPrice = 100
+            response = Proto(retType=0, s2c=Proto(security=Proto(market=11, code='AAPL'), klList=[row1, row2], nextReqKey=b'PRIVATE'))
+            return unpack(response)
+        raw._query_sync = query
+        raw.get_sync_conn_id = lambda: 1
+        raw.get_security_firm = lambda: 'N/A'
+        context = SinglePageHistoryContext(raw, pack_request=object(), us_market=11)
+        result = inspect_history(context, SDK, checked_at=NOW)
+        assert len(wire_calls) == 2
+        assert all(c['max_num'] == 2 and c['next_req_key'] is None for c in wire_calls)
+>       assert all(c['start_date'] == '2026-11-24 00:00:00' and c['end_date'] == '2026-11-24 23:59:59' for c in wire_calls)
+E       assert False
+E        +  where False = all(<generator object test_single_page_wire_does_not_inherit_prices_or_follow_token.<locals>.<genexpr> at 0x000001EE4A5B7C60>)
+
+tests\gabfin\test_history_smoke.py:294: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_history_smoke.py::test_single_page_wire_does_not_inherit_prices_or_follow_token[False]
+FAILED tests/gabfin/test_history_smoke.py::test_single_page_wire_does_not_inherit_prices_or_follow_token[True]
+2 failed, 53 deselected in 1.93s

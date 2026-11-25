@@ -1,0 +1,5 @@
+pydantic==2.14.4
+fastapi==0.165.0
+
+[:sys_platform == "win32"]
+tzdata==2026.6

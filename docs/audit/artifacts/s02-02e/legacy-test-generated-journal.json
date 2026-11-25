@@ -1,0 +1,195 @@
+{
+  "schema_version": "trade_log.v0",
+  "entries": [
+    {
+      "schema_version": "trade_log.v0",
+      "log_id": "tl-6ef7f01601bbfa248b2a",
+      "ts": "2026-11-25T03:38:58.512573+00:00",
+      "symbol": "MSFT",
+      "card_id": null,
+      "strategy_id": null,
+      "intent_id": null,
+      "side": "buy",
+      "qty": 5.0,
+      "order_id": "ee9ecf63-ef40-40da-ae47-6b68a48697a0",
+      "status": "submitted",
+      "risk_decision_id": null,
+      "veto_codes": [],
+      "conviction_tier": null,
+      "fills": [],
+      "r_multiple": null,
+      "user_visible_summary": "submitted buy 5 MSFT",
+      "links": {
+        "audit_ref": "",
+        "signal_ref": "",
+        "intent_ref": ""
+      },
+      "reason_codes": [],
+      "kind": "order",
+      "provenance": {
+        "source": "order_store",
+        "vendor": null,
+        "as_of": "2026-11-25T03:38:58.512573+00:00",
+        "verified": false,
+        "live": false,
+        "note": "Local order ledger — status as stored; not a live confirmation.",
+        "order_id": "ee9ecf63-ef40-40da-ae47-6b68a48697a0"
+      }
+    },
+    {
+      "schema_version": "trade_log.v0",
+      "log_id": "tl-7ed6a28fc2316f3694d5",
+      "ts": "2026-11-25T03:38:58.520087+00:00",
+      "symbol": "AAPL",
+      "card_id": null,
+      "strategy_id": null,
+      "intent_id": null,
+      "side": "buy",
+      "qty": 10.0,
+      "order_id": "db708c02-1eb0-4263-aa6e-5cf8254cd3ac",
+      "status": "filled",
+      "risk_decision_id": null,
+      "veto_codes": [],
+      "conviction_tier": null,
+      "fills": [
+        {
+          "price": 100.0,
+          "qty": 10.0
+        }
+      ],
+      "r_multiple": null,
+      "user_visible_summary": "filled buy 10 AAPL",
+      "links": {
+        "audit_ref": "",
+        "signal_ref": "",
+        "intent_ref": ""
+      },
+      "reason_codes": [],
+      "kind": "fill",
+      "provenance": {
+        "source": "order_store",
+        "vendor": null,
+        "as_of": "2026-11-25T03:38:58.520087+00:00",
+        "verified": false,
+        "live": false,
+        "note": "Local order ledger — status as stored; not a live confirmation.",
+        "order_id": "db708c02-1eb0-4263-aa6e-5cf8254cd3ac"
+      }
+    },
+    {
+      "schema_version": "trade_log.v0",
+      "log_id": "tl-f69e127831127111b4f7",
+      "ts": "2026-11-25T03:38:58.539340+00:00",
+      "symbol": "AAPL",
+      "card_id": null,
+      "strategy_id": null,
+      "intent_id": null,
+      "side": "buy",
+      "qty": 10.0,
+      "order_id": "79a4b0ee-b588-4500-b62f-00790700d87e",
+      "status": "canceled",
+      "risk_decision_id": null,
+      "veto_codes": [],
+      "conviction_tier": null,
+      "fills": [],
+      "r_multiple": null,
+      "user_visible_summary": "Shadow: no positive fill price. Cannot mark filled at $0 or from a placeholder.",
+      "links": {
+        "audit_ref": "",
+        "signal_ref": "",
+        "intent_ref": ""
+      },
+      "reason_codes": [],
+      "kind": "order",
+      "provenance": {
+        "source": "order_store",
+        "vendor": null,
+        "as_of": "2026-11-25T03:38:58.539340+00:00",
+        "verified": false,
+        "live": false,
+        "note": "Local order ledger — status as stored; not a live confirmation.",
+        "order_id": "79a4b0ee-b588-4500-b62f-00790700d87e"
+      }
+    },
+    {
+      "schema_version": "trade_log.v0",
+      "log_id": "tl-f9f9856440bd9dc3c75e",
+      "ts": "2026-11-25T03:39:02.609493+00:00",
+      "symbol": "AAPL",
+      "card_id": null,
+      "strategy_id": "stable",
+      "intent_id": null,
+      "side": "buy",
+      "qty": 68.0,
+      "order_id": "AAPL-202611250339",
+      "status": "filled",
+      "risk_decision_id": null,
+      "veto_codes": [],
+      "conviction_tier": null,
+      "fills": [
+        {
+          "price": 147.0,
+          "qty": 68.0
+        }
+      ],
+      "r_multiple": null,
+      "user_visible_summary": "filled buy 68 AAPL",
+      "links": {
+        "audit_ref": "",
+        "signal_ref": "",
+        "intent_ref": ""
+      },
+      "reason_codes": [],
+      "kind": "fill",
+      "provenance": {
+        "source": "order_store",
+        "vendor": null,
+        "as_of": "2026-11-25T03:39:02.609493+00:00",
+        "verified": false,
+        "live": false,
+        "note": "Local order ledger — status as stored; not a live confirmation.",
+        "order_id": "AAPL-202611250339"
+      }
+    },
+    {
+      "schema_version": "trade_log.v0",
+      "log_id": "tl-6bb96cdd41aeb2591883",
+      "ts": "2026-11-25T03:39:02.650650+00:00",
+      "symbol": "AAPL",
+      "card_id": null,
+      "strategy_id": "stable",
+      "intent_id": null,
+      "side": "buy",
+      "qty": 68.0,
+      "order_id": "AAPL-202611250339",
+      "status": "filled",
+      "risk_decision_id": null,
+      "veto_codes": [],
+      "conviction_tier": null,
+      "fills": [
+        {
+          "price": 147.0,
+          "qty": 68.0
+        }
+      ],
+      "r_multiple": null,
+      "user_visible_summary": "filled buy 68 AAPL",
+      "links": {
+        "audit_ref": "",
+        "signal_ref": "",
+        "intent_ref": ""
+      },
+      "reason_codes": [],
+      "kind": "fill",
+      "provenance": {
+        "source": "order_store",
+        "vendor": null,
+        "as_of": "2026-11-25T03:39:02.650650+00:00",
+        "verified": false,
+        "live": false,
+        "note": "Local order ledger — status as stored; not a live confirmation.",
+        "order_id": "AAPL-202611250339"
+      }
+    }
+  ]
+}

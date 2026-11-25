@@ -1,0 +1,20 @@
+{
+  "base": "709652de8b0a4661b8087ebd6ca31f051d8701f1",
+  "original_tracked_preserved": 493,
+  "lock_preserved": true,
+  "wheel_matches_source": true,
+  "wheel_sha256": "1f4ed85b239af6409ea1ffea0b6cc95958eb13ee94050f8e31237c548f1cddae",
+  "head": "16fd6ff10736b186e9e1bf17815582d1a7231714",
+  "full": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "4",
+    "tests": "1580",
+    "time": "65.848",
+    "timestamp": "2026-11-25T11:38:15.142055+08:00",
+    "hostname": "DESKTOP-BTBR5SC"
+  },
+  "documents_checked": 6,
+  "local_links_checked": 39
+}

@@ -1,0 +1,32 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 10 items
+
+tests\gabfin\test_futu_quote_adapter.py .F........                       [100%]
+
+================================== FAILURES ===================================
+___________________ test_close_before_subscribe_is_terminal ___________________
+tests\gabfin\test_futu_quote_adapter.py:53: in test_close_before_subscribe_is_terminal
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:50: in scenario
+    with pytest.raises(RuntimeError, match='single-use'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'single-use'
+E     Actual message: 'Quote worker could not subscribe'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s03-03g\red-terminal.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_futu_quote_adapter.py::test_close_before_subscribe_is_terminal
+========================= 1 failed, 9 passed in 3.28s =========================

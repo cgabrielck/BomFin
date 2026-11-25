@@ -1,0 +1,11 @@
+{
+  "runs": 22,
+  "rewrites": 22,
+  "last": {
+    "ticker": "AAPL",
+    "rewritten": true,
+    "engine": "sequential_roles",
+    "places_order": false,
+    "llm_used": false
+  }
+}

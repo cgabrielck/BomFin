@@ -1,0 +1,11 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 1 item
+
+tests\gabfin\test_schema_artifact.py .                                   [100%]
+
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-completion\schema-green.xml -
+============================== 1 passed in 2.01s ==============================

@@ -1,0 +1,72 @@
+{
+  "status": "ok",
+  "metadata": {
+    "kind": "history_smoke",
+    "code": "US.AAPL",
+    "checked_at": "2026-11-25T13:14:08.794215+00:00",
+    "requested_date": "2026-11-24",
+    "source_timezone": "America/New_York",
+    "adjustment": "NONE",
+    "interval": "K_1M",
+    "live_rights": "unverified",
+    "market_state": "PRE_MARKET_BEGIN",
+    "quota_before": {
+      "used": 5,
+      "remaining": 295
+    },
+    "quota_after": {
+      "used": 5,
+      "remaining": 295
+    },
+    "requests": [
+      {
+        "session": "RTH",
+        "status": "available",
+        "bars": [
+          {
+            "time": "2026-11-24 09:31:00",
+            "open": "348.06",
+            "high": "348.38",
+            "low": "346.05",
+            "close": "346.09",
+            "clock_window": "RTH"
+          },
+          {
+            "time": "2026-11-24 09:32:00",
+            "open": "346.07",
+            "high": "347.11",
+            "low": "345.88",
+            "close": "347.11",
+            "clock_window": "RTH"
+          }
+        ],
+        "has_more": true
+      },
+      {
+        "session": "ETH",
+        "status": "available",
+        "bars": [
+          {
+            "time": "2026-11-24 04:01:00",
+            "open": "349.08",
+            "high": "350.47",
+            "low": "349.08",
+            "close": "350.43",
+            "clock_window": "PRE"
+          },
+          {
+            "time": "2026-11-24 04:02:00",
+            "open": "350.43",
+            "high": "350.47",
+            "low": "349.74",
+            "close": "349.74",
+            "clock_window": "PRE"
+          }
+        ],
+        "has_more": true
+      }
+    ],
+    "cleanup": "closed",
+    "errors": []
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "review_type": "read-only current-state documentation review, not app commit-range review",
+  "scope_manifest": "review-fixed-input-sha256.json",
+  "initial_context": "fresh fork_turns=none for both reviewers; follow-up reviews retained only their independent review context",
+  "standards": {
+    "agent": "/root/workflow_standards",
+    "initial_findings": [
+      "Specify parallel dispatch and complete reviewer inputs, including baseline, standards and commit list",
+      "Exclude pre-existing staged work and mixed unrelated changes from review and commit",
+      "Hashes pin current content but cannot replace a readable prior state or diff",
+      "Map to-spec ready-for-agent label to local spec status"
+    ],
+    "followup_finding": "Cover the branch where the original index is non-empty but contains only this unit",
+    "final_unresolved": 0
+  },
+  "spec": {
+    "agent": "/root/workflow_spec",
+    "initial_findings": [
+      "Explicitly load skills that disable implicit invocation",
+      "Exclude pre-existing staged work from review and commit",
+      "Keep prototype code outside the spec body"
+    ],
+    "followup_finding": "Cover every non-empty original index, not only unrelated staged files",
+    "final_unresolved": 0
+  },
+  "limitation": "Initial pre-edit workspace snapshots were not saved; reviewers assessed named current-state documents and declared change scope, not a complete historical diff."
+}

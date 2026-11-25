@@ -1,0 +1,29 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 7 items
+
+tests\gabfin\test_session_auth.py .....FF                                [100%]
+
+================================== FAILURES ===================================
+__________________ test_service_principal_from_trusted_store __________________
+tests\gabfin\test_session_auth.py:61: in test_service_principal_from_trusted_store
+    token,_=s.issue_service(actor_id=UUID(int=2),role='research',scope=['read_report'])
+            ^^^^^^^^^^^^^^^
+E   AttributeError: 'SessionStore' object has no attribute 'issue_service'. Did you mean: 'issue_session'?
+_________________________ test_idle_websocket_expiry __________________________
+tests\gabfin\test_session_auth.py:75: in test_idle_websocket_expiry
+    with c.websocket_connect('/ws',headers={'Origin':'https://desk.test'}) as ws:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:116: in __enter__
+    self._raise_on_close(message)
+.venv\Lib\site-packages\starlette\testclient.py:143: in _raise_on_close
+    raise WebSocketDisconnect(code=message.get("code", 1000), reason=message.get("reason", ""))
+E   starlette.websockets.WebSocketDisconnect
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-completion\service-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_session_auth.py::test_service_principal_from_trusted_store
+FAILED tests/gabfin/test_session_auth.py::test_idle_websocket_expiry - starle...
+========================= 2 failed, 5 passed in 2.70s =========================

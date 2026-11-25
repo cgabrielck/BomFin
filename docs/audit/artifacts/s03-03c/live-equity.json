@@ -1,0 +1,32 @@
+{
+  "status": "ok",
+  "metadata": {
+    "kind": "equity_smoke",
+    "code": "US.AAPL",
+    "checked_at": "2026-11-25T07:46:48.468517Z",
+    "symbol_verified": true,
+    "last_price": "354.07",
+    "data_date": "2026-11-24",
+    "data_time": "16:00:00",
+    "bars": [
+      {
+        "time": "2026-11-23 00:00:00",
+        "open": "347.87",
+        "high": "352.6",
+        "low": "345.442189",
+        "close": "349.08"
+      },
+      {
+        "time": "2026-11-24 00:00:00",
+        "open": "348.06",
+        "high": "354.4",
+        "low": "345.88",
+        "close": "354.07"
+      }
+    ],
+    "source_timezone": "America/New_York",
+    "latency": "unverified",
+    "cleanup": "unsubscribed",
+    "errors": []
+  }
+}

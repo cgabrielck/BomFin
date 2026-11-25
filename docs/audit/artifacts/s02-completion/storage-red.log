@@ -1,0 +1,23 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 2 items
+
+tests\gabfin\test_migrations.py FF                                       [100%]
+
+================================== FAILURES ===================================
+____________________ test_migrations_reentrant_and_unknown ____________________
+tests\gabfin\test_migrations.py:5: in test_migrations_reentrant_and_unknown
+    from gabfin.storage.database import open_database
+E   ModuleNotFoundError: No module named 'gabfin.storage'
+_________________________ test_migration_crash_atomic _________________________
+tests\gabfin\test_migrations.py:16: in test_migration_crash_atomic
+    from gabfin.storage import migrations as m
+E   ModuleNotFoundError: No module named 'gabfin.storage'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-completion\storage-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_migrations.py::test_migrations_reentrant_and_unknown
+FAILED tests/gabfin/test_migrations.py::test_migration_crash_atomic - ModuleN...
+============================== 2 failed in 2.73s ==============================

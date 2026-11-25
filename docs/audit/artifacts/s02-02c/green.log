@@ -1,0 +1,18 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 247 items
+
+tests\gabfin\test_contracts.py ......................................... [ 16%]
+.............................................                            [ 34%]
+tests\gabfin\test_market_contracts.py .................................. [ 48%]
+...............................................                          [ 67%]
+tests\gabfin\test_market_events.py ..................................... [ 82%]
+                                                                         [ 82%]
+tests\gabfin\test_research_contracts.py ................................ [ 95%]
+...........                                                              [100%]
+
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-02c\green.xml -
+============================= 247 passed in 2.64s =============================

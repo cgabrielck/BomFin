@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="7" time="2.701" timestamp="2026-11-25T14:57:51.128640+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_session_auth" name="test_role_ceiling_and_ownership" time="1.337" /><testcase classname="tests.gabfin.test_session_auth" name="test_pairing_single_use_expiry_and_restart" time="0.041" /><testcase classname="tests.gabfin.test_session_auth" name="test_auth_boundary" time="0.326" /><testcase classname="tests.gabfin.test_session_auth" name="test_real_http_and_ws_guards" time="0.199" /><testcase classname="tests.gabfin.test_session_auth" name="test_pairing_expiry_and_throttle" time="0.039" /><testcase classname="tests.gabfin.test_session_auth" name="test_service_principal_from_trusted_store" time="0.016"><failure message="AttributeError: 'SessionStore' object has no attribute 'issue_service'. Did you mean: 'issue_session'?">tests\gabfin\test_session_auth.py:61: in test_service_principal_from_trusted_store
+    token,_=s.issue_service(actor_id=UUID(int=2),role='research',scope=['read_report'])
+            ^^^^^^^^^^^^^^^
+E   AttributeError: 'SessionStore' object has no attribute 'issue_service'. Did you mean: 'issue_session'?</failure></testcase><testcase classname="tests.gabfin.test_session_auth" name="test_idle_websocket_expiry" time="0.033"><failure message="starlette.websockets.WebSocketDisconnect">tests\gabfin\test_session_auth.py:75: in test_idle_websocket_expiry
+    with c.websocket_connect('/ws',headers={'Origin':'https://desk.test'}) as ws:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:116: in __enter__
+    self._raise_on_close(message)
+.venv\Lib\site-packages\starlette\testclient.py:143: in _raise_on_close
+    raise WebSocketDisconnect(code=message.get("code", 1000), reason=message.get("reason", ""))
+E   starlette.websockets.WebSocketDisconnect</failure></testcase></testsuite></testsuites>

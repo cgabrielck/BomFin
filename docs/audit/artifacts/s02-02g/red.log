@@ -1,0 +1,398 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 48 items
+
+tests\gabfin\test_job_contracts.py FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 77%]
+FFFFFFFFFFF                                                              [100%]
+
+================================== FAILURES ===================================
+_________________________ test_roundtrip[JobLease-p0] _________________________
+tests\gabfin\test_job_contracts.py:14: in test_roundtrip
+    r=parse(name,p);assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_roundtrip[Reservation-p1] ________________________
+tests\gabfin\test_job_contracts.py:14: in test_roundtrip
+    r=parse(name,p);assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_attempt_strict_positive[0] _______________________
+tests\gabfin\test_job_contracts.py:17: in test_attempt_strict_positive
+    with pytest.raises(ValidationError):parse('JobLease',lease()|{'attempt':attempt})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+______________________ test_attempt_strict_positive[-1] _______________________
+tests\gabfin\test_job_contracts.py:17: in test_attempt_strict_positive
+    with pytest.raises(ValidationError):parse('JobLease',lease()|{'attempt':attempt})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________________ test_attempt_strict_positive[True] ______________________
+tests\gabfin\test_job_contracts.py:17: in test_attempt_strict_positive
+    with pytest.raises(ValidationError):parse('JobLease',lease()|{'attempt':attempt})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+______________________ test_attempt_strict_positive[1.5] ______________________
+tests\gabfin\test_job_contracts.py:17: in test_attempt_strict_positive
+    with pytest.raises(ValidationError):parse('JobLease',lease()|{'attempt':attempt})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_attempt_strict_positive[1] _______________________
+tests\gabfin\test_job_contracts.py:17: in test_attempt_strict_positive
+    with pytest.raises(ValidationError):parse('JobLease',lease()|{'attempt':attempt})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________ test_attempt_strict_positive[9007199254740992] ________________
+tests\gabfin\test_job_contracts.py:17: in test_attempt_strict_positive
+    with pytest.raises(ValidationError):parse('JobLease',lease()|{'attempt':attempt})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change0] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change1] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change2] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change3] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change4] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change5] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change6] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change7] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_bad_lease[change8] ___________________________
+tests\gabfin\test_job_contracts.py:20: in test_bad_lease
+    with pytest.raises(ValidationError):parse('JobLease',lease()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____________ test_token_not_in_repr_but_internal_wire_contains_it _____________
+tests\gabfin\test_job_contracts.py:22: in test_token_not_in_repr_but_internal_wire_contains_it
+    p=lease();p['lease_token']='22222222-2222-4222-8222-222222222222';r=parse('JobLease',p)
+                                                                        ^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+______________________ test_historical_lease_is_readable ______________________
+tests\gabfin\test_job_contracts.py:25: in test_historical_lease_is_readable
+    def test_historical_lease_is_readable():assert parse('JobLease',lease()|{'acquired_at':'2000-01-01T00:00:00Z','expires_at':'2000-01-01T00:01:00Z'}).attempt==1
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_________________ test_unsettled_cost_stays_unknown[reserved] _________________
+tests\gabfin\test_job_contracts.py:28: in test_unsettled_cost_stays_unknown
+    r=parse('Reservation',reservation()|{'status':status});assert r.actual_amount is None
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_________________ test_unsettled_cost_stays_unknown[released] _________________
+tests\gabfin\test_job_contracts.py:28: in test_unsettled_cost_stays_unknown
+    r=parse('Reservation',reservation()|{'status':status});assert r.actual_amount is None
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_________________ test_unsettled_cost_stays_unknown[unknown] __________________
+tests\gabfin\test_job_contracts.py:28: in test_unsettled_cost_stays_unknown
+    r=parse('Reservation',reservation()|{'status':status});assert r.actual_amount is None
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________________ test_settlement_zero_exact_and_overrun[0] __________________
+tests\gabfin\test_job_contracts.py:32: in test_settlement_zero_exact_and_overrun
+    r=parse('Reservation',reservation()|{'status':'settled','actual_amount':actual})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________ test_settlement_zero_exact_and_overrun[0.10] _________________
+tests\gabfin\test_job_contracts.py:32: in test_settlement_zero_exact_and_overrun
+    r=parse('Reservation',reservation()|{'status':'settled','actual_amount':actual})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________ test_settlement_zero_exact_and_overrun[0.25] _________________
+tests\gabfin\test_job_contracts.py:32: in test_settlement_zero_exact_and_overrun
+    r=parse('Reservation',reservation()|{'status':'settled','actual_amount':actual})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________ test_unsettled_cannot_claim_actual[reserved] _________________
+tests\gabfin\test_job_contracts.py:36: in test_unsettled_cannot_claim_actual
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|{'status':status,'actual_amount':'0'})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________ test_unsettled_cannot_claim_actual[released] _________________
+tests\gabfin\test_job_contracts.py:36: in test_unsettled_cannot_claim_actual
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|{'status':status,'actual_amount':'0'})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_________________ test_unsettled_cannot_claim_actual[unknown] _________________
+tests\gabfin\test_job_contracts.py:36: in test_unsettled_cannot_claim_actual
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|{'status':status,'actual_amount':'0'})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change0] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change1] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change2] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change3] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change4] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change5] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change6] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change7] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change8] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________ test_bad_reservation[change9] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_reservation[change10] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_reservation[change11] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_reservation[change12] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_reservation[change13] ________________________
+tests\gabfin\test_job_contracts.py:39: in test_bad_reservation
+    with pytest.raises(ValidationError):parse('Reservation',reservation()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________ test_zero_reservation_is_explicit_and_precision_preserved __________
+tests\gabfin\test_job_contracts.py:41: in test_zero_reservation_is_explicit_and_precision_preserved
+    assert parse('Reservation',reservation()|{'amount':'0'}).amount==0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________ test_required_fields[JobLease-p0-lease_token] ________________
+tests\gabfin\test_job_contracts.py:46: in test_required_fields
+    with pytest.raises(ValidationError):parse(name,p)
+                                        ^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________________ test_required_fields[JobLease-p1-attempt] __________________
+tests\gabfin\test_job_contracts.py:46: in test_required_fields
+    with pytest.raises(ValidationError):parse(name,p)
+                                        ^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________ test_required_fields[Reservation-p2-actual_amount] ______________
+tests\gabfin\test_job_contracts.py:46: in test_required_fields
+    with pytest.raises(ValidationError):parse(name,p)
+                                        ^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_________________ test_required_fields[Reservation-p3-amount] _________________
+tests\gabfin\test_job_contracts.py:46: in test_required_fields
+    with pytest.raises(ValidationError):parse(name,p)
+                                        ^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+________________________________ test_schemas _________________________________
+tests\gabfin\test_job_contracts.py:48: in test_schemas
+    for name,p in [('JobLease',lease()),('Reservation',reservation())]:assert type(parse(name,p)).model_json_schema(mode='serialization')['additionalProperties'] is False
+                                                                                   ^^^^^^^^^^^^^
+tests\gabfin\test_job_contracts.py:10: in parse
+    from gabfin.contracts import jobs
+E   ImportError: cannot import name 'jobs' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-02g\red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_job_contracts.py::test_roundtrip[JobLease-p0] - Impo...
+FAILED tests/gabfin/test_job_contracts.py::test_roundtrip[Reservation-p1] - I...
+FAILED tests/gabfin/test_job_contracts.py::test_attempt_strict_positive[0] - ...
+FAILED tests/gabfin/test_job_contracts.py::test_attempt_strict_positive[-1]
+FAILED tests/gabfin/test_job_contracts.py::test_attempt_strict_positive[True]
+FAILED tests/gabfin/test_job_contracts.py::test_attempt_strict_positive[1.5]
+FAILED tests/gabfin/test_job_contracts.py::test_attempt_strict_positive[1] - ...
+FAILED tests/gabfin/test_job_contracts.py::test_attempt_strict_positive[9007199254740992]
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change0] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change1] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change2] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change3] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change4] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change5] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change6] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change7] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_lease[change8] - ImportEr...
+FAILED tests/gabfin/test_job_contracts.py::test_token_not_in_repr_but_internal_wire_contains_it
+FAILED tests/gabfin/test_job_contracts.py::test_historical_lease_is_readable
+FAILED tests/gabfin/test_job_contracts.py::test_unsettled_cost_stays_unknown[reserved]
+FAILED tests/gabfin/test_job_contracts.py::test_unsettled_cost_stays_unknown[released]
+FAILED tests/gabfin/test_job_contracts.py::test_unsettled_cost_stays_unknown[unknown]
+FAILED tests/gabfin/test_job_contracts.py::test_settlement_zero_exact_and_overrun[0]
+FAILED tests/gabfin/test_job_contracts.py::test_settlement_zero_exact_and_overrun[0.10]
+FAILED tests/gabfin/test_job_contracts.py::test_settlement_zero_exact_and_overrun[0.25]
+FAILED tests/gabfin/test_job_contracts.py::test_unsettled_cannot_claim_actual[reserved]
+FAILED tests/gabfin/test_job_contracts.py::test_unsettled_cannot_claim_actual[released]
+FAILED tests/gabfin/test_job_contracts.py::test_unsettled_cannot_claim_actual[unknown]
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change0] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change1] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change2] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change3] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change4] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change5] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change6] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change7] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change8] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change9] - Im...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change10] - I...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change11] - I...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change12] - I...
+FAILED tests/gabfin/test_job_contracts.py::test_bad_reservation[change13] - I...
+FAILED tests/gabfin/test_job_contracts.py::test_zero_reservation_is_explicit_and_precision_preserved
+FAILED tests/gabfin/test_job_contracts.py::test_required_fields[JobLease-p0-lease_token]
+FAILED tests/gabfin/test_job_contracts.py::test_required_fields[JobLease-p1-attempt]
+FAILED tests/gabfin/test_job_contracts.py::test_required_fields[Reservation-p2-actual_amount]
+FAILED tests/gabfin/test_job_contracts.py::test_required_fields[Reservation-p3-amount]
+FAILED tests/gabfin/test_job_contracts.py::test_schemas - ImportError: cannot...
+============================= 48 failed in 2.31s ==============================

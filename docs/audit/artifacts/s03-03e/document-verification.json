@@ -1,0 +1,13 @@
+{
+  "files_checked": 10,
+  "local_links_checked": 86,
+  "broken_links": [],
+  "memory_lines": {
+    "docs\\memory\\execution.md": 21,
+    "docs\\memory\\tasks.md": 16,
+    "docs\\memory\\progress.md": 63,
+    "docs\\memory\\architecture.md": 63,
+    "docs\\memory\\tooling.md": 43
+  },
+  "progress_entries": 10
+}

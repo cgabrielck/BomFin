@@ -1,0 +1,28 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 3 items
+
+tests\gabfin\test_equity_smoke.py FFF                                    [100%]
+
+================================== FAILURES ===================================
+____________________ test_smoke_wait_cleanup_and_allowlist ____________________
+tests\gabfin\test_equity_smoke.py:13: in test_smoke_wait_cleanup_and_allowlist
+    from gabfin.providers.futu.equity import inspect_equity
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'
+_______________________ test_subscribe_failure_no_wait ________________________
+tests\gabfin\test_equity_smoke.py:19: in test_subscribe_failure_no_wait
+    from gabfin.providers.futu.equity import inspect_equity
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'
+_____________________ test_parent_rejects_private_fields ______________________
+tests\gabfin\test_equity_smoke.py:23: in test_parent_rejects_private_fields
+    from gabfin.providers.futu.equity import validate_smoke
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s03-03c\red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_equity_smoke.py::test_smoke_wait_cleanup_and_allowlist
+FAILED tests/gabfin/test_equity_smoke.py::test_subscribe_failure_no_wait - Mo...
+FAILED tests/gabfin/test_equity_smoke.py::test_parent_rejects_private_fields
+============================== 3 failed in 2.42s ==============================

@@ -1,0 +1,31 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 9 items
+
+tests\gabfin\test_contracts.py ......FFF                                 [100%]
+
+================================== FAILURES ===================================
+_________________________ test_timezone_required[0_1] _________________________
+tests\gabfin\test_contracts.py:93: in test_timezone_required
+    with pytest.raises(ValidationError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValidationError
+____________________ test_timezone_required[1795599000_1] _____________________
+tests\gabfin\test_contracts.py:93: in test_timezone_required
+    with pytest.raises(ValidationError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValidationError
+____________________ test_timezone_required[1795599000.25] ____________________
+tests\gabfin\test_contracts.py:93: in test_timezone_required
+    with pytest.raises(ValidationError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValidationError
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-02a\epoch-string-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[0_1] - Failed: ...
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[1795599000_1]
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[1795599000.25]
+========================= 3 failed, 6 passed in 1.92s =========================

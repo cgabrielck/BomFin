@@ -1,0 +1,47 @@
+{
+  "status": "ok",
+  "metadata": {
+    "kind": "options_smoke",
+    "underlying": "US.AAPL",
+    "checked_at": "2026-11-25T09:00:21.552002+00:00",
+    "expiry": "2026-11-25",
+    "strike_window": {
+      "min": "350",
+      "max": "360"
+    },
+    "chain_verified": true,
+    "contracts": [
+      {
+        "code": "US.AAPL261125C355000",
+        "expiry": "2026-11-25",
+        "right": "CALL",
+        "strike": "355.0",
+        "shares_per_contract": "100",
+        "last_price": "1.7",
+        "data_date": "2026-11-24",
+        "data_time": "16:12:53.930"
+      },
+      {
+        "code": "US.AAPL261125P355000",
+        "expiry": "2026-11-25",
+        "right": "PUT",
+        "strike": "355.0",
+        "shares_per_contract": "100",
+        "last_price": "2.85",
+        "data_date": "2026-11-24",
+        "data_time": "16:13:06.360"
+      }
+    ],
+    "source_timezone": "America/New_York",
+    "latency": "unverified",
+    "cleanup": "unsubscribed",
+    "cleanup_quota": {
+      "own_used": 0,
+      "own_option_used": 0,
+      "option_total_used": 0,
+      "option_remaining": 60
+    },
+    "subscription_attempted": true,
+    "errors": []
+  }
+}

@@ -1,0 +1,318 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 38 items
+
+tests\gabfin\test_subscription_contracts.py FFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 73%]
+FFFFFFFFFF                                                               [100%]
+
+================================== FAILURES ===================================
+_____________________ test_roundtrip[SubscriptionKey-p0] ______________________
+tests\gabfin\test_subscription_contracts.py:15: in test_roundtrip
+    r=parse(name,p);assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________________ test_roundtrip[SubscriptionKey-p1] ______________________
+tests\gabfin\test_subscription_contracts.py:15: in test_roundtrip
+    r=parse(name,p);assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________________ test_roundtrip[FeedCapabilities-p2] _____________________
+tests\gabfin\test_subscription_contracts.py:15: in test_roundtrip
+    r=parse(name,p);assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________________ test_roundtrip[SubscriptionPlan-p3] _____________________
+tests\gabfin\test_subscription_contracts.py:15: in test_roundtrip
+    r=parse(name,p);assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________________________ test_roundtrip[Demand-p4] __________________________
+tests\gabfin\test_subscription_contracts.py:15: in test_roundtrip
+    r=parse(name,p);assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____________________________ test_invalid_key[p0] _____________________________
+tests\gabfin\test_subscription_contracts.py:18: in test_invalid_key
+    with pytest.raises(ValidationError):parse('SubscriptionKey',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____________________________ test_invalid_key[p1] _____________________________
+tests\gabfin\test_subscription_contracts.py:18: in test_invalid_key
+    with pytest.raises(ValidationError):parse('SubscriptionKey',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____________________________ test_invalid_key[p2] _____________________________
+tests\gabfin\test_subscription_contracts.py:18: in test_invalid_key
+    with pytest.raises(ValidationError):parse('SubscriptionKey',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____________________________ test_invalid_key[p3] _____________________________
+tests\gabfin\test_subscription_contracts.py:18: in test_invalid_key
+    with pytest.raises(ValidationError):parse('SubscriptionKey',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____________________________ test_invalid_key[p4] _____________________________
+tests\gabfin\test_subscription_contracts.py:18: in test_invalid_key
+    with pytest.raises(ValidationError):parse('SubscriptionKey',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________________ test_quota_unknown_zero_distinct[0] _____________________
+tests\gabfin\test_subscription_contracts.py:20: in test_quota_unknown_zero_distinct
+    def test_quota_unknown_zero_distinct(value):assert parse('FeedCapabilities',cap()|{'max_subscriptions':value}).max_subscriptions==value
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________ test_quota_unknown_zero_distinct[None] ____________________
+tests\gabfin\test_subscription_contracts.py:20: in test_quota_unknown_zero_distinct
+    def test_quota_unknown_zero_distinct(value):assert parse('FeedCapabilities',cap()|{'max_subscriptions':value}).max_subscriptions==value
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____________________ test_quota_unknown_zero_distinct[100] ____________________
+tests\gabfin\test_subscription_contracts.py:20: in test_quota_unknown_zero_distinct
+    def test_quota_unknown_zero_distinct(value):assert parse('FeedCapabilities',cap()|{'max_subscriptions':value}).max_subscriptions==value
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________________________ test_bad_quota[-1] ______________________________
+tests\gabfin\test_subscription_contracts.py:23: in test_bad_quota
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|{'max_subscriptions':value})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____________________________ test_bad_quota[True] _____________________________
+tests\gabfin\test_subscription_contracts.py:23: in test_bad_quota
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|{'max_subscriptions':value})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________________________ test_bad_quota[1.5] _____________________________
+tests\gabfin\test_subscription_contracts.py:23: in test_bad_quota
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|{'max_subscriptions':value})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_____________________________ test_bad_quota[100] _____________________________
+tests\gabfin\test_subscription_contracts.py:23: in test_bad_quota
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|{'max_subscriptions':value})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+______________________ test_bad_quota[9007199254740992] _______________________
+tests\gabfin\test_subscription_contracts.py:23: in test_bad_quota
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|{'max_subscriptions':value})
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_capabilities[change0] ________________________
+tests\gabfin\test_subscription_contracts.py:26: in test_bad_capabilities
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_capabilities[change1] ________________________
+tests\gabfin\test_subscription_contracts.py:26: in test_bad_capabilities
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_capabilities[change2] ________________________
+tests\gabfin\test_subscription_contracts.py:26: in test_bad_capabilities
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_capabilities[change3] ________________________
+tests\gabfin\test_subscription_contracts.py:26: in test_bad_capabilities
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_capabilities[change4] ________________________
+tests\gabfin\test_subscription_contracts.py:26: in test_bad_capabilities
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_capabilities[change5] ________________________
+tests\gabfin\test_subscription_contracts.py:26: in test_bad_capabilities
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_______________________ test_bad_capabilities[change6] ________________________
+tests\gabfin\test_subscription_contracts.py:26: in test_bad_capabilities
+    with pytest.raises(ValidationError):parse('FeedCapabilities',cap()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________ test_plan_identity_consistency[change0] ___________________
+tests\gabfin\test_subscription_contracts.py:29: in test_plan_identity_consistency
+    with pytest.raises(ValidationError):parse('SubscriptionPlan',plan()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________ test_plan_identity_consistency[change1] ___________________
+tests\gabfin\test_subscription_contracts.py:29: in test_plan_identity_consistency
+    with pytest.raises(ValidationError):parse('SubscriptionPlan',plan()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________ test_plan_identity_consistency[change2] ___________________
+tests\gabfin\test_subscription_contracts.py:29: in test_plan_identity_consistency
+    with pytest.raises(ValidationError):parse('SubscriptionPlan',plan()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________ test_plan_identity_consistency[change3] ___________________
+tests\gabfin\test_subscription_contracts.py:29: in test_plan_identity_consistency
+    with pytest.raises(ValidationError):parse('SubscriptionPlan',plan()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________ test_plan_identity_consistency[change4] ___________________
+tests\gabfin\test_subscription_contracts.py:29: in test_plan_identity_consistency
+    with pytest.raises(ValidationError):parse('SubscriptionPlan',plan()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_________________ test_distinct_bar_timeframes_and_empty_plan _________________
+tests\gabfin\test_subscription_contracts.py:32: in test_distinct_bar_timeframes_and_empty_plan
+    assert len(parse('SubscriptionPlan',p).accepted)==2
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________________________ test_history_limits[None] __________________________
+tests\gabfin\test_subscription_contracts.py:37: in test_history_limits
+    assert parse('FeedCapabilities',p).history_limits[0].max_records==count
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_history_limits[0] ____________________________
+tests\gabfin\test_subscription_contracts.py:37: in test_history_limits
+    assert parse('FeedCapabilities',p).history_limits[0].max_records==count
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________________________ test_history_limits[10] ___________________________
+tests\gabfin\test_subscription_contracts.py:37: in test_history_limits
+    assert parse('FeedCapabilities',p).history_limits[0].max_records==count
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________________ test_demand_metadata_validation[change0] ___________________
+tests\gabfin\test_subscription_contracts.py:43: in test_demand_metadata_validation
+    with pytest.raises(ValidationError):parse('Demand',p|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________________ test_demand_metadata_validation[change1] ___________________
+tests\gabfin\test_subscription_contracts.py:43: in test_demand_metadata_validation
+    with pytest.raises(ValidationError):parse('Demand',p|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________________ test_demand_metadata_validation[change2] ___________________
+tests\gabfin\test_subscription_contracts.py:43: in test_demand_metadata_validation
+    with pytest.raises(ValidationError):parse('Demand',p|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__________________ test_demand_metadata_validation[change3] ___________________
+tests\gabfin\test_subscription_contracts.py:43: in test_demand_metadata_validation
+    with pytest.raises(ValidationError):parse('Demand',p|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_subscription_contracts.py:11: in parse
+    from gabfin.contracts import subscriptions
+E   ImportError: cannot import name 'subscriptions' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-02e\red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_subscription_contracts.py::test_roundtrip[SubscriptionKey-p0]
+FAILED tests/gabfin/test_subscription_contracts.py::test_roundtrip[SubscriptionKey-p1]
+FAILED tests/gabfin/test_subscription_contracts.py::test_roundtrip[FeedCapabilities-p2]
+FAILED tests/gabfin/test_subscription_contracts.py::test_roundtrip[SubscriptionPlan-p3]
+FAILED tests/gabfin/test_subscription_contracts.py::test_roundtrip[Demand-p4]
+FAILED tests/gabfin/test_subscription_contracts.py::test_invalid_key[p0] - Im...
+FAILED tests/gabfin/test_subscription_contracts.py::test_invalid_key[p1] - Im...
+FAILED tests/gabfin/test_subscription_contracts.py::test_invalid_key[p2] - Im...
+FAILED tests/gabfin/test_subscription_contracts.py::test_invalid_key[p3] - Im...
+FAILED tests/gabfin/test_subscription_contracts.py::test_invalid_key[p4] - Im...
+FAILED tests/gabfin/test_subscription_contracts.py::test_quota_unknown_zero_distinct[0]
+FAILED tests/gabfin/test_subscription_contracts.py::test_quota_unknown_zero_distinct[None]
+FAILED tests/gabfin/test_subscription_contracts.py::test_quota_unknown_zero_distinct[100]
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_quota[-1] - Impo...
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_quota[True] - Im...
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_quota[1.5] - Imp...
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_quota[100] - Imp...
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_quota[9007199254740992]
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_capabilities[change0]
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_capabilities[change1]
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_capabilities[change2]
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_capabilities[change3]
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_capabilities[change4]
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_capabilities[change5]
+FAILED tests/gabfin/test_subscription_contracts.py::test_bad_capabilities[change6]
+FAILED tests/gabfin/test_subscription_contracts.py::test_plan_identity_consistency[change0]
+FAILED tests/gabfin/test_subscription_contracts.py::test_plan_identity_consistency[change1]
+FAILED tests/gabfin/test_subscription_contracts.py::test_plan_identity_consistency[change2]
+FAILED tests/gabfin/test_subscription_contracts.py::test_plan_identity_consistency[change3]
+FAILED tests/gabfin/test_subscription_contracts.py::test_plan_identity_consistency[change4]
+FAILED tests/gabfin/test_subscription_contracts.py::test_distinct_bar_timeframes_and_empty_plan
+FAILED tests/gabfin/test_subscription_contracts.py::test_history_limits[None]
+FAILED tests/gabfin/test_subscription_contracts.py::test_history_limits[0] - ...
+FAILED tests/gabfin/test_subscription_contracts.py::test_history_limits[10]
+FAILED tests/gabfin/test_subscription_contracts.py::test_demand_metadata_validation[change0]
+FAILED tests/gabfin/test_subscription_contracts.py::test_demand_metadata_validation[change1]
+FAILED tests/gabfin/test_subscription_contracts.py::test_demand_metadata_validation[change2]
+FAILED tests/gabfin/test_subscription_contracts.py::test_demand_metadata_validation[change3]
+============================= 38 failed in 2.25s ==============================

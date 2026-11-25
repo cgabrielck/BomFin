@@ -1,0 +1,17 @@
+Using Python 3.12.16 environment at: .tools\s03-03g-wheel-check
+Resolved 13 packages in 1.08s
+Prepared 1 package in 50ms
+Installed 13 packages in 993ms
+ + annotated-doc==0.0.7
+ + annotated-types==0.8.0
+ + anyio==4.16.0
+ + fastapi==0.165.0
+ + gabfin==0.1.0 (from file:///C:/Users/001/Desktop/GabFin-ai-trade/docs/audit/artifacts/s03-03g/wheels/gabfin-0.1.0-py3-none-any.whl)
+ + idna==3.20
+ + opentelemetry-api==1.45.2
+ + pydantic==2.14.4
+ + pydantic-core==2.50.5
+ + starlette==1.10.0
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.5
+ + tzdata==2026.6

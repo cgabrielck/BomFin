@@ -1,0 +1,94 @@
+[
+  {
+    "file": "PROGRESS_LOG.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "backend/trading/README.md",
+    "repaired_links": 0
+  },
+  {
+    "file": "backend/trading/ui/README.md",
+    "repaired_links": 0
+  },
+  {
+    "file": "deploy/README.md",
+    "repaired_links": 0
+  },
+  {
+    "file": "docs/ACCOUNT_MANAGEMENT_DESIGN.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/AI_SMART_TRADER_METHOD.md",
+    "repaired_links": 2
+  },
+  {
+    "file": "docs/AUDIT_REMEDIATION_PLAN_2026-10-21.md",
+    "repaired_links": 0
+  },
+  {
+    "file": "docs/AUTO_TRADING_ROADMAP.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/BOUNDED_INTELLIGENCE_ACCEPTANCE.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/CGAB_WORLD_CLASS_UPGRADE.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/CHARTS_INDICATORS_DESIGN.md",
+    "repaired_links": 2
+  },
+  {
+    "file": "docs/DATA_FEED_AND_SUBSCRIPTIONS.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/LAB_CITATION_TRY.md",
+    "repaired_links": 0
+  },
+  {
+    "file": "docs/LAB_PRODUCT_M7_BINDING.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/MODULAR_ARCHITECTURE.md",
+    "repaired_links": 2
+  },
+  {
+    "file": "docs/NEXT_PHASE_PLAN.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/PAPER_VALIDATION_RUNBOOK.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/PROCUREMENT_GUIDE.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/QUALITY_ROADMAP.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/REFERENCE_SIGNALS_DESIGN.md",
+    "repaired_links": 1
+  },
+  {
+    "file": "docs/STRATEGY_ADOPTION.md",
+    "repaired_links": 0
+  },
+  {
+    "file": "docs/TAILSCALE_SERVE.md",
+    "repaired_links": 0
+  },
+  {
+    "file": "docs/boomboom-modular-architecture.html",
+    "repaired_links": 0
+  }
+]

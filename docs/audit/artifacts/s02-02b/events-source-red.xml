@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="1.781" timestamp="2026-11-25T10:07:31.611449+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_market_events" name="test_event_cannot_relabel_payload_as_a_different_feed[quote]" time="1.239"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.events'">tests\gabfin\test_market_events.py:106: in test_event_cannot_relabel_payload_as_a_different_feed
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'</failure></testcase><testcase classname="tests.gabfin.test_market_events" name="test_event_cannot_relabel_payload_as_a_different_feed[bar]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.events'">tests\gabfin\test_market_events.py:106: in test_event_cannot_relabel_payload_as_a_different_feed
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'</failure></testcase></testsuite></testsuites>

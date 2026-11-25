@@ -1,0 +1,224 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 83 items
+
+tests\gabfin\test_contracts.py ......................................... [ 49%]
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                               [100%]
+
+================================== FAILURES ===================================
+______________________ test_trade_plan_never_executable _______________________
+tests\gabfin\test_contracts.py:149: in test_trade_plan_never_executable
+    from gabfin.contracts.intent import StrategyIntent, TradePlan
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+__________________ test_intent_union_preserves_advisory_type __________________
+tests\gabfin\test_contracts.py:161: in test_intent_union_preserves_advisory_type
+    from gabfin.contracts.intent import IntentDocument, StrategyIntent, TradePlan
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____________ test_intent_union_requires_a_known_explicit_tag[None] ____________
+tests\gabfin\test_contracts.py:173: in test_intent_union_requires_a_known_explicit_tag
+    from gabfin.contracts.intent import IntentDocument
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+_______ test_intent_union_requires_a_known_explicit_tag[order_command] ________
+tests\gabfin\test_contracts.py:173: in test_intent_union_requires_a_known_explicit_tag
+    from gabfin.contracts.intent import IntentDocument
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+__ test_contract_requires_supported_explicit_schema_version[TradePlan-None] ___
+tests\gabfin\test_contracts.py:187: in test_contract_requires_supported_explicit_schema_version
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___ test_contract_requires_supported_explicit_schema_version[TradePlan-2.0] ___
+tests\gabfin\test_contracts.py:187: in test_contract_requires_supported_explicit_schema_version
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+____ test_contract_requires_supported_explicit_schema_version[TradePlan-1] ____
+tests\gabfin\test_contracts.py:187: in test_contract_requires_supported_explicit_schema_version
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_ test_contract_requires_supported_explicit_schema_version[StrategyIntent-None] _
+tests\gabfin\test_contracts.py:187: in test_contract_requires_supported_explicit_schema_version
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_ test_contract_requires_supported_explicit_schema_version[StrategyIntent-2.0] _
+tests\gabfin\test_contracts.py:187: in test_contract_requires_supported_explicit_schema_version
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_ test_contract_requires_supported_explicit_schema_version[StrategyIntent-1] __
+tests\gabfin\test_contracts.py:187: in test_contract_requires_supported_explicit_schema_version
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___________ test_trade_plan_advisory_is_explicit_boolean_true[None] ___________
+tests\gabfin\test_contracts.py:200: in test_trade_plan_advisory_is_explicit_boolean_true
+    from gabfin.contracts.intent import TradePlan
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+__________ test_trade_plan_advisory_is_explicit_boolean_true[False] ___________
+tests\gabfin\test_contracts.py:200: in test_trade_plan_advisory_is_explicit_boolean_true
+    from gabfin.contracts.intent import TradePlan
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+___________ test_trade_plan_advisory_is_explicit_boolean_true[true] ___________
+tests\gabfin\test_contracts.py:200: in test_trade_plan_advisory_is_explicit_boolean_true
+    from gabfin.contracts.intent import TradePlan
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____________ test_trade_plan_advisory_is_explicit_boolean_true[1] _____________
+tests\gabfin\test_contracts.py:200: in test_trade_plan_advisory_is_explicit_boolean_true
+    from gabfin.contracts.intent import TradePlan
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____ test_direction_and_position_effect_survive_wire_roundtrip[open-long] _____
+tests\gabfin\test_contracts.py:214: in test_direction_and_position_effect_survive_wire_roundtrip
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____ test_direction_and_position_effect_survive_wire_roundtrip[open-short] ____
+tests\gabfin\test_contracts.py:214: in test_direction_and_position_effect_survive_wire_roundtrip
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+___ test_direction_and_position_effect_survive_wire_roundtrip[reduce-long] ____
+tests\gabfin\test_contracts.py:214: in test_direction_and_position_effect_survive_wire_roundtrip
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+___ test_direction_and_position_effect_survive_wire_roundtrip[reduce-short] ___
+tests\gabfin\test_contracts.py:214: in test_direction_and_position_effect_survive_wire_roundtrip
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____ test_direction_and_position_effect_survive_wire_roundtrip[close-long] ____
+tests\gabfin\test_contracts.py:214: in test_direction_and_position_effect_survive_wire_roundtrip
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+___ test_direction_and_position_effect_survive_wire_roundtrip[close-short] ____
+tests\gabfin\test_contracts.py:214: in test_direction_and_position_effect_survive_wire_roundtrip
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____________ test_position_effect_cannot_silently_default_to_open _____________
+tests\gabfin\test_contracts.py:230: in test_position_effect_cannot_silently_default_to_open
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+__________ test_strategy_direction_does_not_accept_broker_sides[buy] __________
+tests\gabfin\test_contracts.py:240: in test_strategy_direction_does_not_accept_broker_sides
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+_________ test_strategy_direction_does_not_accept_broker_sides[sell] __________
+tests\gabfin\test_contracts.py:240: in test_strategy_direction_does_not_accept_broker_sides
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____________ test_position_effect_rejects_unknown_actions[reverse] ____________
+tests\gabfin\test_contracts.py:250: in test_position_effect_rejects_unknown_actions
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+_____________ test_position_effect_rejects_unknown_actions[sell] ______________
+tests\gabfin\test_contracts.py:250: in test_position_effect_rejects_unknown_actions
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+__ test_intent_requires_nonblank_provenance_and_rationale[strategy_version] ___
+tests\gabfin\test_contracts.py:260: in test_intent_requires_nonblank_provenance_and_rationale
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+___ test_intent_requires_nonblank_provenance_and_rationale[policy_version] ____
+tests\gabfin\test_contracts.py:260: in test_intent_requires_nonblank_provenance_and_rationale
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+________ test_intent_requires_nonblank_provenance_and_rationale[setup] ________
+tests\gabfin\test_contracts.py:260: in test_intent_requires_nonblank_provenance_and_rationale
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____ test_intent_requires_nonblank_provenance_and_rationale[invalidation] _____
+tests\gabfin\test_contracts.py:260: in test_intent_requires_nonblank_provenance_and_rationale
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+__________________ test_intent_ids_must_be_uuids[instrument] __________________
+tests\gabfin\test_contracts.py:270: in test_intent_ids_must_be_uuids
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+__________________ test_intent_ids_must_be_uuids[intent_id] ___________________
+tests\gabfin\test_contracts.py:270: in test_intent_ids_must_be_uuids
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+_________________ test_intent_ids_must_be_uuids[snapshot_id] __________________
+tests\gabfin\test_contracts.py:270: in test_intent_ids_must_be_uuids
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+______ test_broker_or_risk_fields_cannot_be_injected[TradePlan-quantity] ______
+tests\gabfin\test_contracts.py:281: in test_broker_or_risk_fields_cannot_be_injected
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+______ test_broker_or_risk_fields_cannot_be_injected[TradePlan-approved] ______
+tests\gabfin\test_contracts.py:281: in test_broker_or_risk_fields_cannot_be_injected
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+__ test_broker_or_risk_fields_cannot_be_injected[TradePlan-client_order_id] ___
+tests\gabfin\test_contracts.py:281: in test_broker_or_risk_fields_cannot_be_injected
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___ test_broker_or_risk_fields_cannot_be_injected[StrategyIntent-quantity] ____
+tests\gabfin\test_contracts.py:281: in test_broker_or_risk_fields_cannot_be_injected
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+___ test_broker_or_risk_fields_cannot_be_injected[StrategyIntent-approved] ____
+tests\gabfin\test_contracts.py:281: in test_broker_or_risk_fields_cannot_be_injected
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+_ test_broker_or_risk_fields_cannot_be_injected[StrategyIntent-client_order_id] _
+tests\gabfin\test_contracts.py:281: in test_broker_or_risk_fields_cannot_be_injected
+    from gabfin.contracts import intent
+E   ImportError: cannot import name 'intent' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)
+______________ test_chat_scope_is_not_an_intent_producer_marker _______________
+tests\gabfin\test_contracts.py:290: in test_chat_scope_is_not_an_intent_producer_marker
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+______________ test_expired_intent_can_be_deserialized_for_audit ______________
+tests\gabfin\test_contracts.py:299: in test_expired_intent_can_be_deserialized_for_audit
+    from gabfin.contracts.intent import StrategyIntent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+_____________ test_advisory_scenarios_and_evidence_are_validated ______________
+tests\gabfin\test_contracts.py:308: in test_advisory_scenarios_and_evidence_are_validated
+    from gabfin.contracts.intent import TradePlan
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+____ test_wire_schema_exposes_intent_discriminator_and_advisory_constraint ____
+tests\gabfin\test_contracts.py:321: in test_wire_schema_exposes_intent_discriminator_and_advisory_constraint
+    from gabfin.contracts.intent import IntentDocument, TradePlan
+E   ModuleNotFoundError: No module named 'gabfin.contracts.intent'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-02a\intent-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_contracts.py::test_trade_plan_never_executable - Mod...
+FAILED tests/gabfin/test_contracts.py::test_intent_union_preserves_advisory_type
+FAILED tests/gabfin/test_contracts.py::test_intent_union_requires_a_known_explicit_tag[None]
+FAILED tests/gabfin/test_contracts.py::test_intent_union_requires_a_known_explicit_tag[order_command]
+FAILED tests/gabfin/test_contracts.py::test_contract_requires_supported_explicit_schema_version[TradePlan-None]
+FAILED tests/gabfin/test_contracts.py::test_contract_requires_supported_explicit_schema_version[TradePlan-2.0]
+FAILED tests/gabfin/test_contracts.py::test_contract_requires_supported_explicit_schema_version[TradePlan-1]
+FAILED tests/gabfin/test_contracts.py::test_contract_requires_supported_explicit_schema_version[StrategyIntent-None]
+FAILED tests/gabfin/test_contracts.py::test_contract_requires_supported_explicit_schema_version[StrategyIntent-2.0]
+FAILED tests/gabfin/test_contracts.py::test_contract_requires_supported_explicit_schema_version[StrategyIntent-1]
+FAILED tests/gabfin/test_contracts.py::test_trade_plan_advisory_is_explicit_boolean_true[None]
+FAILED tests/gabfin/test_contracts.py::test_trade_plan_advisory_is_explicit_boolean_true[False]
+FAILED tests/gabfin/test_contracts.py::test_trade_plan_advisory_is_explicit_boolean_true[true]
+FAILED tests/gabfin/test_contracts.py::test_trade_plan_advisory_is_explicit_boolean_true[1]
+FAILED tests/gabfin/test_contracts.py::test_direction_and_position_effect_survive_wire_roundtrip[open-long]
+FAILED tests/gabfin/test_contracts.py::test_direction_and_position_effect_survive_wire_roundtrip[open-short]
+FAILED tests/gabfin/test_contracts.py::test_direction_and_position_effect_survive_wire_roundtrip[reduce-long]
+FAILED tests/gabfin/test_contracts.py::test_direction_and_position_effect_survive_wire_roundtrip[reduce-short]
+FAILED tests/gabfin/test_contracts.py::test_direction_and_position_effect_survive_wire_roundtrip[close-long]
+FAILED tests/gabfin/test_contracts.py::test_direction_and_position_effect_survive_wire_roundtrip[close-short]
+FAILED tests/gabfin/test_contracts.py::test_position_effect_cannot_silently_default_to_open
+FAILED tests/gabfin/test_contracts.py::test_strategy_direction_does_not_accept_broker_sides[buy]
+FAILED tests/gabfin/test_contracts.py::test_strategy_direction_does_not_accept_broker_sides[sell]
+FAILED tests/gabfin/test_contracts.py::test_position_effect_rejects_unknown_actions[reverse]
+FAILED tests/gabfin/test_contracts.py::test_position_effect_rejects_unknown_actions[sell]
+FAILED tests/gabfin/test_contracts.py::test_intent_requires_nonblank_provenance_and_rationale[strategy_version]
+FAILED tests/gabfin/test_contracts.py::test_intent_requires_nonblank_provenance_and_rationale[policy_version]
+FAILED tests/gabfin/test_contracts.py::test_intent_requires_nonblank_provenance_and_rationale[setup]
+FAILED tests/gabfin/test_contracts.py::test_intent_requires_nonblank_provenance_and_rationale[invalidation]
+FAILED tests/gabfin/test_contracts.py::test_intent_ids_must_be_uuids[instrument]
+FAILED tests/gabfin/test_contracts.py::test_intent_ids_must_be_uuids[intent_id]
+FAILED tests/gabfin/test_contracts.py::test_intent_ids_must_be_uuids[snapshot_id]
+FAILED tests/gabfin/test_contracts.py::test_broker_or_risk_fields_cannot_be_injected[TradePlan-quantity]
+FAILED tests/gabfin/test_contracts.py::test_broker_or_risk_fields_cannot_be_injected[TradePlan-approved]
+FAILED tests/gabfin/test_contracts.py::test_broker_or_risk_fields_cannot_be_injected[TradePlan-client_order_id]
+FAILED tests/gabfin/test_contracts.py::test_broker_or_risk_fields_cannot_be_injected[StrategyIntent-quantity]
+FAILED tests/gabfin/test_contracts.py::test_broker_or_risk_fields_cannot_be_injected[StrategyIntent-approved]
+FAILED tests/gabfin/test_contracts.py::test_broker_or_risk_fields_cannot_be_injected[StrategyIntent-client_order_id]
+FAILED tests/gabfin/test_contracts.py::test_chat_scope_is_not_an_intent_producer_marker
+FAILED tests/gabfin/test_contracts.py::test_expired_intent_can_be_deserialized_for_audit
+FAILED tests/gabfin/test_contracts.py::test_advisory_scenarios_and_evidence_are_validated
+FAILED tests/gabfin/test_contracts.py::test_wire_schema_exposes_intent_discriminator_and_advisory_constraint
+======================== 42 failed, 41 passed in 2.45s ========================

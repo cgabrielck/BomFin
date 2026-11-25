@@ -1,0 +1,850 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                     [100%]
+================================== FAILURES ===================================
+______ test_two_bounded_history_pages_without_subscription_or_pagination ______
+
+    def test_two_bounded_history_pages_without_subscription_or_pagination():
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:49: SyntaxError
+_____________ test_history_result_crosses_parent_process_boundary _____________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_history_result_crosses_pa0')
+
+    def test_history_result_crosses_parent_process_boundary(tmp_path):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:75: SyntaxError
+___ test_unavailable_quota_stops_history_and_preserves_final_sample[quota0] ___
+
+quota = (0, 0)
+
+    @pytest.mark.parametrize('quota', [(0, 0), (True, 5), (-1, 5), (5, None)])
+    def test_unavailable_quota_stops_history_and_preserves_final_sample(quota):
+>       from gabfin.providers.futu.history import inspect_history, validate_smoke
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:83: SyntaxError
+___ test_unavailable_quota_stops_history_and_preserves_final_sample[quota1] ___
+
+quota = (True, 5)
+
+    @pytest.mark.parametrize('quota', [(0, 0), (True, 5), (-1, 5), (5, None)])
+    def test_unavailable_quota_stops_history_and_preserves_final_sample(quota):
+>       from gabfin.providers.futu.history import inspect_history, validate_smoke
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:83: SyntaxError
+___ test_unavailable_quota_stops_history_and_preserves_final_sample[quota2] ___
+
+quota = (-1, 5)
+
+    @pytest.mark.parametrize('quota', [(0, 0), (True, 5), (-1, 5), (5, None)])
+    def test_unavailable_quota_stops_history_and_preserves_final_sample(quota):
+>       from gabfin.providers.futu.history import inspect_history, validate_smoke
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:83: SyntaxError
+___ test_unavailable_quota_stops_history_and_preserves_final_sample[quota3] ___
+
+quota = (5, None)
+
+    @pytest.mark.parametrize('quota', [(0, 0), (True, 5), (-1, 5), (5, None)])
+    def test_unavailable_quota_stops_history_and_preserves_final_sample(quota):
+>       from gabfin.providers.futu.history import inspect_history, validate_smoke
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:83: SyntaxError
+___________ test_budget_exhaustion_between_reads_retains_first_page ___________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_budget_exhaustion_between0')
+
+    def test_budget_exhaustion_between_reads_retains_first_page(tmp_path):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:95: SyntaxError
+_ test_invalid_history_data_is_discarded_but_other_session_can_succeed[change0] _
+
+change = {'code': 'US.MSFT'}
+
+    @pytest.mark.parametrize('change', [
+        {'code': 'US.MSFT'}, {'time_key': '2026-11-25 09:30:00'},
+        {'time_key': '2026-11-24 02:00:00'}, {'time_key': 'PRIVATE'},
+        {'open': float('nan')}, {'close': True}, {'low': -1}, {'high': 100},
+    ])
+    def test_invalid_history_data_is_discarded_but_other_session_can_succeed(change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:112: SyntaxError
+_ test_invalid_history_data_is_discarded_but_other_session_can_succeed[change1] _
+
+change = {'time_key': '2026-11-25 09:30:00'}
+
+    @pytest.mark.parametrize('change', [
+        {'code': 'US.MSFT'}, {'time_key': '2026-11-25 09:30:00'},
+        {'time_key': '2026-11-24 02:00:00'}, {'time_key': 'PRIVATE'},
+        {'open': float('nan')}, {'close': True}, {'low': -1}, {'high': 100},
+    ])
+    def test_invalid_history_data_is_discarded_but_other_session_can_succeed(change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:112: SyntaxError
+_ test_invalid_history_data_is_discarded_but_other_session_can_succeed[change2] _
+
+change = {'time_key': '2026-11-24 02:00:00'}
+
+    @pytest.mark.parametrize('change', [
+        {'code': 'US.MSFT'}, {'time_key': '2026-11-25 09:30:00'},
+        {'time_key': '2026-11-24 02:00:00'}, {'time_key': 'PRIVATE'},
+        {'open': float('nan')}, {'close': True}, {'low': -1}, {'high': 100},
+    ])
+    def test_invalid_history_data_is_discarded_but_other_session_can_succeed(change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:112: SyntaxError
+_ test_invalid_history_data_is_discarded_but_other_session_can_succeed[change3] _
+
+change = {'time_key': 'PRIVATE'}
+
+    @pytest.mark.parametrize('change', [
+        {'code': 'US.MSFT'}, {'time_key': '2026-11-25 09:30:00'},
+        {'time_key': '2026-11-24 02:00:00'}, {'time_key': 'PRIVATE'},
+        {'open': float('nan')}, {'close': True}, {'low': -1}, {'high': 100},
+    ])
+    def test_invalid_history_data_is_discarded_but_other_session_can_succeed(change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:112: SyntaxError
+_ test_invalid_history_data_is_discarded_but_other_session_can_succeed[change4] _
+
+change = {'open': nan}
+
+    @pytest.mark.parametrize('change', [
+        {'code': 'US.MSFT'}, {'time_key': '2026-11-25 09:30:00'},
+        {'time_key': '2026-11-24 02:00:00'}, {'time_key': 'PRIVATE'},
+        {'open': float('nan')}, {'close': True}, {'low': -1}, {'high': 100},
+    ])
+    def test_invalid_history_data_is_discarded_but_other_session_can_succeed(change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:112: SyntaxError
+_ test_invalid_history_data_is_discarded_but_other_session_can_succeed[change5] _
+
+change = {'close': True}
+
+    @pytest.mark.parametrize('change', [
+        {'code': 'US.MSFT'}, {'time_key': '2026-11-25 09:30:00'},
+        {'time_key': '2026-11-24 02:00:00'}, {'time_key': 'PRIVATE'},
+        {'open': float('nan')}, {'close': True}, {'low': -1}, {'high': 100},
+    ])
+    def test_invalid_history_data_is_discarded_but_other_session_can_succeed(change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:112: SyntaxError
+_ test_invalid_history_data_is_discarded_but_other_session_can_succeed[change6] _
+
+change = {'low': -1}
+
+    @pytest.mark.parametrize('change', [
+        {'code': 'US.MSFT'}, {'time_key': '2026-11-25 09:30:00'},
+        {'time_key': '2026-11-24 02:00:00'}, {'time_key': 'PRIVATE'},
+        {'open': float('nan')}, {'close': True}, {'low': -1}, {'high': 100},
+    ])
+    def test_invalid_history_data_is_discarded_but_other_session_can_succeed(change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:112: SyntaxError
+_ test_invalid_history_data_is_discarded_but_other_session_can_succeed[change7] _
+
+change = {'high': 100}
+
+    @pytest.mark.parametrize('change', [
+        {'code': 'US.MSFT'}, {'time_key': '2026-11-25 09:30:00'},
+        {'time_key': '2026-11-24 02:00:00'}, {'time_key': 'PRIVATE'},
+        {'open': float('nan')}, {'close': True}, {'low': -1}, {'high': 100},
+    ])
+    def test_invalid_history_data_is_discarded_but_other_session_can_succeed(change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:112: SyntaxError
+____ test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[empty] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_empty_and_failed_pages_do0')
+mode = 'empty'
+
+    @pytest.mark.parametrize('mode', ['empty', 'failed', 'raised', 'oversize', 'duplicate', 'private_token'])
+    def test_empty_and_failed_pages_do_not_trigger_pagination_or_retry(tmp_path, mode):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:128: SyntaxError
+___ test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[failed] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_empty_and_failed_pages_do1')
+mode = 'failed'
+
+    @pytest.mark.parametrize('mode', ['empty', 'failed', 'raised', 'oversize', 'duplicate', 'private_token'])
+    def test_empty_and_failed_pages_do_not_trigger_pagination_or_retry(tmp_path, mode):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:128: SyntaxError
+___ test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[raised] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_empty_and_failed_pages_do2')
+mode = 'raised'
+
+    @pytest.mark.parametrize('mode', ['empty', 'failed', 'raised', 'oversize', 'duplicate', 'private_token'])
+    def test_empty_and_failed_pages_do_not_trigger_pagination_or_retry(tmp_path, mode):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:128: SyntaxError
+__ test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[oversize] ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_empty_and_failed_pages_do3')
+mode = 'oversize'
+
+    @pytest.mark.parametrize('mode', ['empty', 'failed', 'raised', 'oversize', 'duplicate', 'private_token'])
+    def test_empty_and_failed_pages_do_not_trigger_pagination_or_retry(tmp_path, mode):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:128: SyntaxError
+__ test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[duplicate] __
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_empty_and_failed_pages_do4')
+mode = 'duplicate'
+
+    @pytest.mark.parametrize('mode', ['empty', 'failed', 'raised', 'oversize', 'duplicate', 'private_token'])
+    def test_empty_and_failed_pages_do_not_trigger_pagination_or_retry(tmp_path, mode):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:128: SyntaxError
+_ test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[private_token] _
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_empty_and_failed_pages_do5')
+mode = 'private_token'
+
+    @pytest.mark.parametrize('mode', ['empty', 'failed', 'raised', 'oversize', 'duplicate', 'private_token'])
+    def test_empty_and_failed_pages_do_not_trigger_pagination_or_retry(tmp_path, mode):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:128: SyntaxError
+__ test_metadata_failures_are_explicit_and_close_is_attempted[market_state] ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_metadata_failures_are_exp0')
+failure = 'market_state'
+
+    @pytest.mark.parametrize('failure', ['market_state', 'quota_before', 'quota_after', 'close'])
+    def test_metadata_failures_are_explicit_and_close_is_attempted(tmp_path, failure):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:154: SyntaxError
+__ test_metadata_failures_are_explicit_and_close_is_attempted[quota_before] ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_metadata_failures_are_exp1')
+failure = 'quota_before'
+
+    @pytest.mark.parametrize('failure', ['market_state', 'quota_before', 'quota_after', 'close'])
+    def test_metadata_failures_are_explicit_and_close_is_attempted(tmp_path, failure):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:154: SyntaxError
+___ test_metadata_failures_are_explicit_and_close_is_attempted[quota_after] ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_metadata_failures_are_exp2')
+failure = 'quota_after'
+
+    @pytest.mark.parametrize('failure', ['market_state', 'quota_before', 'quota_after', 'close'])
+    def test_metadata_failures_are_explicit_and_close_is_attempted(tmp_path, failure):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:154: SyntaxError
+______ test_metadata_failures_are_explicit_and_close_is_attempted[close] ______
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_metadata_failures_are_exp3')
+failure = 'close'
+
+    @pytest.mark.parametrize('failure', ['market_state', 'quota_before', 'quota_after', 'close'])
+    def test_metadata_failures_are_explicit_and_close_is_attempted(tmp_path, failure):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:154: SyntaxError
+____ test_parent_rejects_unsafe_or_contradictory_top_level_result[change0] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_0')
+change = {'account': 'PRIVATE'}
+
+    @pytest.mark.parametrize('change', [
+        {'account': 'PRIVATE'}, {'requested_date': '2026-11-25'}, {'market_state': 'PRIVATE'},
+        {'quota_before': {'used': False, 'remaining': 5}}, {'quota_after': None},
+        {'live_rights': 'verified'}, {'cleanup': 'close_failed'}, {'errors': ['PRIVATE']},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_top_level_result(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:185: SyntaxError
+____ test_parent_rejects_unsafe_or_contradictory_top_level_result[change1] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_1')
+change = {'requested_date': '2026-11-25'}
+
+    @pytest.mark.parametrize('change', [
+        {'account': 'PRIVATE'}, {'requested_date': '2026-11-25'}, {'market_state': 'PRIVATE'},
+        {'quota_before': {'used': False, 'remaining': 5}}, {'quota_after': None},
+        {'live_rights': 'verified'}, {'cleanup': 'close_failed'}, {'errors': ['PRIVATE']},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_top_level_result(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:185: SyntaxError
+____ test_parent_rejects_unsafe_or_contradictory_top_level_result[change2] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_2')
+change = {'market_state': 'PRIVATE'}
+
+    @pytest.mark.parametrize('change', [
+        {'account': 'PRIVATE'}, {'requested_date': '2026-11-25'}, {'market_state': 'PRIVATE'},
+        {'quota_before': {'used': False, 'remaining': 5}}, {'quota_after': None},
+        {'live_rights': 'verified'}, {'cleanup': 'close_failed'}, {'errors': ['PRIVATE']},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_top_level_result(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:185: SyntaxError
+____ test_parent_rejects_unsafe_or_contradictory_top_level_result[change3] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_3')
+change = {'quota_before': {'used': False, 'remaining': 5}}
+
+    @pytest.mark.parametrize('change', [
+        {'account': 'PRIVATE'}, {'requested_date': '2026-11-25'}, {'market_state': 'PRIVATE'},
+        {'quota_before': {'used': False, 'remaining': 5}}, {'quota_after': None},
+        {'live_rights': 'verified'}, {'cleanup': 'close_failed'}, {'errors': ['PRIVATE']},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_top_level_result(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:185: SyntaxError
+____ test_parent_rejects_unsafe_or_contradictory_top_level_result[change4] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_4')
+change = {'quota_after': None}
+
+    @pytest.mark.parametrize('change', [
+        {'account': 'PRIVATE'}, {'requested_date': '2026-11-25'}, {'market_state': 'PRIVATE'},
+        {'quota_before': {'used': False, 'remaining': 5}}, {'quota_after': None},
+        {'live_rights': 'verified'}, {'cleanup': 'close_failed'}, {'errors': ['PRIVATE']},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_top_level_result(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:185: SyntaxError
+____ test_parent_rejects_unsafe_or_contradictory_top_level_result[change5] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_5')
+change = {'live_rights': 'verified'}
+
+    @pytest.mark.parametrize('change', [
+        {'account': 'PRIVATE'}, {'requested_date': '2026-11-25'}, {'market_state': 'PRIVATE'},
+        {'quota_before': {'used': False, 'remaining': 5}}, {'quota_after': None},
+        {'live_rights': 'verified'}, {'cleanup': 'close_failed'}, {'errors': ['PRIVATE']},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_top_level_result(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:185: SyntaxError
+____ test_parent_rejects_unsafe_or_contradictory_top_level_result[change6] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_6')
+change = {'cleanup': 'close_failed'}
+
+    @pytest.mark.parametrize('change', [
+        {'account': 'PRIVATE'}, {'requested_date': '2026-11-25'}, {'market_state': 'PRIVATE'},
+        {'quota_before': {'used': False, 'remaining': 5}}, {'quota_after': None},
+        {'live_rights': 'verified'}, {'cleanup': 'close_failed'}, {'errors': ['PRIVATE']},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_top_level_result(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:185: SyntaxError
+____ test_parent_rejects_unsafe_or_contradictory_top_level_result[change7] ____
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_7')
+change = {'errors': ['PRIVATE']}
+
+    @pytest.mark.parametrize('change', [
+        {'account': 'PRIVATE'}, {'requested_date': '2026-11-25'}, {'market_state': 'PRIVATE'},
+        {'quota_before': {'used': False, 'remaining': 5}}, {'quota_after': None},
+        {'live_rights': 'verified'}, {'cleanup': 'close_failed'}, {'errors': ['PRIVATE']},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_top_level_result(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:185: SyntaxError
+________ test_parent_rejects_unsafe_or_contradictory_request[change0] _________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_8')
+change = {'status': 'empty'}
+
+    @pytest.mark.parametrize('change', [
+        {'status': 'empty'}, {'status': 'not_attempted'}, {'has_more': 'PRIVATE'},
+        {'session': 'ALL'}, {'bars': []}, {'account': 'PRIVATE'},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_request(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:196: SyntaxError
+________ test_parent_rejects_unsafe_or_contradictory_request[change1] _________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_9')
+change = {'status': 'not_attempted'}
+
+    @pytest.mark.parametrize('change', [
+        {'status': 'empty'}, {'status': 'not_attempted'}, {'has_more': 'PRIVATE'},
+        {'session': 'ALL'}, {'bars': []}, {'account': 'PRIVATE'},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_request(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:196: SyntaxError
+________ test_parent_rejects_unsafe_or_contradictory_request[change2] _________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_10')
+change = {'has_more': 'PRIVATE'}
+
+    @pytest.mark.parametrize('change', [
+        {'status': 'empty'}, {'status': 'not_attempted'}, {'has_more': 'PRIVATE'},
+        {'session': 'ALL'}, {'bars': []}, {'account': 'PRIVATE'},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_request(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:196: SyntaxError
+________ test_parent_rejects_unsafe_or_contradictory_request[change3] _________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_11')
+change = {'session': 'ALL'}
+
+    @pytest.mark.parametrize('change', [
+        {'status': 'empty'}, {'status': 'not_attempted'}, {'has_more': 'PRIVATE'},
+        {'session': 'ALL'}, {'bars': []}, {'account': 'PRIVATE'},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_request(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:196: SyntaxError
+________ test_parent_rejects_unsafe_or_contradictory_request[change4] _________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_12')
+change = {'bars': []}
+
+    @pytest.mark.parametrize('change', [
+        {'status': 'empty'}, {'status': 'not_attempted'}, {'has_more': 'PRIVATE'},
+        {'session': 'ALL'}, {'bars': []}, {'account': 'PRIVATE'},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_request(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:196: SyntaxError
+________ test_parent_rejects_unsafe_or_contradictory_request[change5] _________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_unsafe_or_13')
+change = {'account': 'PRIVATE'}
+
+    @pytest.mark.parametrize('change', [
+        {'status': 'empty'}, {'status': 'not_attempted'}, {'has_more': 'PRIVATE'},
+        {'session': 'ALL'}, {'bars': []}, {'account': 'PRIVATE'},
+    ])
+    def test_parent_rejects_unsafe_or_contradictory_request(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:196: SyntaxError
+_________________ test_parent_rechecks_bar_semantics[change0] _________________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rechecks_bar_seman0')
+change = {'time': '2026-11-25 09:30:00'}
+
+    @pytest.mark.parametrize('change', [
+        {'time': '2026-11-25 09:30:00'}, {'clock_window': 'PRE'}, {'close': 'NaN'},
+        {'low': '103'}, {'code': 'PRIVATE'}, {'open': 100},
+    ])
+    def test_parent_rechecks_bar_semantics(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:208: SyntaxError
+_________________ test_parent_rechecks_bar_semantics[change1] _________________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rechecks_bar_seman1')
+change = {'clock_window': 'PRE'}
+
+    @pytest.mark.parametrize('change', [
+        {'time': '2026-11-25 09:30:00'}, {'clock_window': 'PRE'}, {'close': 'NaN'},
+        {'low': '103'}, {'code': 'PRIVATE'}, {'open': 100},
+    ])
+    def test_parent_rechecks_bar_semantics(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:208: SyntaxError
+_________________ test_parent_rechecks_bar_semantics[change2] _________________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rechecks_bar_seman2')
+change = {'close': 'NaN'}
+
+    @pytest.mark.parametrize('change', [
+        {'time': '2026-11-25 09:30:00'}, {'clock_window': 'PRE'}, {'close': 'NaN'},
+        {'low': '103'}, {'code': 'PRIVATE'}, {'open': 100},
+    ])
+    def test_parent_rechecks_bar_semantics(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:208: SyntaxError
+_________________ test_parent_rechecks_bar_semantics[change3] _________________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rechecks_bar_seman3')
+change = {'low': '103'}
+
+    @pytest.mark.parametrize('change', [
+        {'time': '2026-11-25 09:30:00'}, {'clock_window': 'PRE'}, {'close': 'NaN'},
+        {'low': '103'}, {'code': 'PRIVATE'}, {'open': 100},
+    ])
+    def test_parent_rechecks_bar_semantics(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:208: SyntaxError
+_________________ test_parent_rechecks_bar_semantics[change4] _________________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rechecks_bar_seman4')
+change = {'code': 'PRIVATE'}
+
+    @pytest.mark.parametrize('change', [
+        {'time': '2026-11-25 09:30:00'}, {'clock_window': 'PRE'}, {'close': 'NaN'},
+        {'low': '103'}, {'code': 'PRIVATE'}, {'open': 100},
+    ])
+    def test_parent_rechecks_bar_semantics(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:208: SyntaxError
+_________________ test_parent_rechecks_bar_semantics[change5] _________________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rechecks_bar_seman5')
+change = {'open': 100}
+
+    @pytest.mark.parametrize('change', [
+        {'time': '2026-11-25 09:30:00'}, {'clock_window': 'PRE'}, {'close': 'NaN'},
+        {'low': '103'}, {'code': 'PRIVATE'}, {'open': 100},
+    ])
+    def test_parent_rechecks_bar_semantics(tmp_path, change):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:208: SyntaxError
+___ test_target_date_is_previous_new_york_calendar_day_even_at_utc_midnight ___
+
+    def test_target_date_is_previous_new_york_calendar_day_even_at_utc_midnight():
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:216: SyntaxError
+______________ test_initialization_failure_still_closes_context _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001E53AD60890>
+
+    def test_initialization_failure_still_closes_context(monkeypatch):
+>       from gabfin.providers.futu import history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:225: SyntaxError
+________ test_final_quota_is_skipped_when_budget_cannot_cover_one_rpc _________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_final_quota_is_skipped_wh0')
+
+    def test_final_quota_is_skipped_when_budget_cannot_cover_one_rpc(tmp_path):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:237: SyntaxError
+_________________ test_parent_rejects_noncanonical_checked_at _________________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_parent_rejects_noncanonic0')
+
+    def test_parent_rejects_noncanonical_checked_at(tmp_path):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:248: SyntaxError
+___ test_history_clock_evidence_lists_unobserved_post_and_is_parent_checked ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-105/test_history_clock_evidence_li0')
+
+    def test_history_clock_evidence_lists_unobserved_post_and_is_parent_checked(tmp_path):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:256: SyntaxError
+____ test_single_page_wire_does_not_inherit_prices_or_follow_token[False] _____
+
+missing = False
+
+    @pytest.mark.parametrize('missing', [False, True])
+    def test_single_page_wire_does_not_inherit_prices_or_follow_token(missing):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:274: SyntaxError
+_____ test_single_page_wire_does_not_inherit_prices_or_follow_token[True] _____
+
+missing = True
+
+    @pytest.mark.parametrize('missing', [False, True])
+    def test_single_page_wire_does_not_inherit_prices_or_follow_token(missing):
+>       from gabfin.providers.futu.history import inspect_history
+E         File "C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\providers\futu\history.py", line 33
+E           if (observed.tzinfo is None or observed.astimezone(timezone.utc).isoformat().replace('+00:00', 'Z') != result['checked_at']
+E              ^
+E       SyntaxError: '(' was never closed
+
+tests\gabfin\test_history_smoke.py:274: SyntaxError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_history_smoke.py::test_two_bounded_history_pages_without_subscription_or_pagination
+FAILED tests/gabfin/test_history_smoke.py::test_history_result_crosses_parent_process_boundary
+FAILED tests/gabfin/test_history_smoke.py::test_unavailable_quota_stops_history_and_preserves_final_sample[quota0]
+FAILED tests/gabfin/test_history_smoke.py::test_unavailable_quota_stops_history_and_preserves_final_sample[quota1]
+FAILED tests/gabfin/test_history_smoke.py::test_unavailable_quota_stops_history_and_preserves_final_sample[quota2]
+FAILED tests/gabfin/test_history_smoke.py::test_unavailable_quota_stops_history_and_preserves_final_sample[quota3]
+FAILED tests/gabfin/test_history_smoke.py::test_budget_exhaustion_between_reads_retains_first_page
+FAILED tests/gabfin/test_history_smoke.py::test_invalid_history_data_is_discarded_but_other_session_can_succeed[change0]
+FAILED tests/gabfin/test_history_smoke.py::test_invalid_history_data_is_discarded_but_other_session_can_succeed[change1]
+FAILED tests/gabfin/test_history_smoke.py::test_invalid_history_data_is_discarded_but_other_session_can_succeed[change2]
+FAILED tests/gabfin/test_history_smoke.py::test_invalid_history_data_is_discarded_but_other_session_can_succeed[change3]
+FAILED tests/gabfin/test_history_smoke.py::test_invalid_history_data_is_discarded_but_other_session_can_succeed[change4]
+FAILED tests/gabfin/test_history_smoke.py::test_invalid_history_data_is_discarded_but_other_session_can_succeed[change5]
+FAILED tests/gabfin/test_history_smoke.py::test_invalid_history_data_is_discarded_but_other_session_can_succeed[change6]
+FAILED tests/gabfin/test_history_smoke.py::test_invalid_history_data_is_discarded_but_other_session_can_succeed[change7]
+FAILED tests/gabfin/test_history_smoke.py::test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[empty]
+FAILED tests/gabfin/test_history_smoke.py::test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[failed]
+FAILED tests/gabfin/test_history_smoke.py::test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[raised]
+FAILED tests/gabfin/test_history_smoke.py::test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[oversize]
+FAILED tests/gabfin/test_history_smoke.py::test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[duplicate]
+FAILED tests/gabfin/test_history_smoke.py::test_empty_and_failed_pages_do_not_trigger_pagination_or_retry[private_token]
+FAILED tests/gabfin/test_history_smoke.py::test_metadata_failures_are_explicit_and_close_is_attempted[market_state]
+FAILED tests/gabfin/test_history_smoke.py::test_metadata_failures_are_explicit_and_close_is_attempted[quota_before]
+FAILED tests/gabfin/test_history_smoke.py::test_metadata_failures_are_explicit_and_close_is_attempted[quota_after]
+FAILED tests/gabfin/test_history_smoke.py::test_metadata_failures_are_explicit_and_close_is_attempted[close]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_top_level_result[change0]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_top_level_result[change1]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_top_level_result[change2]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_top_level_result[change3]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_top_level_result[change4]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_top_level_result[change5]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_top_level_result[change6]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_top_level_result[change7]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_request[change0]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_request[change1]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_request[change2]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_request[change3]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_request[change4]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_unsafe_or_contradictory_request[change5]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rechecks_bar_semantics[change0]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rechecks_bar_semantics[change1]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rechecks_bar_semantics[change2]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rechecks_bar_semantics[change3]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rechecks_bar_semantics[change4]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rechecks_bar_semantics[change5]
+FAILED tests/gabfin/test_history_smoke.py::test_target_date_is_previous_new_york_calendar_day_even_at_utc_midnight
+FAILED tests/gabfin/test_history_smoke.py::test_initialization_failure_still_closes_context
+FAILED tests/gabfin/test_history_smoke.py::test_final_quota_is_skipped_when_budget_cannot_cover_one_rpc
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_noncanonical_checked_at
+FAILED tests/gabfin/test_history_smoke.py::test_history_clock_evidence_lists_unobserved_post_and_is_parent_checked
+FAILED tests/gabfin/test_history_smoke.py::test_single_page_wire_does_not_inherit_prices_or_follow_token[False]
+FAILED tests/gabfin/test_history_smoke.py::test_single_page_wire_does_not_inherit_prices_or_follow_token[True]
+52 failed in 2.58s

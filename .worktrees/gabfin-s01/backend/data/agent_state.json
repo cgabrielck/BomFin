@@ -1,0 +1,37 @@
+{
+  "source_health": {
+    "test:source": {
+      "success": 1,
+      "failure": 0,
+      "last_status": "ok"
+    },
+    "news:AAPL": {
+      "success": 1,
+      "failure": 0,
+      "last_status": "ok"
+    },
+    "sec:content:TEST": {
+      "success": 1,
+      "failure": 0,
+      "last_status": "ok"
+    },
+    "sec:submissions:TEST": {
+      "success": 1,
+      "failure": 0,
+      "last_status": "ok"
+    }
+  },
+  "recommendation_history": [],
+  "failed_sources": {},
+  "upgrade_logs": [
+    {
+      "time": 1795618443.6162505,
+      "message": "\u6d4b\u8bd5"
+    }
+  ],
+  "scoring_metrics_performance": {},
+  "detected_issues": [],
+  "resolved_issues": [],
+  "version": 2,
+  "last_upgrade": 1795618443.6162505
+}

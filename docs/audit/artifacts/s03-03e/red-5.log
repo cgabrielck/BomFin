@@ -1,0 +1,238 @@
+FFFFFFF                                                                  [100%]
+================================== FAILURES ===================================
+_ test_malformed_successful_wire_payload_is_invalid_not_transport_failure[wrong_security] _
+
+mode = 'wrong_security'
+
+    @pytest.mark.parametrize('mode', ['wrong_security', 'missing_security', 'missing_time', 'missing_blank', 'oversize'])
+    def test_malformed_successful_wire_payload_is_invalid_not_transport_failure(mode):
+        from gabfin.providers.futu.history import inspect_history
+        from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+    
+        raw = QuoteContext()
+        def query(pack, unpack, **kwargs):
+            row = Proto(time='2026-11-24 09:31:00', isBlank=False, openPrice=100, highPrice=102, lowPrice=99, closePrice=101)
+            page = Proto(security=Proto(market=11, code='MSFT' if mode == 'wrong_security' else 'AAPL'), klList=[row])
+            if mode == 'missing_security':
+                del page.security
+            if mode == 'missing_time':
+                del row.time
+            if mode == 'missing_blank':
+                del row.isBlank
+            if mode == 'oversize':
+                page.klList = [row] * 3
+            try:
+                return unpack(Proto(retType=0, s2c=page))
+            except Exception:
+                return -1, 'PRIVATE', None  # The pinned SDK catches decoder exceptions.
+        raw._query_sync = query
+        raw.get_sync_conn_id = lambda: 1
+        raw.get_security_firm = lambda: 'N/A'
+        result = inspect_history(SinglePageHistoryContext(raw, pack_request=object(), us_market=11), SDK, checked_at=NOW)
+>       assert [r['status'] for r in result['requests']] == ['invalid_data', 'invalid_data']
+E       AssertionError: assert ['failed', 'failed'] == ['invalid_dat...invalid_data']
+E         
+E         At index 0 diff: 'failed' != 'invalid_data'
+E         Use -v to get more diff
+
+tests\gabfin\test_history_smoke.py:363: AssertionError
+_ test_malformed_successful_wire_payload_is_invalid_not_transport_failure[missing_security] _
+
+mode = 'missing_security'
+
+    @pytest.mark.parametrize('mode', ['wrong_security', 'missing_security', 'missing_time', 'missing_blank', 'oversize'])
+    def test_malformed_successful_wire_payload_is_invalid_not_transport_failure(mode):
+        from gabfin.providers.futu.history import inspect_history
+        from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+    
+        raw = QuoteContext()
+        def query(pack, unpack, **kwargs):
+            row = Proto(time='2026-11-24 09:31:00', isBlank=False, openPrice=100, highPrice=102, lowPrice=99, closePrice=101)
+            page = Proto(security=Proto(market=11, code='MSFT' if mode == 'wrong_security' else 'AAPL'), klList=[row])
+            if mode == 'missing_security':
+                del page.security
+            if mode == 'missing_time':
+                del row.time
+            if mode == 'missing_blank':
+                del row.isBlank
+            if mode == 'oversize':
+                page.klList = [row] * 3
+            try:
+                return unpack(Proto(retType=0, s2c=page))
+            except Exception:
+                return -1, 'PRIVATE', None  # The pinned SDK catches decoder exceptions.
+        raw._query_sync = query
+        raw.get_sync_conn_id = lambda: 1
+        raw.get_security_firm = lambda: 'N/A'
+        result = inspect_history(SinglePageHistoryContext(raw, pack_request=object(), us_market=11), SDK, checked_at=NOW)
+>       assert [r['status'] for r in result['requests']] == ['invalid_data', 'invalid_data']
+E       AssertionError: assert ['failed', 'failed'] == ['invalid_dat...invalid_data']
+E         
+E         At index 0 diff: 'failed' != 'invalid_data'
+E         Use -v to get more diff
+
+tests\gabfin\test_history_smoke.py:363: AssertionError
+_ test_malformed_successful_wire_payload_is_invalid_not_transport_failure[missing_time] _
+
+mode = 'missing_time'
+
+    @pytest.mark.parametrize('mode', ['wrong_security', 'missing_security', 'missing_time', 'missing_blank', 'oversize'])
+    def test_malformed_successful_wire_payload_is_invalid_not_transport_failure(mode):
+        from gabfin.providers.futu.history import inspect_history
+        from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+    
+        raw = QuoteContext()
+        def query(pack, unpack, **kwargs):
+            row = Proto(time='2026-11-24 09:31:00', isBlank=False, openPrice=100, highPrice=102, lowPrice=99, closePrice=101)
+            page = Proto(security=Proto(market=11, code='MSFT' if mode == 'wrong_security' else 'AAPL'), klList=[row])
+            if mode == 'missing_security':
+                del page.security
+            if mode == 'missing_time':
+                del row.time
+            if mode == 'missing_blank':
+                del row.isBlank
+            if mode == 'oversize':
+                page.klList = [row] * 3
+            try:
+                return unpack(Proto(retType=0, s2c=page))
+            except Exception:
+                return -1, 'PRIVATE', None  # The pinned SDK catches decoder exceptions.
+        raw._query_sync = query
+        raw.get_sync_conn_id = lambda: 1
+        raw.get_security_firm = lambda: 'N/A'
+        result = inspect_history(SinglePageHistoryContext(raw, pack_request=object(), us_market=11), SDK, checked_at=NOW)
+>       assert [r['status'] for r in result['requests']] == ['invalid_data', 'invalid_data']
+E       AssertionError: assert ['failed', 'failed'] == ['invalid_dat...invalid_data']
+E         
+E         At index 0 diff: 'failed' != 'invalid_data'
+E         Use -v to get more diff
+
+tests\gabfin\test_history_smoke.py:363: AssertionError
+_ test_malformed_successful_wire_payload_is_invalid_not_transport_failure[missing_blank] _
+
+mode = 'missing_blank'
+
+    @pytest.mark.parametrize('mode', ['wrong_security', 'missing_security', 'missing_time', 'missing_blank', 'oversize'])
+    def test_malformed_successful_wire_payload_is_invalid_not_transport_failure(mode):
+        from gabfin.providers.futu.history import inspect_history
+        from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+    
+        raw = QuoteContext()
+        def query(pack, unpack, **kwargs):
+            row = Proto(time='2026-11-24 09:31:00', isBlank=False, openPrice=100, highPrice=102, lowPrice=99, closePrice=101)
+            page = Proto(security=Proto(market=11, code='MSFT' if mode == 'wrong_security' else 'AAPL'), klList=[row])
+            if mode == 'missing_security':
+                del page.security
+            if mode == 'missing_time':
+                del row.time
+            if mode == 'missing_blank':
+                del row.isBlank
+            if mode == 'oversize':
+                page.klList = [row] * 3
+            try:
+                return unpack(Proto(retType=0, s2c=page))
+            except Exception:
+                return -1, 'PRIVATE', None  # The pinned SDK catches decoder exceptions.
+        raw._query_sync = query
+        raw.get_sync_conn_id = lambda: 1
+        raw.get_security_firm = lambda: 'N/A'
+        result = inspect_history(SinglePageHistoryContext(raw, pack_request=object(), us_market=11), SDK, checked_at=NOW)
+>       assert [r['status'] for r in result['requests']] == ['invalid_data', 'invalid_data']
+E       AssertionError: assert ['failed', 'failed'] == ['invalid_dat...invalid_data']
+E         
+E         At index 0 diff: 'failed' != 'invalid_data'
+E         Use -v to get more diff
+
+tests\gabfin\test_history_smoke.py:363: AssertionError
+_ test_malformed_successful_wire_payload_is_invalid_not_transport_failure[oversize] _
+
+mode = 'oversize'
+
+    @pytest.mark.parametrize('mode', ['wrong_security', 'missing_security', 'missing_time', 'missing_blank', 'oversize'])
+    def test_malformed_successful_wire_payload_is_invalid_not_transport_failure(mode):
+        from gabfin.providers.futu.history import inspect_history
+        from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+    
+        raw = QuoteContext()
+        def query(pack, unpack, **kwargs):
+            row = Proto(time='2026-11-24 09:31:00', isBlank=False, openPrice=100, highPrice=102, lowPrice=99, closePrice=101)
+            page = Proto(security=Proto(market=11, code='MSFT' if mode == 'wrong_security' else 'AAPL'), klList=[row])
+            if mode == 'missing_security':
+                del page.security
+            if mode == 'missing_time':
+                del row.time
+            if mode == 'missing_blank':
+                del row.isBlank
+            if mode == 'oversize':
+                page.klList = [row] * 3
+            try:
+                return unpack(Proto(retType=0, s2c=page))
+            except Exception:
+                return -1, 'PRIVATE', None  # The pinned SDK catches decoder exceptions.
+        raw._query_sync = query
+        raw.get_sync_conn_id = lambda: 1
+        raw.get_security_firm = lambda: 'N/A'
+        result = inspect_history(SinglePageHistoryContext(raw, pack_request=object(), us_market=11), SDK, checked_at=NOW)
+>       assert [r['status'] for r in result['requests']] == ['invalid_data', 'invalid_data']
+E       AssertionError: assert ['failed', 'failed'] == ['invalid_dat...invalid_data']
+E         
+E         At index 0 diff: 'failed' != 'invalid_data'
+E         Use -v to get more diff
+
+tests\gabfin\test_history_smoke.py:363: AssertionError
+____________ test_metadata_queries_respect_remaining_budget[False] ____________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-111/test_metadata_queries_respect_0')
+after_market = False
+
+    @pytest.mark.parametrize('after_market', [False, True])
+    def test_metadata_queries_respect_remaining_budget(tmp_path, after_market):
+        from gabfin.providers.futu.history import inspect_history
+    
+        context = QuoteContext()
+        market_calls = []
+        original = context.get_market_state
+        def market(codes):
+            market_calls.append(codes)
+            return original(codes)
+        context.get_market_state = market
+        ticks = iter([0, 80, 80] if after_market else [99, 99])
+        result = inspect_history(context, SDK, checked_at=NOW, deadline=100, monotonic=lambda: next(ticks))
+>       assert bool(market_calls) is after_market
+E       AssertionError: assert True is False
+E        +  where True = bool([['US.AAPL']])
+
+tests\gabfin\test_history_smoke.py:380: AssertionError
+____________ test_metadata_queries_respect_remaining_budget[True] _____________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-111/test_metadata_queries_respect_1')
+after_market = True
+
+    @pytest.mark.parametrize('after_market', [False, True])
+    def test_metadata_queries_respect_remaining_budget(tmp_path, after_market):
+        from gabfin.providers.futu.history import inspect_history
+    
+        context = QuoteContext()
+        market_calls = []
+        original = context.get_market_state
+        def market(codes):
+            market_calls.append(codes)
+            return original(codes)
+        context.get_market_state = market
+        ticks = iter([0, 80, 80] if after_market else [99, 99])
+        result = inspect_history(context, SDK, checked_at=NOW, deadline=100, monotonic=lambda: next(ticks))
+        assert bool(market_calls) is after_market
+>       assert context.quota_calls == 0 and not context.history_calls and context.closed
+E       assert (1 == 0)
+E        +  where 1 = <test_history_smoke.QuoteContext object at 0x000001F7C7FA3DA0>.quota_calls
+
+tests\gabfin\test_history_smoke.py:381: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_history_smoke.py::test_malformed_successful_wire_payload_is_invalid_not_transport_failure[wrong_security]
+FAILED tests/gabfin/test_history_smoke.py::test_malformed_successful_wire_payload_is_invalid_not_transport_failure[missing_security]
+FAILED tests/gabfin/test_history_smoke.py::test_malformed_successful_wire_payload_is_invalid_not_transport_failure[missing_time]
+FAILED tests/gabfin/test_history_smoke.py::test_malformed_successful_wire_payload_is_invalid_not_transport_failure[missing_blank]
+FAILED tests/gabfin/test_history_smoke.py::test_malformed_successful_wire_payload_is_invalid_not_transport_failure[oversize]
+FAILED tests/gabfin/test_history_smoke.py::test_metadata_queries_respect_remaining_budget[False]
+FAILED tests/gabfin/test_history_smoke.py::test_metadata_queries_respect_remaining_budget[True]
+7 failed, 55 deselected in 1.96s

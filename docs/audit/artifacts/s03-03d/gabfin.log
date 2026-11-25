@@ -1,0 +1,35 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 622 items
+
+tests\gabfin\test_contracts.py ......................................... [  6%]
+.............................................                            [ 13%]
+tests\gabfin\test_equity_smoke.py ...........                            [ 15%]
+tests\gabfin\test_feed_preflight.py ........................             [ 19%]
+tests\gabfin\test_feed_runner.py .........................               [ 23%]
+tests\gabfin\test_identity_contracts.py ................................ [ 28%]
+.......................                                                  [ 32%]
+tests\gabfin\test_job_contracts.py ..................................... [ 38%]
+...................                                                      [ 41%]
+tests\gabfin\test_market_contracts.py .................................. [ 46%]
+...............................................                          [ 54%]
+tests\gabfin\test_market_events.py ..................................... [ 60%]
+                                                                         [ 60%]
+tests\gabfin\test_migrations.py ...                                      [ 60%]
+tests\gabfin\test_options_smoke.py ..................................... [ 66%]
+...................                                                      [ 69%]
+tests\gabfin\test_order_policy_contracts.py ............................ [ 74%]
+........................................                                 [ 80%]
+tests\gabfin\test_research_contracts.py ................................ [ 85%]
+...................                                                      [ 88%]
+tests\gabfin\test_schema_artifact.py .                                   [ 89%]
+tests\gabfin\test_session_auth.py ..........                             [ 90%]
+tests\gabfin\test_subscription_contracts.py ............................ [ 95%]
+.................                                                        [ 97%]
+tests\gabfin\test_support_contracts.py .............                     [100%]
+
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s03-03d\gabfin.xml -
+============================ 622 passed in 14.04s =============================

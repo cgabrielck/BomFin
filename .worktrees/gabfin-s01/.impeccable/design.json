@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T08:10:00Z",
+  "title": "Design System: Cgab Desk",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#071016", "tonalRamp": ["#040a0d", "#1d2326", "#363d3f", "#4f5658", "#677071", "#80898a", "#99a3a3", "#b2bcbc"] },
+      "hull": { "role": "neutral", "displayName": "Hull", "canonical": "#050b0e", "tonalRamp": ["#03080a", "#1c2223", "#353b3c", "#4e5555", "#666e6e", "#7f8887", "#98a1a0", "#b1bbb9"] },
+      "console": { "role": "neutral", "displayName": "Console", "canonical": "#0b1820", "tonalRamp": ["#050c10", "#1e2529", "#373f42", "#50585b", "#687273", "#818b8c", "#9aa5a5", "#b3bebe"] },
+      "panel": { "role": "neutral", "displayName": "Panel", "canonical": "#0e1c22", "tonalRamp": ["#060e11", "#1f272a", "#384143", "#515a5c", "#697374", "#828c8d", "#9ba6a6", "#b4bfbf"] },
+      "panel-raised": { "role": "neutral", "displayName": "Panel raised", "canonical": "#12242c", "tonalRamp": ["#081015", "#21292e", "#394346", "#525c5f", "#6b7678", "#848f91", "#9ca9a9", "#b5c2c2"] },
+      "hairline": { "role": "neutral", "displayName": "Hairline", "canonical": "#1a3d44", "tonalRamp": ["#0a191d", "#233235", "#3b4b4e", "#546466", "#6d7e7f", "#869797", "#9eb0b0", "#b7c9c8"] },
+      "phosphor": { "role": "neutral", "displayName": "Phosphor", "canonical": "#e8fffb", "tonalRamp": ["#525d5d", "#697474", "#7f8b8a", "#96a2a1", "#adbab8", "#c4d1cf", "#dae8e5", "#f1fffc"] },
+      "secondary": { "role": "neutral", "displayName": "Secondary text", "canonical": "#8aa8ae", "tonalRamp": ["#323f42", "#495759", "#616f71", "#788788", "#909fa0", "#a7b7b7", "#bfcfcf", "#d6e7e6"] },
+      "action": { "role": "primary", "displayName": "Action cyan", "canonical": "#2de2c5", "tonalRamp": ["#11534a", "#296a61", "#428279", "#5a9990", "#73b1a7", "#8bc8be", "#a4e0d6", "#bcf7ed"] },
+      "action-hover": { "role": "primary", "displayName": "Action hover", "canonical": "#28cbb2", "tonalRamp": ["#0f4b43", "#266258", "#3d796e", "#549083", "#6ba799", "#82beae", "#99d5c4", "#b0ecd9"] },
+      "well": { "role": "neutral", "displayName": "Well", "canonical": "#07141a", "tonalRamp": ["#040c10", "#1d2528", "#363d41", "#4f5659", "#686f72", "#81888a", "#9aa0a3", "#b3b9bb"] },
+      "support": { "role": "secondary", "displayName": "Support mint", "canonical": "#3ee0a0", "tonalRamp": ["#17523d", "#2f6955", "#48816c", "#609884", "#78b09b", "#90c7b3", "#a9dfca", "#c1f6e2"] },
+      "resist": { "role": "tertiary", "displayName": "Resist rose", "canonical": "#ff6b81", "tonalRamp": ["#5b2932", "#71424a", "#885a62", "#9e737a", "#b48c92", "#caa5aa", "#e1bdc2", "#f7d6da"] },
+      "caution": { "role": "tertiary", "displayName": "Caution", "canonical": "#e7c36a", "tonalRamp": ["#52482a", "#696042", "#7f775a", "#968f72", "#aca78b", "#c3bfa3", "#d9d6bb", "#f0eed3"] },
+      "action-ink": { "role": "neutral", "displayName": "Action ink", "canonical": "#052226", "tonalRamp": ["#031416", "#1c2b2e", "#354247", "#4e595f", "#677078", "#808790", "#999ea9", "#b2b5c1"] }
+    },
+    "typographyMeta": {
+      "title": { "displayName": "Title", "purpose": "Wordmark only, at most 20px." },
+      "headline": { "displayName": "Headline", "purpose": "Card and phone section titles." },
+      "body": { "displayName": "Body", "purpose": "Desk and phone copy." },
+      "label": { "displayName": "Label", "purpose": "Secondary line under a heading, not an eyebrow above it." },
+      "mono": { "displayName": "Mono", "purpose": "Zone ids and code only." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "progress", "value": "width .4s ease", "purpose": "Progress fill only. Removed when the user prefers reduced motion." }
+    ],
+    "breakpoints": [
+      { "name": "phone-gate", "value": "520px" },
+      { "name": "chart-stack", "value": "860px" },
+      { "name": "desk-stack", "value": "1100px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Filled cyan action. The only filled brand control.",
+      "html": "<button class=\"ds-btn-primary\">Continue paper</button>",
+      "css": ".ds-btn-primary { background:#2de2c5; color:#052226; border:0; border-radius:999px; padding:9px 14px; font-weight:700; font-family:Segoe UI,system-ui,sans-serif; cursor:pointer; } .ds-btn-primary:hover { background:#28cbb2; } .ds-btn-primary:focus-visible { outline:2px solid #2de2c5; outline-offset:2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Cyan hairline for a secondary action.",
+      "html": "<button class=\"ds-btn-ghost\">Pause paper</button>",
+      "css": ".ds-btn-ghost { background:transparent; color:#2de2c5; border:1px solid #2de2c5; border-radius:999px; padding:9px 14px; font-weight:700; font-family:Segoe UI,system-ui,sans-serif; cursor:pointer; } .ds-btn-ghost:hover { background:rgba(45,226,197,.08); } .ds-btn-ghost:focus-visible { outline:2px solid #2de2c5; outline-offset:2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Rose hairline for halt and other destructive desk actions.",
+      "html": "<button class=\"ds-btn-danger\">Halt</button>",
+      "css": ".ds-btn-danger { background:transparent; color:#ff6b81; border:1px solid #ff6b81; border-radius:999px; padding:9px 14px; font-weight:700; font-family:Segoe UI,system-ui,sans-serif; cursor:pointer; } .ds-btn-danger:hover { background:rgba(255,107,129,.08); } .ds-btn-danger:focus-visible { outline:2px solid #2de2c5; outline-offset:2px; }"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "One flat panel. No shadow and no nested card.",
+      "html": "<article class=\"ds-card\"><h3 class=\"ds-card-title\">Paper vs SPY</h3><p class=\"ds-card-label\">Sharpe</p><p class=\"ds-card-value\">0.40</p></article>",
+      "css": ".ds-card { background:#0e1c22; color:#e8fffb; border:1px solid #1a3d44; border-radius:16px; padding:16px; font-family:Segoe UI,system-ui,sans-serif; } .ds-card-title { margin:0 0 10px; font-size:15px; font-weight:700; } .ds-card-label { margin:0; color:#8aa8ae; font-size:12px; } .ds-card-value { margin:6px 0 0; font-size:20px; font-weight:700; }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Search and ticket fields. Cyan caret, no glow.",
+      "html": "<input class=\"ds-input\" placeholder=\"Search symbol…\" />",
+      "css": ".ds-input { background:#07141a; color:#e8fffb; border:1px solid #1a3d44; border-radius:12px; padding:10px 16px; font:13px Segoe UI,system-ui,sans-serif; caret-color:#2de2c5; } .ds-input::placeholder { color:#8aa8ae; } .ds-input:focus { outline:2px solid #2de2c5; outline-offset:2px; border-color:#2de2c5; }"
+    },
+    {
+      "name": "Paper pill",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Status pill. Paper is cyan. It is not a live stamp.",
+      "html": "<span class=\"ds-pill\">PAPER</span>",
+      "css": ".ds-pill { display:inline-flex; align-items:center; border:1px solid #2de2c5; color:#2de2c5; border-radius:999px; padding:6px 12px; font:800 11px Segoe UI,system-ui,sans-serif; letter-spacing:.08em; }"
+    },
+    {
+      "name": "Sidebar item",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "Text nav item. Current item is a cyan tint, with no rail and no icon tile.",
+      "html": "<button class=\"ds-nav ds-nav-on\">Desk</button>",
+      "css": ".ds-nav { display:flex; width:100%; text-align:left; background:transparent; border:0; color:#8aa8ae; padding:9px 12px; border-radius:11px; font:600 13px Segoe UI,system-ui,sans-serif; cursor:pointer; } .ds-nav:hover, .ds-nav-on { background:rgba(45,226,197,.08); color:#2de2c5; } .ds-nav:focus-visible { outline:2px solid #2de2c5; outline-offset:2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Quiet Operate Desk",
+    "overview": "Cgab is a dark paper desk, not a campaign page. The operator scans status, evidence, and the next paper action. Color is scarce: the ground is near-black teal, type is a cool white, and filled cyan is reserved for the control that does something.\n\nThe phone morning report uses the same ground, hairline, and action color. It is a separate read-only layout, not a shrunk trading ticket. Depth comes from one panel on the ground, never from glow, blur, or a card inside a card.",
+    "keyCharacteristics": [
+      "Flat panels, 1px hairline, radius at most 16px",
+      "Cyan only on actions, the current nav item, and focus",
+      "Mint, rose, and caution carry meaning (up, down, withhold), not decoration",
+      "System UI type, tight tracking, no display costume",
+      "Paper honesty stays on the surface: not live, not verified, not an order"
+    ],
+    "rules": [
+      { "name": "The One Action Rule", "body": "Filled color is cyan. Ghost actions use a cyan hairline. Danger uses rose. There is no second filled brand color.", "section": "colors" },
+      { "name": "The Unused Purple Rule", "body": "A --purple variable may remain declared so older notes stay findable. It is not applied to chrome, type, buttons, or charts.", "section": "colors" },
+      { "name": "The Heading Speaks Rule", "body": "A section name is the heading. Do not stack a tracked uppercase eyebrow above it.", "section": "typography" },
+      { "name": "The Flat Panel Rule", "body": "No box-shadow, no blur, no radial wash, no cyan-to-purple sweep. Focus is a 2px cyan outline with no halo.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep cyan as the only filled action, including Ask Cgab send and phone Continue paper.",
+      "Do keep one panel layer. Put related numbers in the same card as type.",
+      "Do keep the phone honesty line in the bottom dock, and name unreachable Tailscale without offering a public tunnel.",
+      "Do theme selection, caret, and the scrollbar from ink, hairline, and cyan."
+    ],
+    "donts": [
+      "Don't apply purple, a radial wash, a gradient sweep, or a glow shadow on the shell.",
+      "Don't nest a bordered card inside a card, or put a tracked uppercase label above a heading.",
+      "Don't add a marketing hero, a landing page, or an Ask Cgab control on /m.",
+      "Don't stamp verified or live, or add an order CTA on the chart, the teaching chat, or the phone."
+    ]
+  }
+}

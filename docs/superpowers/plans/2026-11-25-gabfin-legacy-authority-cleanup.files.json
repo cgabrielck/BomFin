@@ -1,0 +1,61 @@
+{
+  "status": "completed",
+  "checkout": ".worktrees/gabfin-s01",
+  "source_sha": "42f96b3b8a39e40f2e4e579aa9e619814dc80e7b",
+  "replace_authority": [
+    "AGENTS.md",
+    "README.md",
+    "PRODUCT.md",
+    "docs/ARCHITECTURE_DECISION.md",
+    "docs/LOCAL_CURSOR_HANDOFF.md"
+  ],
+  "delete_legacy_adrs": [
+    "docs/ADR-003-live-ai-trading-desk.md",
+    "docs/ADR-004-chart-engine.md",
+    "docs/ADR-005-mobile-desk-readonly.md",
+    "docs/ADR-006-futu-opend-desk-observe.md"
+  ],
+  "retire_or_relink_legacy_docs": [
+    "PROGRESS_LOG.md",
+    "backend/trading/README.md",
+    "backend/trading/ui/README.md",
+    "deploy/README.md",
+    "docs/ACCOUNT_MANAGEMENT_DESIGN.md",
+    "docs/AI_SMART_TRADER_METHOD.md",
+    "docs/AUDIT_REMEDIATION_PLAN_2026-10-21.md",
+    "docs/AUTO_TRADING_ROADMAP.md",
+    "docs/BOUNDED_INTELLIGENCE_ACCEPTANCE.md",
+    "docs/CGAB_WORLD_CLASS_UPGRADE.md",
+    "docs/CHARTS_INDICATORS_DESIGN.md",
+    "docs/DATA_FEED_AND_SUBSCRIPTIONS.md",
+    "docs/LAB_CITATION_TRY.md",
+    "docs/LAB_PRODUCT_M7_BINDING.md",
+    "docs/MODULAR_ARCHITECTURE.md",
+    "docs/NEXT_PHASE_PLAN.md",
+    "docs/PAPER_VALIDATION_RUNBOOK.md",
+    "docs/PROCUREMENT_GUIDE.md",
+    "docs/QUALITY_ROADMAP.md",
+    "docs/REFERENCE_SIGNALS_DESIGN.md",
+    "docs/STRATEGY_ADOPTION.md",
+    "docs/TAILSCALE_SERVE.md",
+    "docs/boomboom-modular-architecture.html"
+  ],
+  "comments_only": [
+    "backend/api/mobile_desk.py",
+    "backend/trading/intents/models.py"
+  ],
+  "update_document_assertions": [
+    "tests/api/test_mobile_desk_ro.py"
+  ],
+  "preserve": [
+    "web/package-lock.json",
+    "docs/superpowers/specs/2026-11-25-gabfin-system-design.md (outer workspace)",
+    "docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md (outer workspace)",
+    "all production function bodies and API response fields"
+  ],
+  "current_head": "2dba0be7adf1f74a489031a1774edd5fd4dd15d4",
+  "task_commits": {
+    "1": "4827c3c25d783459a48e7423112166aeb1db33af",
+    "2": "2dba0be7adf1f74a489031a1774edd5fd4dd15d4"
+  }
+}

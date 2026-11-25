@@ -1,0 +1,114 @@
+......F.......................................FFFFFF                     [100%]
+================================== FAILURES ===================================
+___________ test_budget_exhaustion_between_reads_retains_first_page ___________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-104/test_budget_exhaustion_between0')
+
+    def test_budget_exhaustion_between_reads_retains_first_page(tmp_path):
+        from gabfin.providers.futu.history import inspect_history
+    
+        ticks = iter([0, 50, 50])
+        context = QuoteContext()
+        result = inspect_history(context, SDK, checked_at=NOW, deadline=90, monotonic=lambda: next(ticks))
+>       assert context.history_calls == ['RTH'] and context.closed
+E       AssertionError: assert (['RTH', 'ETH'] == ['RTH']
+E         
+E         Left contains one more item: 'ETH'
+E         Use -v to get more diff)
+
+tests\gabfin\test_history_smoke.py:100: AssertionError
+______________ test_initialization_failure_still_closes_context _______________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C1D5194470>
+
+    def test_initialization_failure_still_closes_context(monkeypatch):
+        from gabfin.providers.futu import history
+    
+        def unavailable(zone):
+            raise ValueError('PRIVATE')
+        context = QuoteContext()
+        monkeypatch.setattr(history, 'ZoneInfo', unavailable)
+        with pytest.raises(ValueError):
+            history.inspect_history(context, SDK, checked_at=NOW)
+>       assert context.closed
+E       assert False
+E        +  where False = <test_history_smoke.QuoteContext object at 0x000001C1D5194590>.closed
+
+tests\gabfin\test_history_smoke.py:233: AssertionError
+________ test_final_quota_is_skipped_when_budget_cannot_cover_one_rpc _________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-104/test_final_quota_is_skipped_wh0')
+
+    def test_final_quota_is_skipped_when_budget_cannot_cover_one_rpc(tmp_path):
+        from gabfin.providers.futu.history import inspect_history
+    
+        context = QuoteContext()
+        ticks = iter([0, 80, 80])
+        result = inspect_history(context, SDK, checked_at=NOW, deadline=90, monotonic=lambda: next(ticks))
+>       assert context.history_calls == ['RTH'] and context.quota_calls == 1 and context.closed
+E       AssertionError: assert (['RTH', 'ETH'] == ['RTH']
+E         
+E         Left contains one more item: 'ETH'
+E         Use -v to get more diff)
+
+tests\gabfin\test_history_smoke.py:242: AssertionError
+_________________ test_parent_rejects_noncanonical_checked_at _________________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-104/test_parent_rejects_noncanonic0')
+
+    def test_parent_rejects_noncanonical_checked_at(tmp_path):
+        from gabfin.providers.futu.history import inspect_history
+    
+        result = inspect_history(QuoteContext(), SDK, checked_at=NOW)
+        result['checked_at'] = '2026-11-25˽15:00:00+00:00'
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result})['status'] == 'invalid_result'
+E       AssertionError: assert 'ok' == 'invalid_result'
+E         
+E         - invalid_result
+E         + ok
+
+tests\gabfin\test_history_smoke.py:252: AssertionError
+___ test_history_clock_evidence_lists_unobserved_post_and_is_parent_checked ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-104/test_history_clock_evidence_li0')
+
+    def test_history_clock_evidence_lists_unobserved_post_and_is_parent_checked(tmp_path):
+        from gabfin.providers.futu.history import inspect_history
+    
+        result = inspect_history(QuoteContext(), SDK, checked_at=NOW)
+>       assert result['historical_evidence'] == {'PRE': 'sampled', 'RTH': 'sampled', 'POST': 'not_sampled'}
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'historical_evidence'
+
+tests\gabfin\test_history_smoke.py:259: KeyError
+____ test_single_page_wire_does_not_inherit_prices_or_follow_token[False] _____
+
+missing = False
+
+    @pytest.mark.parametrize('missing', [False, True])
+    def test_single_page_wire_does_not_inherit_prices_or_follow_token(missing):
+        from gabfin.providers.futu.history import inspect_history
+>       from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+E       ModuleNotFoundError: No module named 'gabfin.providers.futu.history_wire'
+
+tests\gabfin\test_history_smoke.py:275: ModuleNotFoundError
+_____ test_single_page_wire_does_not_inherit_prices_or_follow_token[True] _____
+
+missing = True
+
+    @pytest.mark.parametrize('missing', [False, True])
+    def test_single_page_wire_does_not_inherit_prices_or_follow_token(missing):
+        from gabfin.providers.futu.history import inspect_history
+>       from gabfin.providers.futu.history_wire import SinglePageHistoryContext
+E       ModuleNotFoundError: No module named 'gabfin.providers.futu.history_wire'
+
+tests\gabfin\test_history_smoke.py:275: ModuleNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_history_smoke.py::test_budget_exhaustion_between_reads_retains_first_page
+FAILED tests/gabfin/test_history_smoke.py::test_initialization_failure_still_closes_context
+FAILED tests/gabfin/test_history_smoke.py::test_final_quota_is_skipped_when_budget_cannot_cover_one_rpc
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_noncanonical_checked_at
+FAILED tests/gabfin/test_history_smoke.py::test_history_clock_evidence_lists_unobserved_post_and_is_parent_checked
+FAILED tests/gabfin/test_history_smoke.py::test_single_page_wire_does_not_inherit_prices_or_follow_token[False]
+FAILED tests/gabfin/test_history_smoke.py::test_single_page_wire_does_not_inherit_prices_or_follow_token[True]
+7 failed, 45 passed in 6.04s

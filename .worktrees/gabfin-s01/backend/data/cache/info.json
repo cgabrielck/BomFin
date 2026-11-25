@@ -1,0 +1,638 @@
+{
+  "news_v3_AAPL_7d": {
+    "value": [
+      {
+        "ticker": "AAPL",
+        "id": "fresh",
+        "title": "Apple fresh update",
+        "summary": "",
+        "publisher": "",
+        "link": "",
+        "sentiment": "positive",
+        "published_at": "2026-07-21T12:00:00+00:00",
+        "content_type": null,
+        "source": "yahoo",
+        "fetched_at": "2026-07-22T12:00:00+00:00",
+        "cutoff_at": "2026-07-15T12:00:00+00:00"
+      }
+    ],
+    "ts": 1795618444.1438935,
+    "ttl": 900
+  },
+  "options_v2_TEST_100.0": {
+    "value": {
+      "ticker": "TEST",
+      "expirations": [
+        "2026-08-21"
+      ],
+      "nearest_expiry": "2026-08-21",
+      "selected_expiry": "2026-08-21",
+      "num_calls": 1,
+      "num_puts": 1,
+      "atm_strike": 100.0,
+      "max_call_oi": 100.0,
+      "max_put_oi": 100.0,
+      "max_call_volume": 100.0,
+      "max_put_volume": 100.0,
+      "put_call_ratio": 1.0,
+      "calls": [
+        {
+          "contract_symbol": "TEST260821C00100000",
+          "strike": 100.0,
+          "bid": 2.0,
+          "ask": 2.2,
+          "mid": 2.1,
+          "last": 2.1,
+          "volume": 100,
+          "open_interest": 500,
+          "implied_volatility": 0.25,
+          "in_the_money": false,
+          "spread_pct": 9.5,
+          "last_trade_time": null
+        }
+      ],
+      "puts": [
+        {
+          "contract_symbol": "TEST260821C00100000",
+          "strike": 100.0,
+          "bid": 2.0,
+          "ask": 2.2,
+          "mid": 2.1,
+          "last": 2.1,
+          "volume": 100,
+          "open_interest": 500,
+          "implied_volatility": 0.25,
+          "in_the_money": false,
+          "spread_pct": 9.5,
+          "last_trade_time": null
+        }
+      ],
+      "source": "yfinance_options",
+      "fetched_at": "2026-11-25T14:54:04.241757+00:00",
+      "as_of": "2026-11-25T14:54:04.241757+00:00",
+      "from_cache": false
+    },
+    "ts": 1795618444.2417579,
+    "ttl": 60
+  },
+  "options_provider_cooldown_v2_LIMITED": {
+    "value": {
+      "error": "rate_limited",
+      "error_code": "rate_limit",
+      "provider_reason": "yahoo_rate_limit",
+      "retry_after_seconds": 300,
+      "source": "multi_source_options",
+      "fetched_at": "2026-11-25T14:54:04.304051+00:00",
+      "from_cache": false,
+      "provider_failures": [
+        {
+          "source": "tradier_options",
+          "error_code": "not_configured",
+          "reason": "token_missing"
+        },
+        {
+          "source": "polygon_options",
+          "error_code": "not_configured",
+          "reason": "api_key_missing"
+        },
+        {
+          "source": "cboe_delayed_options",
+          "error_code": "provider_error",
+          "reason": "failed"
+        }
+      ],
+      "fallback_sources": [
+        "yfinance_options",
+        "tradier_options",
+        "polygon_options",
+        "cboe_delayed_options"
+      ]
+    },
+    "ts": 1795618444.3040512,
+    "ttl": 300
+  },
+  "options_provider_cooldown_v2_BROKEN": {
+    "value": {
+      "error": "provider_unavailable",
+      "error_code": "provider_error",
+      "provider_reason": "yahoo_request_failed",
+      "retry_after_seconds": 300,
+      "source": "multi_source_options",
+      "fetched_at": "2026-11-25T14:54:04.370106+00:00",
+      "from_cache": false,
+      "provider_failures": [
+        {
+          "source": "tradier_options",
+          "error_code": "not_configured",
+          "reason": "token_missing"
+        },
+        {
+          "source": "polygon_options",
+          "error_code": "not_configured",
+          "reason": "api_key_missing"
+        },
+        {
+          "source": "cboe_delayed_options",
+          "error_code": "provider_error",
+          "reason": "failed"
+        }
+      ],
+      "fallback_sources": [
+        "yfinance_options",
+        "tradier_options",
+        "polygon_options",
+        "cboe_delayed_options"
+      ]
+    },
+    "ts": 1795618444.3701065,
+    "ttl": 300
+  },
+  "options_provider_cooldown_v2_EMPTY": {
+    "value": {
+      "error": "provider_unavailable",
+      "error_code": "provider_error",
+      "provider_reason": "empty_expirations",
+      "retry_after_seconds": 300,
+      "source": "multi_source_options",
+      "fetched_at": "2026-11-25T14:54:04.433022+00:00",
+      "from_cache": false,
+      "provider_failures": [
+        {
+          "source": "tradier_options",
+          "error_code": "not_configured",
+          "reason": "token_missing"
+        },
+        {
+          "source": "polygon_options",
+          "error_code": "not_configured",
+          "reason": "api_key_missing"
+        },
+        {
+          "source": "cboe_delayed_options",
+          "error_code": "provider_error",
+          "reason": "failed"
+        }
+      ],
+      "fallback_sources": [
+        "yfinance_options",
+        "tradier_options",
+        "polygon_options",
+        "cboe_delayed_options"
+      ]
+    },
+    "ts": 1795618444.4330223,
+    "ttl": 300
+  },
+  "options_provider_cooldown_v2_EMPTYCHAIN": {
+    "value": {
+      "error": "provider_unavailable",
+      "error_code": "provider_error",
+      "provider_reason": "empty_chain",
+      "retry_after_seconds": 300,
+      "source": "multi_source_options",
+      "fetched_at": "2026-11-25T14:54:04.495800+00:00",
+      "from_cache": false,
+      "provider_failures": [
+        {
+          "source": "tradier_options",
+          "error_code": "not_configured",
+          "reason": "token_missing"
+        },
+        {
+          "source": "polygon_options",
+          "error_code": "not_configured",
+          "reason": "api_key_missing"
+        },
+        {
+          "source": "cboe_delayed_options",
+          "error_code": "provider_error",
+          "reason": "failed"
+        }
+      ],
+      "fallback_sources": [
+        "yfinance_options",
+        "tradier_options",
+        "polygon_options",
+        "cboe_delayed_options"
+      ]
+    },
+    "ts": 1795618444.4958007,
+    "ttl": 300
+  },
+  "options_v2_TSLA_FALLBACK_100.0": {
+    "value": {
+      "ticker": "TSLA",
+      "calls": [
+        {
+          "contract_symbol": "TSLA_CALL"
+        }
+      ],
+      "puts": [],
+      "source": "cboe_delayed_options",
+      "from_cache": false,
+      "fallback_from": "yfinance_options",
+      "fallback_reason": "empty_expirations",
+      "providers_attempted": [
+        "yfinance_options",
+        "tradier_options",
+        "polygon_options",
+        "cboe_delayed_options"
+      ]
+    },
+    "ts": 1795618444.5524652,
+    "ttl": 60
+  },
+  "options_v2_PRIORITY_100.0": {
+    "value": {
+      "ticker": "PRIORITY",
+      "calls": [],
+      "puts": [],
+      "source": "tradier_options",
+      "fallback_from": "yfinance_options",
+      "fallback_reason": "empty_expirations",
+      "providers_attempted": [
+        "yfinance_options",
+        "tradier_options"
+      ]
+    },
+    "ts": 1795618444.6129692,
+    "ttl": 60
+  },
+  "options_v2_PRIORITY2_100.0": {
+    "value": {
+      "ticker": "PRIORITY2",
+      "calls": [],
+      "puts": [],
+      "source": "polygon_options",
+      "fallback_from": "yfinance_options",
+      "fallback_reason": "empty_expirations",
+      "providers_attempted": [
+        "yfinance_options",
+        "tradier_options",
+        "polygon_options"
+      ]
+    },
+    "ts": 1795618444.6745236,
+    "ttl": 60
+  },
+  "tech_v4_TEST_6mo": {
+    "value": {
+      "ticker": "TEST",
+      "price": 319.0,
+      "price_session": "Market Closed",
+      "price_source": "yahoo_regular_market",
+      "price_quote_time": null,
+      "price_market_state": "CLOSED",
+      "price_stale": true,
+      "technical_source": "yfinance_history",
+      "bars_vendor": "yahoo",
+      "bars_fallback": false,
+      "technical_adjusted": true,
+      "technical_price_basis": "latest_share_basis",
+      "history_last_close": 319.0,
+      "quote_to_history_ratio": 1.0,
+      "price_scale_status": "aligned",
+      "technical_period": "6mo",
+      "technical_as_of": "2025-11-04T00:00:00",
+      "technical_fetched_at": "2026-11-25T14:54:10.412743+00:00",
+      "technical_from_cache": false,
+      "rsi_14": null,
+      "macd_line": 6.999990245691492,
+      "macd_signal": "bullish",
+      "macd_histogram": 4.17603521363219e-06,
+      "bb_upper": 321.3321595661992,
+      "bb_lower": 297.6678404338008,
+      "sma_20": 309.5,
+      "sma_50": 294.5,
+      "atr_14": 2.0,
+      "volume_ratio_10_50": 1.0,
+      "dollar_volume_10d_avg": 314500.0,
+      "dollar_volume_50d_avg": 294500.0,
+      "dollar_volume_ratio": 1.067911714770798,
+      "volume_quality_score": 50.0,
+      "obv_trend": 10000.0,
+      "price_vs_sma50_pct": 8.31918505942275,
+      "ema_9": 315.00000000000006,
+      "ema_21": 309.00000000860985,
+      "ema_50": 294.5038391850449,
+      "ema_200": 230.63551325940512,
+      "sma_200": 219.5,
+      "adx_14": 100.0,
+      "risk_metrics": {
+        "available": true,
+        "observations": 125,
+        "annual_return_pct": 172.54,
+        "annual_volatility_pct": 0.92,
+        "var_95_daily_pct": 0.32,
+        "max_drawdown_pct": 0.0,
+        "sharpe_ratio": 109.45,
+        "sortino_ratio": null,
+        "beta": null,
+        "risk_level": "low"
+      },
+      "bb_signal": "within",
+      "trend_signal": "uptrend",
+      "volume_signal": "normal",
+      "legacy_technical_score": 55,
+      "signal_pillars": {
+        "score": 73.9,
+        "coverage": 1.0,
+        "pillars": {
+          "trend": {
+            "score": 100.0,
+            "available": true,
+            "reasons": [
+              "price_above_sma50",
+              "sma20_above_sma50",
+              "price_above_sma200",
+              "strong_trend"
+            ]
+          },
+          "momentum": {
+            "score": 70.0,
+            "available": true,
+            "reasons": [
+              "macd_positive"
+            ]
+          },
+          "mean_reversion": {
+            "score": 38,
+            "available": true,
+            "reasons": [
+              "near_upper_band"
+            ]
+          },
+          "volume": {
+            "score": 66.0,
+            "available": true,
+            "reasons": [
+              "healthy_participation",
+              "positive_price_volume",
+              "obv_rising"
+            ]
+          },
+          "risk": {
+            "score": 80.0,
+            "available": true,
+            "reasons": [
+              "low_volatility",
+              "drawdown_checked",
+              "atr_checked"
+            ]
+          }
+        },
+        "weights": {
+          "trend": 0.25,
+          "momentum": 0.2,
+          "mean_reversion": 0.15,
+          "volume": 0.2,
+          "risk": 0.2
+        },
+        "version": 1
+      },
+      "technical_score": 73.9
+    },
+    "ts": 1795618450.4218707,
+    "ttl": 300
+  },
+  "tech_v4_TEST_1y": {
+    "value": {
+      "ticker": "TEST",
+      "price": 319.0,
+      "price_session": "Market Closed",
+      "price_source": "yahoo_regular_market",
+      "price_quote_time": null,
+      "price_market_state": "CLOSED",
+      "price_stale": true,
+      "technical_source": "yfinance_history",
+      "bars_vendor": "yahoo",
+      "bars_fallback": false,
+      "technical_adjusted": true,
+      "technical_price_basis": "latest_share_basis",
+      "history_last_close": 319.0,
+      "quote_to_history_ratio": 1.0,
+      "price_scale_status": "aligned",
+      "technical_period": "1y",
+      "technical_as_of": "2025-11-04T00:00:00",
+      "technical_fetched_at": "2026-11-25T14:54:10.452286+00:00",
+      "technical_from_cache": false,
+      "rsi_14": null,
+      "macd_line": 6.999990245691492,
+      "macd_signal": "bullish",
+      "macd_histogram": 4.17603521363219e-06,
+      "bb_upper": 321.3321595661992,
+      "bb_lower": 297.6678404338008,
+      "sma_20": 309.5,
+      "sma_50": 294.5,
+      "atr_14": 2.0,
+      "volume_ratio_10_50": 1.0,
+      "dollar_volume_10d_avg": 314500.0,
+      "dollar_volume_50d_avg": 294500.0,
+      "dollar_volume_ratio": 1.067911714770798,
+      "volume_quality_score": 50.0,
+      "obv_trend": 10000.0,
+      "price_vs_sma50_pct": 8.31918505942275,
+      "ema_9": 315.00000000000006,
+      "ema_21": 309.00000000860985,
+      "ema_50": 294.5038391850449,
+      "ema_200": 230.63551325940512,
+      "sma_200": 219.5,
+      "adx_14": 100.0,
+      "risk_metrics": {
+        "available": true,
+        "observations": 125,
+        "annual_return_pct": 172.54,
+        "annual_volatility_pct": 0.92,
+        "var_95_daily_pct": 0.32,
+        "max_drawdown_pct": 0.0,
+        "sharpe_ratio": 109.45,
+        "sortino_ratio": null,
+        "beta": null,
+        "risk_level": "low"
+      },
+      "bb_signal": "within",
+      "trend_signal": "uptrend",
+      "volume_signal": "normal",
+      "legacy_technical_score": 55,
+      "signal_pillars": {
+        "score": 73.9,
+        "coverage": 1.0,
+        "pillars": {
+          "trend": {
+            "score": 100.0,
+            "available": true,
+            "reasons": [
+              "price_above_sma50",
+              "sma20_above_sma50",
+              "price_above_sma200",
+              "strong_trend"
+            ]
+          },
+          "momentum": {
+            "score": 70.0,
+            "available": true,
+            "reasons": [
+              "macd_positive"
+            ]
+          },
+          "mean_reversion": {
+            "score": 38,
+            "available": true,
+            "reasons": [
+              "near_upper_band"
+            ]
+          },
+          "volume": {
+            "score": 66.0,
+            "available": true,
+            "reasons": [
+              "healthy_participation",
+              "positive_price_volume",
+              "obv_rising"
+            ]
+          },
+          "risk": {
+            "score": 80.0,
+            "available": true,
+            "reasons": [
+              "low_volatility",
+              "drawdown_checked",
+              "atr_checked"
+            ]
+          }
+        },
+        "weights": {
+          "trend": 0.25,
+          "momentum": 0.2,
+          "mean_reversion": 0.15,
+          "volume": 0.2,
+          "risk": 0.2
+        },
+        "version": 1
+      },
+      "technical_score": 73.9
+    },
+    "ts": 1795618450.460029,
+    "ttl": 300
+  },
+  "tech_v4_POLY_1y": {
+    "value": {
+      "ticker": "POLY",
+      "price": 319.0,
+      "price_session": "Market Closed",
+      "price_source": "yahoo_regular_market",
+      "price_quote_time": null,
+      "price_market_state": "CLOSED",
+      "price_stale": true,
+      "technical_source": "polygon_aggs",
+      "bars_vendor": "polygon",
+      "bars_fallback": false,
+      "technical_adjusted": true,
+      "technical_price_basis": "latest_share_basis",
+      "history_last_close": 319.0,
+      "quote_to_history_ratio": 1.0,
+      "price_scale_status": "aligned",
+      "technical_period": "1y",
+      "technical_as_of": "2025-11-04T00:00:00",
+      "technical_fetched_at": "2026-11-25T14:54:10.510035+00:00",
+      "technical_from_cache": false,
+      "rsi_14": null,
+      "macd_line": 6.999990245691492,
+      "macd_signal": "bullish",
+      "macd_histogram": 4.17603521363219e-06,
+      "bb_upper": 321.3321595661992,
+      "bb_lower": 297.6678404338008,
+      "sma_20": 309.5,
+      "sma_50": 294.5,
+      "atr_14": 2.0,
+      "volume_ratio_10_50": 1.0,
+      "dollar_volume_10d_avg": 314500.0,
+      "dollar_volume_50d_avg": 294500.0,
+      "dollar_volume_ratio": 1.067911714770798,
+      "volume_quality_score": 50.0,
+      "obv_trend": 10000.0,
+      "price_vs_sma50_pct": 8.31918505942275,
+      "ema_9": 315.00000000000006,
+      "ema_21": 309.00000000860985,
+      "ema_50": 294.5038391850449,
+      "ema_200": 230.63551325940512,
+      "sma_200": 219.5,
+      "adx_14": 100.0,
+      "risk_metrics": {
+        "available": true,
+        "observations": 125,
+        "annual_return_pct": 172.54,
+        "annual_volatility_pct": 0.92,
+        "var_95_daily_pct": 0.32,
+        "max_drawdown_pct": 0.0,
+        "sharpe_ratio": 109.45,
+        "sortino_ratio": null,
+        "beta": null,
+        "risk_level": "low"
+      },
+      "bb_signal": "within",
+      "trend_signal": "uptrend",
+      "volume_signal": "normal",
+      "legacy_technical_score": 55,
+      "signal_pillars": {
+        "score": 73.9,
+        "coverage": 1.0,
+        "pillars": {
+          "trend": {
+            "score": 100.0,
+            "available": true,
+            "reasons": [
+              "price_above_sma50",
+              "sma20_above_sma50",
+              "price_above_sma200",
+              "strong_trend"
+            ]
+          },
+          "momentum": {
+            "score": 70.0,
+            "available": true,
+            "reasons": [
+              "macd_positive"
+            ]
+          },
+          "mean_reversion": {
+            "score": 38,
+            "available": true,
+            "reasons": [
+              "near_upper_band"
+            ]
+          },
+          "volume": {
+            "score": 66.0,
+            "available": true,
+            "reasons": [
+              "healthy_participation",
+              "positive_price_volume",
+              "obv_rising"
+            ]
+          },
+          "risk": {
+            "score": 80.0,
+            "available": true,
+            "reasons": [
+              "low_volatility",
+              "drawdown_checked",
+              "atr_checked"
+            ]
+          }
+        },
+        "weights": {
+          "trend": 0.25,
+          "momentum": 0.2,
+          "mean_reversion": 0.15,
+          "volume": 0.2,
+          "risk": 0.2
+        },
+        "version": 1
+      },
+      "technical_score": 73.9
+    },
+    "ts": 1795618450.5162284,
+    "ttl": 300
+  }
+}

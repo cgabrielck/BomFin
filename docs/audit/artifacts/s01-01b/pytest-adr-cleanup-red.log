@@ -1,0 +1,25 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 1 item
+
+tests\api\test_mobile_desk_ro.py F                                       [100%]
+
+================================== FAILURES ===================================
+_____________ test_serve_doc_is_private_mesh_and_adr_stays_draft ______________
+tests\api\test_mobile_desk_ro.py:243: in test_serve_doc_is_private_mesh_and_adr_stays_draft
+    adr = ADR.read_text(encoding="utf-8").splitlines()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\001\\Desktop\\GabFin-ai-trade\\.worktrees\\gabfin-s01\\docs\\ADR-005-mobile-desk-readonly.md'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s01-01b\pytest-adr-cleanup-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/api/test_mobile_desk_ro.py::test_serve_doc_is_private_mesh_and_adr_stays_draft
+============================== 1 failed in 3.79s ==============================

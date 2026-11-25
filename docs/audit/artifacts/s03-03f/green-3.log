@@ -1,0 +1,63 @@
+.....................................FFF...........                      [100%]
+================================== FAILURES ===================================
+____________ test_unverified_session_is_not_authorization[closed] _____________
+
+session = 'closed'
+
+    @pytest.mark.parametrize('session', ['closed', 'unknown', 'pre_market'])
+    def test_unverified_session_is_not_authorization(session):
+        result = plan([demand()], session=session)
+>       assert not result.apply_allowed and result.plan.rejected[0].reason_codes == ('session_unverified',)
+E       AssertionError: assert (not False and ('channel_unv...n_unverified') == ('session_unverified',)
+E        +  where False = SubscriptionSchedule(plan=SubscriptionPlan(schema_version='1.0', source='futu', as_of=datetime.datetime(2026, 11, 25, ... 'session_unverified')),)), subscribe=(), unsubscribe=(), apply_allowed=False, blocked_reasons=('session_unverified',)).apply_allowed
+E         
+E         At index 0 diff: 'channel_unverified' != 'session_unverified'
+E         Left contains one more item: 'session_unverified'
+E         Use -v to get more diff)
+
+tests\gabfin\test_subscription_planner.py:206: AssertionError
+____________ test_unverified_session_is_not_authorization[unknown] ____________
+
+session = 'unknown'
+
+    @pytest.mark.parametrize('session', ['closed', 'unknown', 'pre_market'])
+    def test_unverified_session_is_not_authorization(session):
+        result = plan([demand()], session=session)
+>       assert not result.apply_allowed and result.plan.rejected[0].reason_codes == ('session_unverified',)
+E       AssertionError: assert (not False and ('channel_unv...n_unverified') == ('session_unverified',)
+E        +  where False = SubscriptionSchedule(plan=SubscriptionPlan(schema_version='1.0', source='futu', as_of=datetime.datetime(2026, 11, 25, ... 'session_unverified')),)), subscribe=(), unsubscribe=(), apply_allowed=False, blocked_reasons=('session_unverified',)).apply_allowed
+E         
+E         At index 0 diff: 'channel_unverified' != 'session_unverified'
+E         Left contains one more item: 'session_unverified'
+E         Use -v to get more diff)
+
+tests\gabfin\test_subscription_planner.py:206: AssertionError
+__________ test_unverified_session_is_not_authorization[pre_market] ___________
+
+session = 'pre_market'
+
+    @pytest.mark.parametrize('session', ['closed', 'unknown', 'pre_market'])
+    def test_unverified_session_is_not_authorization(session):
+        result = plan([demand()], session=session)
+>       assert not result.apply_allowed and result.plan.rejected[0].reason_codes == ('session_unverified',)
+E       AssertionError: assert (not False and ('channel_unv...n_unverified') == ('session_unverified',)
+E        +  where False = SubscriptionSchedule(plan=SubscriptionPlan(schema_version='1.0', source='futu', as_of=datetime.datetime(2026, 11, 25, ... 'session_unverified')),)), subscribe=(), unsubscribe=(), apply_allowed=False, blocked_reasons=('session_unverified',)).apply_allowed
+E         
+E         At index 0 diff: 'channel_unverified' != 'session_unverified'
+E         Left contains one more item: 'session_unverified'
+E         Use -v to get more diff)
+
+tests\gabfin\test_subscription_planner.py:206: AssertionError
+============================== warnings summary ===============================
+tests/gabfin/test_subscription_planner.py::test_stock_pre_market_support_does_not_imply_option_pre_market_support
+  C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\.venv\Lib\site-packages\pydantic\main.py:520: UserWarning: Pydantic serializer warnings:
+    PydanticSerializationUnexpectedValue(Expected `enum` - serialized value may not be as expected [field_name='sessions', input_value='regular', input_type=str])
+    PydanticSerializationUnexpectedValue(Expected `enum` - serialized value may not be as expected [field_name='sessions', input_value='pre_market', input_type=str])
+    return self.__pydantic_serializer__.to_python(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_subscription_planner.py::test_unverified_session_is_not_authorization[closed]
+FAILED tests/gabfin/test_subscription_planner.py::test_unverified_session_is_not_authorization[unknown]
+FAILED tests/gabfin/test_subscription_planner.py::test_unverified_session_is_not_authorization[pre_market]
+3 failed, 48 passed, 1 warning in 2.21s

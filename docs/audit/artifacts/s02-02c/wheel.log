@@ -1,0 +1,18 @@
+Processing .\.
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+  error: backend-unavailable
+  
+  Cannot import build backend 'setuptools.build_meta'.
+  
+  ModuleNotFoundError: No module named 'setuptools'
+  
+  note: This is likely not a problem with pip.
+error: metadata-generation-failed
+
+Encountered error while generating package metadata.
+
+from file:///C:/Users/001/Desktop/GabFin-ai-trade/.worktrees/gabfin-s01
+
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.

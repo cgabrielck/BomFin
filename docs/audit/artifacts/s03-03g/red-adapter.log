@@ -1,0 +1,23 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 0 items / 1 error
+
+=================================== ERRORS ====================================
+__________ ERROR collecting tests/gabfin/test_futu_quote_adapter.py ___________
+ImportError while importing test module 'C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\tests\gabfin\test_futu_quote_adapter.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:7: in <module>
+    from gabfin.providers.futu.adapter import FutuQuoteAdapter
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.adapter'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s03-03g\red-adapter.xml -
+=========================== short test summary info ===========================
+ERROR tests/gabfin/test_futu_quote_adapter.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+============================== 1 error in 0.54s ===============================

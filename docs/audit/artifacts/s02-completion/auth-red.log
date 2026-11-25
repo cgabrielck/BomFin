@@ -1,0 +1,28 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 3 items
+
+tests\gabfin\test_session_auth.py FFF                                    [100%]
+
+================================== FAILURES ===================================
+_______________________ test_role_ceiling_and_ownership _______________________
+tests\gabfin\test_session_auth.py:7: in test_role_ceiling_and_ownership
+    from gabfin.api.capabilities import authorize
+E   ModuleNotFoundError: No module named 'gabfin.api'
+_________________ test_pairing_single_use_expiry_and_restart __________________
+tests\gabfin\test_session_auth.py:14: in test_pairing_single_use_expiry_and_restart
+    from gabfin.api.sessions import SessionStore
+E   ModuleNotFoundError: No module named 'gabfin.api'
+_____________________________ test_auth_boundary ______________________________
+tests\gabfin\test_session_auth.py:22: in test_auth_boundary
+    from gabfin.api.sessions import SessionStore
+E   ModuleNotFoundError: No module named 'gabfin.api'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-completion\auth-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_session_auth.py::test_role_ceiling_and_ownership - M...
+FAILED tests/gabfin/test_session_auth.py::test_pairing_single_use_expiry_and_restart
+FAILED tests/gabfin/test_session_auth.py::test_auth_boundary - ModuleNotFound...
+============================== 3 failed in 1.94s ==============================

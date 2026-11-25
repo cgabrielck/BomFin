@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="9" time="1.892" timestamp="2026-11-25T09:42:18.880785+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[value0]" time="1.313" /><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[2026-11-25T09:30:00]" time="0.003" /><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[2026-11-25]" time="0.003" /><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[0_0]" time="0.003" /><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[1795599000_0]" time="0.002" /><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[True]" time="0.002" /><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[0_1]" time="0.003"><failure message="Failed: DID NOT RAISE ValidationError">tests\gabfin\test_contracts.py:93: in test_timezone_required
+    with pytest.raises(ValidationError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValidationError</failure></testcase><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[1795599000_1]" time="0.003"><failure message="Failed: DID NOT RAISE ValidationError">tests\gabfin\test_contracts.py:93: in test_timezone_required
+    with pytest.raises(ValidationError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValidationError</failure></testcase><testcase classname="tests.gabfin.test_contracts" name="test_timezone_required[1795599000.25]" time="0.003"><failure message="Failed: DID NOT RAISE ValidationError">tests\gabfin\test_contracts.py:93: in test_timezone_required
+    with pytest.raises(ValidationError):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValidationError</failure></testcase></testsuite></testsuites>

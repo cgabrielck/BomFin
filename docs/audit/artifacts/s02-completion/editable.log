@@ -1,0 +1,21 @@
+Obtaining file:///C:/Users/001/Desktop/GabFin-ai-trade/.worktrees/gabfin-s01
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: gabfin
+  Building editable for gabfin (pyproject.toml): started
+  Building editable for gabfin (pyproject.toml): finished with status 'done'
+  Created wheel for gabfin: filename=gabfin-0.1.0-0.editable-py3-none-any.whl size=1289 sha256=e8a2d47cac6c95ce69b88f925787b36216b59ea8a1783bcb9b4abe615b62bbeb
+  Stored in directory: C:\Users\001\AppData\Local\Temp\pip-ephem-wheel-cache-yegq6_ya\wheels\1a\4f\61\4c8e04eca59b976ac83896658e543c976a0d4f834e0a20f113
+Successfully built gabfin
+Installing collected packages: gabfin
+  Attempting uninstall: gabfin
+    Found existing installation: gabfin 0.1.0
+    Uninstalling gabfin-0.1.0:
+      Successfully uninstalled gabfin-0.1.0
+Successfully installed gabfin-0.1.0

@@ -1,0 +1,25 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 8 items
+
+tests\gabfin\test_support_contracts.py ..F....F                          [100%]
+
+================================== FAILURES ===================================
+______________________ test_strategy_future_bar_rejected ______________________
+tests\gabfin\test_support_contracts.py:20: in test_strategy_future_bar_rejected
+    with pytest.raises(ValidationError):StrategyContext.model_validate(p)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValidationError
+________________________ test_proposal_hash_is_digest _________________________
+tests\gabfin\test_support_contracts.py:34: in test_proposal_hash_is_digest
+    with pytest.raises(ValidationError):HarnessProposal(schema_version='1.0',proposal_id=U,artifact_hash='not-a-digest',base_version='v1',deploy_version='v2',diff='change',experiment_ids=[U],metrics={},rollback_version='v1',approval=None)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValidationError
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-completion\review-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_support_contracts.py::test_strategy_future_bar_rejected
+FAILED tests/gabfin/test_support_contracts.py::test_proposal_hash_is_digest
+========================= 2 failed, 6 passed in 1.93s =========================

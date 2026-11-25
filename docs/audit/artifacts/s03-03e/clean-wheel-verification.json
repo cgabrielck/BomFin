@@ -1,0 +1,6 @@
+{
+  "wheel_import": true,
+  "no_futu": true,
+  "no_pandas": true,
+  "stored_live_result_revalidated": true
+}

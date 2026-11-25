@@ -1,0 +1,3 @@
+Using CPython 3.12.16 interpreter at: .tools\python\cpython-3.12.16-windows-x86_64-none\python.exe
+Creating virtual environment at: .tools/futu-sdk
+Activate with: .tools\futu-sdk\Scripts\activate

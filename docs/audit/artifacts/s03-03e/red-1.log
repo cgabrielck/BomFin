@@ -1,0 +1,12 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_two_bounded_history_pages_without_subscription_or_pagination ______
+
+    def test_two_bounded_history_pages_without_subscription_or_pagination():
+>       from gabfin.providers.futu.history import inspect_history
+E       ModuleNotFoundError: No module named 'gabfin.providers.futu.history'
+
+tests\gabfin\test_history_smoke.py:44: ModuleNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_history_smoke.py::test_two_bounded_history_pages_without_subscription_or_pagination
+1 failed in 2.23s

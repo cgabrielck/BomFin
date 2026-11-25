@@ -1,0 +1,50 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ test_parent_rejects_price_without_complete_source_time_even_on_quote_failure[missing0] _
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-94/test_parent_rejects_price_with0')
+missing = ('data_time',)
+
+    @pytest.mark.parametrize('missing', [('data_time',), ('data_date', 'data_time')])
+    def test_parent_rejects_price_without_complete_source_time_even_on_quote_failure(tmp_path, missing):
+        from gabfin.providers.futu.options import inspect_options
+    
+        result = inspect_options(QuoteContext(), SDK, checked_at=NOW, sleep=lambda n: None)
+        result['errors'] = ['quote_failed']
+        for field in missing:
+            result['contracts'][0][field] = None
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-27', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}} != {'metadata': None}
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:375: AssertionError
+_ test_parent_rejects_price_without_complete_source_time_even_on_quote_failure[missing1] _
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-94/test_parent_rejects_price_with1')
+missing = ('data_date', 'data_time')
+
+    @pytest.mark.parametrize('missing', [('data_time',), ('data_date', 'data_time')])
+    def test_parent_rejects_price_without_complete_source_time_even_on_quote_failure(tmp_path, missing):
+        from gabfin.providers.futu.options import inspect_options
+    
+        result = inspect_options(QuoteContext(), SDK, checked_at=NOW, sleep=lambda n: None)
+        result['errors'] = ['quote_failed']
+        for field in missing:
+            result['contracts'][0][field] = None
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-27', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}} != {'metadata': None}
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:375: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_options_smoke.py::test_parent_rejects_price_without_complete_source_time_even_on_quote_failure[missing0]
+FAILED tests/gabfin/test_options_smoke.py::test_parent_rejects_price_without_complete_source_time_even_on_quote_failure[missing1]
+2 failed, 62 deselected in 4.19s

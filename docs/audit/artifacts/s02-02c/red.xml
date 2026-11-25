@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="43" skipped="0" tests="43" time="2.773" timestamp="2026-11-25T11:21:31.459539+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_research_contracts" name="test_report_roundtrip_and_shared_evidence" time="1.691"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:19: in test_report_roundtrip_and_shared_evidence
+    r=parse(p);assert len(r.evidence)==1
+      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h0]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h1]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h2]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h3]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h4]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h5]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h6]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h7]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_horizon_variants[h8]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:25: in test_horizon_variants
+    p=payload();p['horizon']=h;assert parse(p).horizon.kind==h['kind']
+                                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_duration[0]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:30: in test_invalid_duration
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_duration[-1]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:30: in test_invalid_duration
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_duration[True]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:30: in test_invalid_duration
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_duration[1.5]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:30: in test_invalid_duration
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_duration[3]" time="0.019"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:30: in test_invalid_duration
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_duration[9007199254740992]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:30: in test_invalid_duration
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_duplicate_ids[evidence]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:35: in test_duplicate_ids
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_duplicate_ids[citations]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:35: in test_duplicate_ids
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_duplicate_ids[facts]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:35: in test_duplicate_ids
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_duplicate_ids[inferences]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:35: in test_duplicate_ids
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_bad_references[evidence]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:45: in test_bad_references
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_bad_references[fact]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:45: in test_bad_references
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_bad_references[inference]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:45: in test_bad_references
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_bad_references[counter]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:45: in test_bad_references
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_bad_references[duplicate_ref]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:45: in test_bad_references
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[future]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[capture]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[naive]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[hash]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[source]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[extra]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[unsupported]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[empty]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[partial]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[complete_missing]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[cost]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[known]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[negative]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_invalid_report[bool_tokens]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:64: in test_invalid_report
+    with pytest.raises(ValidationError):parse(p)
+                                        ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_honest_partial_empty_report" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:68: in test_honest_partial_empty_report
+    assert parse(p).completeness=='partial'
+           ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_known_cost_exact" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:72: in test_known_cost_exact
+    assert json.loads(parse(p).model_dump_json())['usage']['cost']['amount']=='0.10'
+                      ^^^^^^^^
+tests\gabfin\test_research_contracts.py:14: in parse
+    from gabfin.contracts.research import ResearchReport
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_request_identity_and_deadline" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:75: in test_request_identity_and_deadline
+    from gabfin.contracts.research import ResearchRequest
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase><testcase classname="tests.gabfin.test_research_contracts" name="test_schema_generation" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.research'">tests\gabfin\test_research_contracts.py:82: in test_schema_generation
+    from gabfin.contracts.research import ResearchReport, ResearchRequest, EvidenceItem
+E   ModuleNotFoundError: No module named 'gabfin.contracts.research'</failure></testcase></testsuite></testsuites>

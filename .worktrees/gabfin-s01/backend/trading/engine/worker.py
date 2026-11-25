@@ -1,0 +1,2015 @@
+"""
+TradingWorker 2.0 — full auto-trading signal polling loop.
+
+Upgrade from 1.0:
+  - Replaces the `pass` stub _run_reconciliation with real position sync
+  - Adds _run_strategy_signals() — the core auto-trading loop
+  - Integrates StrategyBase, ATR/1R sizer, RiskEngine 2.0, and price_history
+  - Kelly helpers stay importable. Default auto buys do not size with them
+    (Owner 2026-11-14; CGAB_AUTO_KELLY_SIZER=1 restores the old min).
+  - Tracks trailing stops per position
+  - Tracks cooldown tickers (24h cool-down after sell)
+  - Market-hours gate: only trade during US market hours (9:30–16:00 ET)
+    unless IGNORE_MARKET_HOURS=true (allows strategy cycles anytime).
+"""
+from __future__ import annotations
+
+import logging
+import os
+import threading
+import time
+from datetime import datetime, timezone, timedelta, date
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
+
+from backend.trading.broker import BrokerAdapter
+from backend.trading.engine.order_manager import OrderManager, OrderStore
+from backend.trading.engine.shadow import ShadowTradingEngine
+from backend.trading.engine.signal_processor import JournalWriteError, SignalProcessor
+from backend.trading.engine.stamp import VENUE_STATUSES, sell_reached_venue, stamp_risk_approved
+from backend.trading.engine.sticky_idempotency import (
+    StickyLookupUnproven,
+    clear_sticky,
+    detach_if_would_clobber_sticky,
+    find_sticky_order,
+    mark_acceptance_unknown,
+    pin_sticky,
+)
+from backend.trading.models import Order, OrderSide, OrderStatus, OrderType
+from backend.trading.reconciliation.service import ReconciliationService
+from backend.trading.fill_honesty import fill_notify_price
+from backend.trading.risk.gates import RiskEngine, RiskLimits, positive_price
+from backend.trading.risk.shared_state import (
+    COOLDOWN_HOURS,
+    active_cooldown_tickers,
+    mark_cooldown,
+)
+from backend.trading.risk.position_sizer import (
+    auto_kelly_sizer_enabled,
+    cap_shares_to_notional,
+    quantity_after_kelly_gate,
+    shares_to_buy,
+)
+from backend.trading.strategies.base import StrategyBase
+from backend.trading.strategies.experimental import experimental_strategies_enabled
+from backend.trading.strategies.registry import get_strategy, strategy_choices
+from backend.trading.strategies.stage2 import size_shares_by_risk
+from backend.trading.engine.cadence import allows_new_entries as cadence_allows_new_entries
+from backend.trading.engine.cadence import resolve_cadence
+from backend.trading.engine.fetch_policy import (
+    env_universe_cap,
+    parse_fetch_batch,
+    parse_fetch_pause_sec,
+    symbols_to_fetch,
+)
+from backend.trading.strategies import skip_codes
+from backend.pathsetup import ensure_backend_on_path
+from backend.trading.safety import audit, kill_switch
+from backend.trading.safety.mandate import (
+    MandateGate,
+    MandateLoadError,
+    TradingMandate,
+    load_mandate,
+)
+
+ensure_backend_on_path()
+
+logger = logging.getLogger(__name__)
+
+
+def _order_status_token(order: Any) -> str:
+    """Map an order onto the session-card vocabulary. Not a seal."""
+    error = str(getattr(order, "error_message", "") or "")
+    raw = getattr(getattr(order, "status", None), "value", getattr(order, "status", ""))
+    token = str(raw or "").lower()
+    if error.startswith("Risk Gate Rejected") or (
+        token == "rejected" and "risk" in error.lower()
+    ):
+        return "risk_rejected"
+    if token == "cancelled":
+        return "canceled"
+    if token == "filled":
+        return "filled"
+    if token in ("submitted", "accepted", "partially_filled", "risk_approved"):
+        return "submitted"
+    if token == "rejected":
+        return "canceled"
+    return token or "proposed"
+
+# US Eastern timezone offset (ET = UTC-5 winter, UTC-4 summer)
+# We approximate market hours as 14:30–21:00 UTC (conservative)
+MARKET_OPEN_UTC_HOUR  = 14  # 09:30 ET = 14:30 UTC (winter)
+MARKET_CLOSE_UTC_HOUR = 21  # 16:00 ET = 21:00 UTC
+
+
+class TradingWorker:
+    """
+    Background daemon that:
+      1. Every tick: syncs open order statuses with the broker.
+      2. Every tick: checks exits (stop-loss, take-profit) for open positions.
+      3. Every tick: generates strategy signals for the stock universe and submits orders.
+      4. Once per day: runs account reconciliation and resets daily-loss tracker.
+
+    All operations are guarded by market-hours gate (US equities only).
+    """
+
+    def __init__(
+        self,
+        broker: BrokerAdapter,
+        store: OrderStore,
+        manager: OrderManager,
+        reconciler: ReconciliationService,
+        strategy_id: str = "breakout",
+        risk_limits: Optional[RiskLimits] = None,
+        ticker_universe: Optional[List[str]] = None,
+        mandate: Optional[TradingMandate] = None,
+        execution_mode: str = "paper",
+        shadow_engine: Optional["ShadowTradingEngine"] = None,
+    ):
+        self.broker      = broker
+        self.store       = store
+        self.manager     = manager
+        self.reconciler  = reconciler
+        self.strategy: StrategyBase = get_strategy(strategy_id)
+        if str(strategy_id or "").lower() == "leader_campaign" and not experimental_strategies_enabled():
+            logger.warning(
+                "leader_campaign requested but BOOMBOOM_EXPERIMENTAL_STRATEGIES is off. "
+                "No buys from this id."
+            )
+        self.risk_engine = RiskEngine(risk_limits or RiskLimits())
+        # Explicit TradingMandate (including permissive / {}) is a real policy.
+        # A missing or unreadable config/mandate.json is not: fail closed.
+        # Do not install a fake permissive mandate for that file.
+        if mandate is not None:
+            self.mandate_gate = MandateGate(mandate)
+        else:
+            try:
+                self.mandate_gate = MandateGate(load_mandate())
+            except MandateLoadError as exc:
+                logger.error(
+                    "Mandate %s at %s — worker orders fail closed: %s",
+                    exc.snapshot.status,
+                    exc.snapshot.path,
+                    exc.snapshot.error,
+                )
+                self.mandate_gate = MandateGate(unavailable=exc.snapshot)
+        # Execution mode: "paper" submits to broker, "shadow" simulates fills locally
+        self.execution_mode = execution_mode
+        self.shadow_engine = shadow_engine
+        # Single entry point: strategy signals → risk → paper/shadow execution.
+        self.signal_processor = SignalProcessor(
+            broker,
+            self.risk_engine,
+            manager,
+            execution_mode=execution_mode,
+            shadow_engine=shadow_engine,
+        )
+
+        # Default universe — can be overridden. Named strategies may pin a
+        # exclusive list (defensive_gld → GLD) without rewriting research_list.
+        if ticker_universe is None:
+            try:
+                from backend.utils.constants import STOCK_UNIVERSE
+                self.ticker_universe = [s["ticker"] for s in STOCK_UNIVERSE]
+                self.universe_source = "stock_universe"
+            except Exception:
+                # Five-name import fallback is a data fault, not a strategy book.
+                self.ticker_universe = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"]
+                self.universe_source = "import_fallback"
+                logger.error(
+                    "STOCK_UNIVERSE import failed — using fallback names as a data fault, not a book."
+                )
+            override = getattr(self.strategy, "universe_override", None)
+            if override:
+                names = [str(s).upper().strip() for s in override if str(s).strip()]
+                if names:
+                    self.ticker_universe = names
+                    self.universe_source = "strategy_override"
+        else:
+            self.ticker_universe = ticker_universe
+            self.universe_source = "override"
+
+        self._running   = False
+        self._thread: Optional[threading.Thread] = None
+        self._last_reconcile_date: Optional[date] = None
+
+        # Per-position trailing stop tracking: {symbol: highest_close_since_entry}
+        self._trailing_highs: Dict[str, float] = {}
+        # Per-position entry metadata: {symbol: {entry_price, stop, target, strategy_id}}
+        self._position_meta: Dict[str, Dict[str, Any]] = {}
+        # Cool-down set: tickers we sold recently
+        self._cooldown: Dict[str, datetime] = {}
+
+        # Latest stats (readable from UI without locking)
+        self.last_run_utc: Optional[datetime] = None
+        self.last_signal_summary: List[Dict[str, Any]] = []
+        self.is_market_hours: bool = False
+        self.is_halted: bool = False  # Kill switch state (checked every tick)
+        # Latest market regime (SPY+VIX) — gates total exposure by target allocation
+        self.last_regime: Optional[Dict[str, Any]] = None
+        self._telegram_sent: set[str] = set()
+        self.last_skip_counts: Dict[str, int] = {}
+        self.last_skip_by_ticker: Dict[str, str] = {}
+        self.last_universe_cap: int = len(self.ticker_universe)
+        self.last_fetched: int = 0
+        self.last_fetched_symbols: List[str] = []
+        self.last_order_statuses: List[Dict[str, Any]] = []
+        self.last_invested_pct: Optional[float] = None
+        self.last_session_card: Optional[Dict[str, Any]] = None
+        self._cycle_orders: List[Dict[str, Any]] = []
+        self.last_scan_stale: bool = False
+        self.last_ohlcv_vendor: Optional[str] = None
+        self.last_ohlcv_fallback: bool = False
+        self.last_cadence: str = "intraday"
+
+    # ------------------------------------------------------------------
+    # Public control API
+    # ------------------------------------------------------------------
+
+    def set_strategy(self, strategy_id: str) -> None:
+        """Hot-swap strategy without restarting the worker."""
+        self.strategy = get_strategy(strategy_id)
+        logger.info("Strategy switched to: %s", strategy_id)
+
+    def start(self, interval_seconds: int = 60) -> None:
+        if self._running:
+            return
+        self._running = True
+        self._thread = threading.Thread(
+            target=self._run_loop,
+            args=(interval_seconds,),
+            daemon=True,
+            name="TradingWorker",
+        )
+        self._thread.start()
+        logger.info("TradingWorker started — strategy=%s, interval=%ds",
+                    self.strategy.strategy_id, interval_seconds)
+
+    def stop(self) -> None:
+        self._running = False
+        if self._thread:
+            self._thread.join(timeout=10.0)
+        logger.info("TradingWorker stopped.")
+
+    @property
+    def running(self) -> bool:
+        return self._running
+
+    # ------------------------------------------------------------------
+    # Main loop
+    # ------------------------------------------------------------------
+
+    def _run_loop(self, interval_seconds: int) -> None:
+        while self._running:
+            try:
+                now_utc = datetime.now(timezone.utc)
+                self.is_market_hours = self._is_market_hours(now_utc)
+                self.last_run_utc = now_utc
+
+                # Always sync orders regardless of market hours
+                self._sync_orders()
+
+                if self.is_market_hours:
+                    account = self._safe_get_account()
+                    if account:
+                        # Once per day: record start-of-day portfolio value
+                        self.risk_engine.record_day_start(account.portfolio_value)
+                        # Run strategy
+                        self._run_strategy_signals(account)
+                        # H1 consume of H3 intents (thin hook; see harness_realtime TODO).
+                        self._consume_intents(account)
+                        # Run daily reconciliation
+                        self._run_reconciliation(account)
+
+            except Exception as exc:
+                logger.error("TradingWorker loop error: %s", exc, exc_info=True)
+
+            # Responsive sleep
+            for _ in range(int(interval_seconds)):
+                if not self._running:
+                    break
+                time.sleep(1)
+
+    # ------------------------------------------------------------------
+    # Strategy signal loop
+    # ------------------------------------------------------------------
+
+    def _run_strategy_signals(self, account) -> None:
+        """Core auto-trading: fetch data, check exits, generate entries."""
+        summary_rows: List[Dict[str, Any]] = []
+        skip_counts: Dict[str, int] = {}
+        skip_by_ticker: Dict[str, str] = {}
+        self._cycle_orders = []
+        self.last_fetched_symbols = []
+        self.last_invested_pct = None
+
+        def note(ticker: Optional[str], code: str) -> None:
+            skip_codes.bump(skip_counts, code)
+            if ticker:
+                skip_by_ticker[str(ticker).upper()] = code
+
+        # 0. Kill switch — highest-priority manual override.
+        # When engaged, we still run EXITS through _submit_sell (Mandate +
+        # Risk + OM) so open risk can flatten. New BUY entries are blocked
+        # by worker_kill_blocks_side("buy"). Desk POST sell stays 409.
+        was_halted = self.is_halted
+        self.is_halted = kill_switch.is_halted()
+        halt_reason = kill_switch.get_reason() if self.is_halted else None
+        audit.log_kill_switch_check(self.is_halted, halt_reason)
+        if self.is_halted:
+            logger.warning("KILL SWITCH ENGAGED (%s) — new entries blocked, exits still active.",
+                           halt_reason)
+            if not was_halted:
+                self._notify_kill_switch(halt_reason or "kill_switch_engaged")
+            skip_codes.bump(skip_counts, "kill_switch")
+
+        held_symbols = [p.symbol for p in getattr(account, "positions", []) or []]
+        cap = env_universe_cap(len(self.ticker_universe))
+        to_fetch = symbols_to_fetch(self.ticker_universe, held_symbols, cap)
+        self.last_universe_cap = cap
+        batch = parse_fetch_batch()
+        pause = parse_fetch_pause_sec()
+
+        price_history: Dict[str, pd.DataFrame] = {}
+        for i, ticker in enumerate(to_fetch):
+            if i and batch and i % batch == 0 and pause > 0:
+                time.sleep(pause)
+            hist_period = str(getattr(self.strategy, "history_period", "") or "1y")
+            df = self._fetch_ohlcv(ticker, period=hist_period)
+            if df is not None and len(df) >= 30:
+                price_history[ticker] = df
+        self.last_fetched = len(price_history)
+        self.last_fetched_symbols = [str(t).upper() for t in price_history]
+
+        fetched_u = {str(t).upper() for t in price_history}
+        fetch_u = {str(t).upper() for t in to_fetch}
+        univ_u = [str(t).upper() for t in self.ticker_universe]
+        for symbol in univ_u:
+            if symbol in fetched_u:
+                continue
+            if symbol in fetch_u:
+                note(symbol, "no_price")
+            else:
+                note(symbol, "universe_capped")
+
+        if not price_history:
+            logger.warning(
+                "No price data fetched — skipping strategy signals. "
+                "Tried %s names (cap=%s of %s). No orders this cycle.",
+                len(to_fetch), cap, len(self.ticker_universe),
+            )
+            skip_counts.setdefault("no_price", len(to_fetch) or 1)
+            self.last_fetched_symbols = []
+            summary_rows.append({"action": "NO_PRICE", "tried": len(to_fetch), "cap": cap})
+            self._finish_strategy_cycle(summary_rows, skip_counts, skip_by_ticker)
+            return
+
+        # Inject SPY for Stage-2 RS / adaptive regime (strategies that support it)
+        try:
+            spy_df = self._fetch_ohlcv("SPY", period="2y")
+            if spy_df is not None and len(spy_df) > 210:
+                if hasattr(self.strategy, "set_spy_frame"):
+                    self.strategy.set_spy_frame(spy_df)
+                elif hasattr(self.strategy, "set_spy_close"):
+                    self.strategy.set_spy_close(spy_df["Close"])
+        except Exception as exc:
+            logger.debug("SPY inject skipped: %s", exc)
+
+        # Apply desk max_positions from ai_mode.json into RiskEngine
+        try:
+            from pathlib import Path
+            import json as _json
+            from backend.utils.constants import DATA_DIR
+            cfg_path = Path(DATA_DIR) / "ai_mode.json"
+            if cfg_path.exists():
+                cfg = _json.loads(cfg_path.read_text(encoding="utf-8"))
+                mp = int(cfg.get("max_positions") or self.risk_engine.limits.max_open_positions)
+                self.risk_engine.limits.max_open_positions = max(1, min(25, mp))
+                if cfg.get("strategy") == "research_list" and hasattr(self.strategy, "MIN_FUND_SCORE"):
+                    self.strategy.MIN_FUND_SCORE = float(cfg.get("entry_threshold") or 65)
+        except Exception as exc:
+            logger.debug("ai_mode limits skipped: %s", exc)
+
+        # 2. Fetch VIX for dampening
+        vix_level = self._fetch_vix()
+
+        # 2b. Detect market regime (SPY + VIX) — gates total exposure.
+        regime = self._detect_regime()
+        self.last_regime = regime
+        target_allocation = float(regime.get("target_allocation", 0.70)) if regime else 0.70
+        if hasattr(self.strategy, "set_regime"):
+            try:
+                self.strategy.set_regime(regime)
+            except Exception as exc:
+                logger.debug("set_regime skipped: %s", exc)
+
+        # 3. Clean expired cooldowns (in-process + durable Desk-shared book).
+        now = datetime.now(timezone.utc)
+        self._cooldown = {
+            t: ts for t, ts in self._cooldown.items()
+            if (now - ts).total_seconds() < COOLDOWN_HOURS * 3600
+        }
+        cooldown_tickers = list(
+            {str(t).upper() for t in self._cooldown} | set(active_cooldown_tickers(now=now))
+        )
+
+        # 4. Check exits for open positions
+        open_positions = {p.symbol: p for p in account.positions}
+        for symbol, pos in open_positions.items():
+            if symbol not in price_history:
+                continue
+            df = price_history[symbol]
+            current_price = float(df["Close"].iloc[-1])
+
+            # Update trailing high
+            prev_high = self._trailing_highs.get(symbol, pos.average_entry_price)
+            self._trailing_highs[symbol] = max(prev_high or 0.0, current_price)
+
+            meta = self._position_meta.get(symbol, {})
+            strategy_id = meta.get("strategy_id", self.strategy.strategy_id)
+            strat = get_strategy(strategy_id)
+            if hasattr(strat, "set_regime"):
+                try:
+                    strat.set_regime(regime)
+                except Exception:
+                    pass
+
+            # Dynamic trailing stop for aggressive strategy
+            trailing_stop = meta.get("stop_loss_price", pos.average_entry_price * 0.95)
+            if strategy_id == "aggressive":
+                from backend.trading.strategies.aggressive import AggressiveStrategy
+                trailing_stop = self._trailing_highs[symbol] * (1 - AggressiveStrategy.TRAILING_STOP_PCT)
+                # Update in meta
+                if symbol in self._position_meta:
+                    self._position_meta[symbol]["stop_loss_price"] = trailing_stop
+
+            if hasattr(strat, "bind_position_meta"):
+                try:
+                    strat.bind_position_meta(meta if isinstance(meta, dict) else {})
+                except Exception:
+                    logger.debug("bind_position_meta skipped", exc_info=True)
+            exit_sig = strat.check_exit(
+                ticker=symbol,
+                entry_price=pos.average_entry_price,
+                current_price=current_price,
+                df=df,
+                stop_loss_price=trailing_stop,
+                take_profit_price=meta.get("take_profit_price", current_price * 1.1),
+            )
+
+            if exit_sig:
+                logger.info("EXIT signal for %s: %s @ %.4f", symbol, exit_sig.reason, exit_sig.exit_price)
+                sell_result = self._submit_sell(
+                    symbol, pos.quantity, exit_sig.exit_price, exit_sig.reason
+                )
+                if sell_result is not None:
+                    self._record_cycle_order(symbol, "sell", _order_status_token(sell_result))
+                if sell_reached_venue(sell_result):
+                    self._cooldown[symbol] = now
+                    mark_cooldown(symbol, when=now)
+                    self._trailing_highs.pop(symbol, None)
+                    self._position_meta.pop(symbol, None)
+                    summary_rows.append({"ticker": symbol, "action": f"EXIT:{exit_sig.reason}",
+                                          "price": exit_sig.exit_price})
+                else:
+                    reason = (
+                        (sell_result.error_message if sell_result is not None else None)
+                        or "sell_not_evaluated"
+                    )
+                    logger.info("EXIT blocked for %s: %s", symbol, reason)
+                    summary_rows.append({
+                        "ticker": symbol,
+                        "action": "EXIT_BLOCKED",
+                        "reason": reason,
+                    })
+
+        # 5. Scan universe for entry signals — prefer today's top-5 when available
+        current_positions_list = [
+            {"symbol": p.symbol, "quantity": p.quantity, "avg_entry": p.average_entry_price}
+            for p in account.positions
+        ]
+
+        # Regime exposure gate: don't open new positions beyond the regime's
+        # target allocation (e.g. bear/high-vol caps total invested at 40%).
+        portfolio_value = float(getattr(account, "portfolio_value", 0.0) or 0.0)
+        invested_value = 0.0
+        for p in account.positions:
+            px = price_history.get(p.symbol)
+            mark = float(px["Close"].iloc[-1]) if px is not None and len(px) else float(p.average_entry_price)
+            invested_value += mark * float(p.quantity)
+        exposure_ratio = invested_value / portfolio_value if portfolio_value > 0 else 0.0
+        self.last_invested_pct = round(exposure_ratio * 100, 2) if portfolio_value > 0 else None
+        cadence = self._resolve_cadence()
+        self.last_cadence = cadence
+        cadence_ok = cadence_allows_new_entries(cadence, now, regime)
+        if not cadence_ok:
+            logger.info(
+                "Cadence=%s blocks new entries (US Monday rebalance or PANIC exception).",
+                cadence,
+            )
+            skip_codes.bump(skip_counts, "cadence_wait")
+            summary_rows.append({
+                "action": "CADENCE_WAIT",
+                "cadence": cadence,
+                "regime": (regime or {}).get("regime", "n/a"),
+            })
+        allow_new_entries = exposure_ratio < target_allocation and cadence_ok
+        if exposure_ratio >= target_allocation:
+            logger.info(
+                "Regime=%s exposure gate: invested %.0f%% >= target %.0f%% — no new entries.",
+                (regime or {}).get("regime", "n/a"), exposure_ratio * 100, target_allocation * 100,
+            )
+            skip_codes.bump(skip_counts, "regime_gate")
+            summary_rows.append({
+                "action": "REGIME_GATE",
+                "regime": (regime or {}).get("regime", "n/a"),
+                "exposure_pct": round(exposure_ratio * 100, 1),
+                "target_pct": round(target_allocation * 100, 1),
+            })
+
+        top5 = set(self._get_top5_tickers())
+        ordered_tickers = sorted(
+            price_history.keys(),
+            key=lambda t: (0 if t in top5 else 1, t),
+        )
+        pending_buys = self._pending_buy_symbols()
+        research_stale_logged = False
+        self.last_scan_stale = False
+
+        for ticker in ordered_tickers:
+            if not allow_new_entries:
+                break
+            df = price_history[ticker]
+            if ticker in open_positions:
+                continue  # already holding — not a skip for new-entry diagnostics
+            if ticker.upper() in pending_buys:
+                note(ticker, "order_open")
+                summary_rows.append(
+                    {"ticker": ticker, "action": "ORDER_OPEN", "reason": "working order already submitted"}
+                )
+                continue
+
+            fund_info = self._get_fundamental_score_info(ticker)
+            if getattr(self.strategy, "rejects_synthetic_fund_score", False):
+                # leader_campaign: a filled 50/55 is fund_missing, not a score.
+                fund_score = self.strategy.coerce_fund_score(fund_info)
+            else:
+                fund_score = float(fund_info.get("score", 50.0))
+            if fund_info.get("stale"):
+                # Wave 1 fail-closed: Scan/signal as-of past SIGNAL max-age → no new buys
+                # for any strategy. Last real fund scores are kept (not rewritten to 50).
+                self.last_scan_stale = True
+                if not research_stale_logged:
+                    max_age = None
+                    try:
+                        from backend.api.research_jobs import signal_max_age_hours
+
+                        max_age = signal_max_age_hours()
+                    except Exception:
+                        max_age = None
+                    logger.warning(
+                        "research_stale: last_scan missing or older than SIGNAL max-age "
+                        "(%s h) — no new buys; last real fund scores kept",
+                        max_age if max_age is not None else "session",
+                    )
+                    research_stale_logged = True
+                    summary_rows.append(
+                        {
+                            "action": "RESEARCH_STALE",
+                            "scan_ts": fund_info.get("scan_ts"),
+                            "signal_max_age_hours": max_age,
+                        }
+                    )
+                note(ticker, "research_stale")
+                continue
+            # Pass Scan-cache LLM label into the same _entry_skip as research/backtest.
+            # Never call an LLM from the worker; never place orders from text.
+            llm_signal = self._cached_llm_signal(fund_info)
+            if self._sentiment_veto(fund_info):
+                note(ticker, "sentiment_veto")
+                continue
+
+            signal = self.strategy.generate_signal(
+                ticker=ticker,
+                df=df,
+                fundamental_score=fund_score,
+                llm_signal=llm_signal,
+                current_positions=current_positions_list,
+            )
+
+            if signal is None:
+                code = self.strategy.diagnose_entry(
+                    ticker, df, fund_score, llm_signal, current_positions_list,
+                ) or "no_setup"
+                note(ticker, code)
+                continue
+
+            if (
+                signal.strategy_id == "leader_campaign"
+                and not experimental_strategies_enabled()
+            ):
+                logger.info("BLOCKED %s: experimental leader_campaign flag is off", ticker)
+                note(ticker, "experimental_disabled")
+                continue
+
+            # Overlay Deep Research stop / target as suggestions (RiskEngine still gates).
+            # leader_campaign stops are structural. Do not replace them with a plan.
+            plan = None if signal.strategy_id == "leader_campaign" else self._get_deep_trade_plan(ticker)
+            if plan:
+                stop = plan.get("stop_loss")
+                targets = plan.get("targets") or []
+                if stop is not None:
+                    try:
+                        signal.stop_loss_price = float(stop)
+                    except (TypeError, ValueError):
+                        pass
+                if targets:
+                    try:
+                        signal.take_profit_price = float(targets[0])
+                    except (TypeError, ValueError):
+                        pass
+                signal.meta = dict(signal.meta or {})
+                signal.meta["deep_overlay"] = {
+                    "stance": plan.get("stance"),
+                    "action": plan.get("action"),
+                    "entry_zone": plan.get("entry_zone"),
+                }
+
+            logger.info(
+                "ENTRY signal for %s via %s: %s (fund=%.1f source=%s top5=%s)",
+                ticker,
+                signal.strategy_id,
+                signal.reason,
+                fund_score,
+                fund_info.get("source"),
+                ticker in top5,
+            )
+
+            # Kill switch gate (blocks BUYs only; flatten/exit sells already
+            # ran through _submit_sell → Mandate + Risk + OM).
+            if kill_switch.worker_kill_blocks_side("buy"):
+                logger.info("BLOCKED %s: kill switch engaged", ticker)
+                audit.log_mandate_decision(ticker, "buy", approved=False,
+                                           reason="kill_switch_engaged")
+                summary_rows.append({"ticker": ticker, "action": "BLOCKED", "reason": "kill_switch"})
+                note(ticker, "kill_switch")
+                continue
+
+            # Mandate symbol / side / daily before sizing. Quantity=1 is only
+            # a pre-check: its notional is NOT the order. A pass here must not
+            # be logged as approval — the sized evaluate below owns that claim.
+            entry_px = positive_price(signal.entry_price)
+            draft_for_mandate = Order(
+                id=f"draft-{ticker}",
+                symbol=ticker,
+                side=OrderSide.BUY,
+                order_type=OrderType.LIMIT,
+                quantity=1,
+                limit_price=entry_px,
+                idempotency_key=f"mandate-check-{ticker}",
+            )
+            mandate_decision = self.mandate_gate.evaluate(draft_for_mandate, entry_px)
+            if not mandate_decision.approved:
+                reason = mandate_decision.reason or "Mandate rejected this order."
+                audit.log_mandate_decision(
+                    ticker, "buy", False, reason,
+                    notional=entry_px,
+                )
+                if self.mandate_gate.unavailable_reason:
+                    self._journal_mandate_file_reject(draft_for_mandate, reason)
+                logger.info("BLOCKED %s: %s", ticker, reason)
+                summary_rows.append({"ticker": ticker, "action": "BLOCKED",
+                                    "reason": reason})
+                note(ticker, "mandate")
+                continue
+
+            # ATR / 1R risk units, then the order notional cap.
+            # Owner 2026-11-14: Kelly does not set qty unless
+            # CGAB_AUTO_KELLY_SIZER=1. The 25% name cap is not applied here.
+            # Invalid stop (missing, <=0, or >= entry) sizes to 0 — do not
+            # invent a 5% stop and submit anyway.
+            vix_mult = self.risk_engine.vix_size_multiplier(vix_level)
+            use_kelly = auto_kelly_sizer_enabled()
+            qty_kelly = 0
+            if use_kelly:
+                qty_kelly = shares_to_buy(
+                    portfolio_value=account.portfolio_value * vix_mult,
+                    current_price=signal.entry_price,
+                    win_rate=self.strategy.expected_win_rate,
+                    avg_win_pct=signal.avg_win_pct,
+                    avg_loss_pct=signal.avg_loss_pct,
+                    kelly_fraction_scale=self.risk_engine.limits.kelly_scale,
+                    max_fraction=self.risk_engine.limits.max_position_concentration,
+                    min_shares=1,
+                )
+            cash_now = float(getattr(account, "cash", 0.0) or getattr(account, "buying_power", 0.0) or 0.0)
+            try:
+                stop_for_risk = float(signal.stop_loss_price)
+            except (TypeError, ValueError):
+                stop_for_risk = 0.0
+            qty_risk = size_shares_by_risk(
+                equity=float(account.portfolio_value) * vix_mult,
+                cash=cash_now,
+                fill_price=float(signal.entry_price),
+                stop_price=stop_for_risk,
+                risk_pct=float(os.getenv("WORKER_RISK_PCT", "0.01") or 0.01),
+                max_position_pct=None,
+            )
+            qty = quantity_after_kelly_gate(qty_risk, qty_kelly, use_kelly=use_kelly)
+            if entry_px is not None:
+                qty = cap_shares_to_notional(
+                    qty,
+                    float(entry_px),
+                    float(self.risk_engine.limits.max_order_notional),
+                )
+            else:
+                qty = 0
+
+            if qty <= 0:
+                # kelly_zero only when the opt-in Kelly leg is what zeroed the order.
+                if use_kelly and qty_kelly <= 0:
+                    note(ticker, "kelly_zero")
+                else:
+                    note(ticker, "risk_size_zero")
+                continue
+
+            # Real qty × entry. A cap that 1 share slips under must still
+            # reject the sized order. Do not hand it to RiskEngine / broker.
+            sized_notional = float(qty) * float(entry_px)
+            sized_for_mandate = Order(
+                id=f"draft-sized-{ticker}",
+                symbol=ticker,
+                side=OrderSide.BUY,
+                order_type=OrderType.LIMIT,
+                quantity=float(qty),
+                limit_price=entry_px,
+                idempotency_key=f"mandate-sized-{ticker}",
+            )
+            sized_decision = self.mandate_gate.evaluate(sized_for_mandate, entry_px)
+            audit.log_mandate_decision(
+                ticker, "buy", sized_decision.approved, sized_decision.reason,
+                notional=sized_notional,
+            )
+            if not sized_decision.approved:
+                reason = sized_decision.reason or "Mandate rejected this order."
+                logger.info("BLOCKED %s: %s", ticker, reason)
+                summary_rows.append({
+                    "ticker": ticker, "action": "BLOCKED", "reason": reason,
+                })
+                note(ticker, "mandate")
+                continue
+
+            # Inject extra args for RiskEngine 2.0 via SignalProcessor
+            account_refresh = self._safe_get_account()
+            if account_refresh is None:
+                continue
+
+            use_bracket = (
+                self.execution_mode != "shadow"
+                and signal.stop_loss_price is not None
+                and signal.take_profit_price is not None
+            )
+            try:
+                sticky_buy = (
+                    None
+                    if self.execution_mode == "shadow"
+                    else find_sticky_order(self.store, symbol=ticker, side="buy")
+                )
+            except StickyLookupUnproven:
+                logger.error(
+                    "Sticky lookup unproven for %s buy; refusing broker submit.",
+                    ticker,
+                )
+                note(ticker, "sticky_unproven")
+                continue
+            if sticky_buy is not None:
+                # Safe retry reuses the 502 key. A new minute-key would be a
+                # second independent submit.
+                buy_id = sticky_buy.id
+                buy_key = sticky_buy.idempotency_key
+                sticky_replay = True
+            else:
+                buy_id = f"{ticker}-{now.strftime('%Y%m%d%H%M')}"
+                buy_key = buy_id
+                sticky_replay = False
+            signal_dict = {
+                "id": buy_id,
+                "symbol": ticker,
+                "side": "buy",
+                "quantity": qty,
+                "limit_price": signal.entry_price,
+                "order_type": "limit",
+                "stop_loss_price": signal.stop_loss_price,
+                "take_profit_price": signal.take_profit_price,
+                "order_class": "bracket" if use_bracket else "simple",
+                "idempotency_key": buy_key,
+                "strategy_id": signal.strategy_id,
+            }
+
+            next_bars = (
+                self._fetch_next_bar(ticker, signal.entry_price)
+                if self.execution_mode == "shadow"
+                else None
+            )
+            reserved = False
+            loaded_mandate = self.mandate_gate.mandate
+            # The unknown/502 place already holds the daily slot. Do not reserve again.
+            if (
+                not sticky_replay
+                and loaded_mandate is not None
+                and loaded_mandate.max_daily_orders is not None
+            ):
+                slot = self.mandate_gate.try_reserve()
+                if not slot.approved:
+                    logger.info("BLOCKED %s: %s", ticker, slot.reason)
+                    audit.log_mandate_decision(
+                        ticker, "buy", False, slot.reason, notional=sized_notional,
+                    )
+                    summary_rows.append({
+                        "ticker": ticker, "action": "BLOCKED",
+                        "reason": slot.reason,
+                    })
+                    note(ticker, "mandate")
+                    continue
+                reserved = True
+            # Phase 1 judge slot: immediately before the only buy submitter.
+            # AI_JUDGE=0 does not call the client. A block does not resize and
+            # does not write an active intent. Qty above is unchanged.
+            # leader_campaign uses this same slot and the same process_signal.
+            from backend.trading.advisory.judge import evaluate_entry
+
+            judge_decision = evaluate_entry(
+                {
+                    "symbol": ticker,
+                    "side": "buy",
+                    "strategy_id": signal.strategy_id,
+                    "reason": signal.reason,
+                },
+                client=getattr(self, "judge_client", None),
+            )
+            if judge_decision.ignored_codes:
+                logger.info(
+                    "AI judge ignored unknown veto codes for %s: %s",
+                    ticker,
+                    ",".join(judge_decision.ignored_codes),
+                )
+            if judge_decision.conviction_tier and not judge_decision.noop:
+                logger.info(
+                    "AI judge tier=%s for %s; Phase 1 does not resize (qty=%s)",
+                    judge_decision.conviction_tier,
+                    ticker,
+                    qty,
+                )
+            if not judge_decision.allow:
+                if reserved:
+                    self.mandate_gate.release_reservation()
+                self._journal_judge_silence(ticker, judge_decision, sized_qty=qty)
+                if judge_decision.veto_codes and not judge_decision.failure:
+                    note(ticker, "judge_veto")
+                    action = "JUDGE_VETO"
+                else:
+                    note(ticker, "judge_failure")
+                    action = "JUDGE_SILENCE"
+                logger.info(
+                    "BLOCKED %s: judge %s",
+                    ticker,
+                    judge_decision.failure or ",".join(judge_decision.veto_codes),
+                )
+                summary_rows.append({
+                    "ticker": ticker,
+                    "action": action,
+                    "reason": judge_decision.failure or ",".join(judge_decision.veto_codes),
+                    "veto_codes": list(judge_decision.veto_codes),
+                })
+                continue
+            result = self.signal_processor.process_signal(
+                signal_dict,
+                account_summary=account_refresh,
+                risk_extras={
+                    "vix_level": vix_level,
+                    "price_history": price_history,
+                    "cooldown_tickers": cooldown_tickers,
+                    "enforce_name_concentration": False,
+                },
+                next_bars=next_bars,
+            )
+            self._record_cycle_order(ticker, "buy", _order_status_token(result))
+
+            # Audit the risk / submission outcome
+            if (result.error_message or "").startswith("Risk Gate Rejected"):
+                # SignalProcessor already wrote AuditEvent + TradeLogEntry.
+                if reserved:
+                    self.mandate_gate.release_reservation()
+                logger.info("BLOCKED %s: %s", ticker, result.error_message)
+                summary_rows.append({
+                    "ticker": ticker, "action": "BLOCKED",
+                    "reason": result.error_message,
+                })
+                note(ticker, "risk_rejected")
+                continue
+
+            if result.status == OrderStatus.ACCEPTANCE_UNKNOWN:
+                logger.warning(
+                    "BUY %s acceptance unknown; sticky key %s; do not blind-retry",
+                    ticker,
+                    result.idempotency_key,
+                )
+                summary_rows.append({
+                    "ticker": ticker,
+                    "action": "ACCEPTANCE_UNKNOWN",
+                    "reason": result.error_message,
+                })
+                note(ticker, "acceptance_unknown")
+                continue
+
+            audit.log_risk_decision(ticker, "buy", qty, True, "approved_via_signal_processor")
+            if not reserved and not sticky_replay:
+                self.mandate_gate.record_order()
+            audit.log_order_submission(
+                ticker, "buy", qty, signal.entry_price,
+                result.id, result.status.value,
+            )
+
+            if result.status in (OrderStatus.REJECTED,):
+                logger.warning("Order rejected for %s: %s", ticker, result.error_message)
+                continue
+
+            self._notify_trade(
+                "decision",
+                symbol=ticker,
+                side="buy",
+                quantity=qty,
+                price=float(signal.entry_price),
+                stop_loss=signal.stop_loss_price,
+                take_profit=signal.take_profit_price,
+                strategy=signal.strategy_id,
+                reason=signal.reason,
+                order_id=result.id,
+                status=result.status.value,
+            )
+            fill_px = fill_notify_price(result)
+            if result.status == OrderStatus.FILLED and fill_px is not None:
+                self._notify_trade(
+                    "fill",
+                    symbol=ticker,
+                    side="buy",
+                    quantity=qty,
+                    price=fill_px,
+                    stop_loss=signal.stop_loss_price or result.stop_loss_price,
+                    take_profit=signal.take_profit_price or result.take_profit_price,
+                    strategy=signal.strategy_id,
+                    reason=signal.reason,
+                    order_id=result.id,
+                    status=result.status.value,
+                )
+
+            self._position_meta[ticker] = {
+                "stop_loss_price":   signal.stop_loss_price,
+                "take_profit_price": signal.take_profit_price,
+                "strategy_id":       signal.strategy_id,
+            }
+            if signal.strategy_id == "leader_campaign" and isinstance(signal.meta, dict):
+                # Evidence for the written exit. Not a writer of strategy constants.
+                for key in (
+                    "setup", "pivot", "entry_date", "r_unit", "catalyst",
+                    "bars_held", "last_bar_day", "max_r", "adx30",
+                ):
+                    if key in signal.meta:
+                        self._position_meta[ticker][key] = signal.meta[key]
+            self._trailing_highs[ticker] = signal.entry_price
+            summary_rows.append({"ticker": ticker, "action": "BUY",
+                                  "qty": qty, "price": signal.entry_price,
+                                  "reason": signal.reason})
+
+        self._finish_strategy_cycle(summary_rows, skip_counts, skip_by_ticker)
+
+    def _finish_strategy_cycle(
+        self,
+        summary_rows: List[Dict[str, Any]],
+        skip_counts: Dict[str, int],
+        skip_by_ticker: Dict[str, str],
+    ) -> None:
+        """Persist why_no_trade and the session card. A quiet cycle is success."""
+        self.last_skip_counts = skip_counts
+        self.last_skip_by_ticker = skip_by_ticker
+        self.last_signal_summary = summary_rows
+        self.last_order_statuses = list(self._cycle_orders)
+        try:
+            self._publish_session_card()
+        except Exception:
+            logger.exception("session card failed")
+        if skip_counts:
+            logger.info("why_no_trade this cycle: %s", skip_counts)
+
+    def _publish_session_card(self) -> None:
+        from backend.trading.advisory.judge import ai_judge_enabled
+        from backend.trading.engine.session_card import build_session_card
+
+        report = None
+        try:
+            from backend.api.paper_performance import load_cached_paper_report
+
+            report = load_cached_paper_report()
+        except Exception:
+            report = None
+        self.last_session_card = build_session_card(
+            universe_source=getattr(self, "universe_source", ""),
+            universe_requested=self.ticker_universe,
+            cap=int(self.last_universe_cap),
+            cap_env=os.getenv("WORKER_UNIVERSE_CAP"),
+            fetched=self.last_fetched_symbols,
+            skip_counts=self.last_skip_counts,
+            order_statuses=self.last_order_statuses,
+            execution_mode=self.execution_mode,
+            invested_pct=self.last_invested_pct,
+            performance_report=report if isinstance(report, dict) else None,
+            ai_judge=ai_judge_enabled(),
+        )
+
+    def _record_cycle_order(self, symbol: str, side: str, status: str) -> None:
+        self._cycle_orders.append(
+            {
+                "symbol": str(symbol or "").upper(),
+                "side": str(side or "").lower(),
+                "status": str(status or "").lower(),
+            }
+        )
+
+    def _journal_judge_silence(self, ticker: str, decision: Any, *, sized_qty: int) -> None:
+        """Journal a veto or judge failure. Not an order and not an intent."""
+        from backend.utils.provenance.journal_store import append_entry
+        from backend.utils.provenance.trade_log import empty_trade_log, journal_provenance
+
+        reason = decision.failure or ",".join(decision.veto_codes) or "judge"
+        entry = empty_trade_log(symbol=ticker, status="vetoed")
+        entry.update(
+            {
+                "side": "buy",
+                "qty": 0,
+                "strategy_id": getattr(self.strategy, "strategy_id", None),
+                "veto_codes": list(decision.veto_codes),
+                "conviction_tier": decision.conviction_tier,
+                "user_visible_summary": (
+                    f"judge silence ({reason}); would_have_submitted qty={int(sized_qty)} not sent"
+                ),
+                "reason_codes": [
+                    "judge_failure" if decision.failure else "judge_veto"
+                ],
+                "provenance": journal_provenance(
+                    source="trade_journal",
+                    note="Judge decision — not a broker order and not an active intent.",
+                ),
+            }
+        )
+        try:
+            append_entry(entry)
+        except Exception:
+            logger.exception("Failed to journal judge silence for %s", ticker)
+
+    # ------------------------------------------------------------------
+    # Order sync  (from 1.0)
+    # ------------------------------------------------------------------
+
+    def _pending_buy_symbols(self) -> set:
+        """Symbols with a non-terminal BUY already in the local ledger."""
+        terminal = {
+            OrderStatus.FILLED,
+            OrderStatus.CANCELLED,
+            OrderStatus.REJECTED,
+            OrderStatus.EXPIRED,
+        }
+        found = set()
+        try:
+            for order in self.store.get_recent_orders(limit=100):
+                if order.side != OrderSide.BUY:
+                    continue
+                if order.status in terminal:
+                    continue
+                found.add(str(order.symbol or "").upper())
+        except Exception:
+            return found
+        return found
+
+    def _sync_orders(self) -> None:
+        active_states = {OrderStatus.SUBMITTED, OrderStatus.ACCEPTED, OrderStatus.PARTIALLY_FILLED}
+        try:
+            orders = self.store.get_recent_orders(limit=100)
+        except Exception:
+            return
+        for order in orders:
+            unpriced_fill = (
+                order.status in (OrderStatus.FILLED, OrderStatus.PARTIALLY_FILLED)
+                and fill_notify_price(order) is None
+            )
+            if order.status in active_states or unpriced_fill:
+                try:
+                    updated = self.manager.sync_order_status(order.id)
+                except Exception as exc:
+                    logger.debug("sync_order_status failed for %s: %s", order.id, exc)
+                    continue
+                fill_px = fill_notify_price(updated)
+                if updated and updated.status == OrderStatus.FILLED and fill_px is not None:
+                    meta = self._position_meta.get(updated.symbol, {})
+                    self._notify_trade(
+                        "fill",
+                        symbol=updated.symbol,
+                        side=updated.side.value,
+                        quantity=updated.quantity,
+                        price=fill_px,
+                        stop_loss=updated.stop_loss_price or meta.get("stop_loss_price"),
+                        take_profit=updated.take_profit_price or meta.get("take_profit_price"),
+                        strategy=meta.get("strategy_id"),
+                        order_id=updated.id,
+                        status=updated.status.value,
+                    )
+
+    # ------------------------------------------------------------------
+    # Reconciliation
+    # ------------------------------------------------------------------
+
+    def _run_reconciliation(self, account) -> None:
+        today = date.today()
+        if self._last_reconcile_date == today:
+            return
+        try:
+            report = self.reconciler.reconcile_positions(account.positions)
+            if not report.is_match:
+                logger.warning("Reconciliation discrepancies: %s", report.discrepancies)
+            self._last_reconcile_date = today
+        except Exception as exc:
+            logger.error("Reconciliation failed: %s", exc)
+
+    # ------------------------------------------------------------------
+    # H1 Intent consume (thin hook — full H1/H2 split is TODO)
+    # ------------------------------------------------------------------
+
+    def _consume_intents(self, account) -> None:
+        """Consume active Intent v0 rows through M8. Never calls LLM or a broker.
+
+        TODO(full-h1-h2-split): move to a dedicated ~1s harness_realtime worker.
+        TradingWorker stays on H3 cadence; this hook is a no-op when the
+        IntentStore is empty.
+        """
+        try:
+            from backend.trading.engine.harness_realtime import consume_active_intents
+            from backend.trading.intents.store import create_intent_store
+
+            store = getattr(self, "intent_store", None)
+            if store is None:
+                store = create_intent_store()
+                self.intent_store = store
+            if not store.list(status="active", limit=1):
+                return
+
+            def _price(symbol: str) -> Optional[float]:
+                df = self._fetch_ohlcv(symbol, period="5d")
+                if df is None or getattr(df, "empty", True):
+                    return None
+                try:
+                    return float(df["Close"].iloc[-1])
+                except Exception:
+                    return None
+
+            # Same M8 inputs as _run_strategy_signals: VIX, cooldown, OHLCV
+            # history (correlation), MandateGate. Intents still go through
+            # full M8 — gates, sizer, mandate, kill.
+            vix_level = self._fetch_vix()
+            now = datetime.now(timezone.utc)
+            self._cooldown = {
+                t: ts for t, ts in self._cooldown.items()
+                if (now - ts).total_seconds() < COOLDOWN_HOURS * 3600
+            }
+            cooldown_tickers = list(
+                {str(t).upper() for t in self._cooldown} | set(active_cooldown_tickers(now=now))
+            )
+            price_history: Dict[str, pd.DataFrame] = {}
+            needed = {row.symbol for row in store.list(status="active", limit=1000)}
+            for pos in getattr(account, "positions", None) or []:
+                sym = getattr(pos, "symbol", None) or (pos.get("symbol") if isinstance(pos, dict) else None)
+                if sym:
+                    needed.add(str(sym).upper())
+            for symbol in needed:
+                df = self._fetch_ohlcv(symbol, period="1y")
+                if df is not None and len(df) >= 30:
+                    price_history[symbol] = df
+            vix_mult = self.risk_engine.vix_size_multiplier(vix_level)
+
+            consume_active_intents(
+                store,
+                process_signal=self.signal_processor.process_signal,
+                get_price=_price,
+                account_summary=account,
+                killed=bool(self.is_halted),
+                limits=self.risk_engine.limits,
+                mandate_gate=self.mandate_gate,
+                risk_extras={
+                    "vix_level": vix_level,
+                    "price_history": price_history,
+                    "cooldown_tickers": cooldown_tickers,
+                    "enforce_name_concentration": False,
+                },
+                vix_multiplier=vix_mult,
+            )
+        except Exception as exc:
+            logger.error("H1 intent consume loop failed: %s", exc, exc_info=True)
+
+    # ------------------------------------------------------------------
+    # Helpers
+    # ------------------------------------------------------------------
+
+    def _is_market_hours(self, now_utc: datetime) -> bool:
+        """Approximate US market hours gate (Mon–Fri, 14:30–21:00 UTC).
+
+        Set IGNORE_MARKET_HOURS=true to run strategy cycles around the clock.
+        Broker may still queue/reject orders outside regular session.
+        """
+        if os.getenv("IGNORE_MARKET_HOURS", "").strip().lower() in ("1", "true", "yes"):
+            return True
+        if now_utc.weekday() >= 5:  # Saturday=5, Sunday=6
+            return False
+        hour = now_utc.hour + now_utc.minute / 60
+        return MARKET_OPEN_UTC_HOUR + 0.5 <= hour <= MARKET_CLOSE_UTC_HOUR
+
+    def _resolve_cadence(self) -> str:
+        """Operator cadence from env or ai_mode.json. Default = current 24h demo."""
+        cfg: Dict[str, Any] = {}
+        try:
+            from backend.utils.constants import DATA_DIR as _data_dir
+
+            cfg_path = Path(_data_dir) / "ai_mode.json"
+            if cfg_path.exists():
+                import json as _json
+
+                raw = _json.loads(cfg_path.read_text(encoding="utf-8"))
+                if isinstance(raw, dict):
+                    cfg = raw
+        except Exception as exc:
+            logger.debug("cadence ai_mode read skipped: %s", exc)
+        return resolve_cadence(cfg)
+
+    def _safe_get_account(self):
+        try:
+            return self.broker.get_account_summary()
+        except Exception as exc:
+            logger.error("Failed to get account summary: %s", exc)
+            return None
+
+    def _fetch_ohlcv(self, ticker: str, period: str = "1y") -> Optional[pd.DataFrame]:
+        """Fetch daily OHLCV — Polygon preferred when keyed, Yahoo labeled fallback."""
+        ensure_backend_on_path()
+        min_bars = 1 if str(period or "").lower() in ("5d", "1d") else 30
+        try:
+            from backend.utils.equity_ohlcv import fetch_daily_ohlcv
+
+            result = fetch_daily_ohlcv(ticker, period=period, min_bars=min_bars)
+            if result.get("provider"):
+                self.last_ohlcv_vendor = str(result.get("provider"))
+                self.last_ohlcv_fallback = bool(result.get("fallback"))
+            if result.get("ok") and result.get("data") is not None and not result["data"].empty:
+                return result["data"]
+        except Exception as exc:
+            logger.debug("Preferred OHLCV fetch failed for %s: %s", ticker, exc)
+        try:
+            from backend.utils.chart_utils import fetch_chart_data
+            from backend.utils.us_equity_calendar import filter_us_equity_daily_bars
+
+            result = fetch_chart_data(ticker, "1d", False)
+            if result.get("error"):
+                logger.debug("chart_utils error for %s: %s", ticker, result.get("error"))
+                return None
+            df = result.get("data")
+            if df is None or df.empty:
+                return None
+            self.last_ohlcv_vendor = str(result.get("provider") or "yahoo")
+            self.last_ohlcv_fallback = True
+            return filter_us_equity_daily_bars(df)
+        except Exception as exc:
+            logger.warning("OHLCV fetch failed for %s: %s", ticker, exc)
+            return None
+
+    def _notify_trade(
+        self,
+        kind: str,
+        *,
+        symbol: str,
+        side: str,
+        quantity: float,
+        price: float,
+        stop_loss: Any = None,
+        take_profit: Any = None,
+        strategy: Optional[str] = None,
+        reason: Optional[str] = None,
+        order_id: Optional[str] = None,
+        status: Optional[str] = None,
+    ) -> None:
+        key = f"{order_id or symbol}:{kind}:{side}"
+        if key in self._telegram_sent:
+            return
+        try:
+            from backend.config import get_telegram_settings
+            from backend.trading import ops_notifier
+
+            settings = get_telegram_settings()
+            if kind == "decision":
+                ok = ops_notifier.notify_trade_decision(
+                    settings,
+                    symbol=symbol,
+                    side=side,
+                    quantity=quantity,
+                    price=price,
+                    mode=self.execution_mode,
+                    stop_loss=stop_loss,
+                    take_profit=take_profit,
+                    strategy=strategy,
+                    reason=reason,
+                    order_id=order_id,
+                    status=status,
+                )
+            else:
+                ok = ops_notifier.notify_trade_fill(
+                    settings,
+                    symbol=symbol,
+                    side=side,
+                    quantity=quantity,
+                    price=price,
+                    mode=self.execution_mode,
+                    order_id=order_id,
+                    stop_loss=stop_loss,
+                    take_profit=take_profit,
+                    strategy=strategy,
+                    reason=reason,
+                    status=status,
+                )
+            if ok:
+                self._telegram_sent.add(key)
+                if len(self._telegram_sent) > 400:
+                    self._telegram_sent = set(list(self._telegram_sent)[-200:])
+        except Exception as exc:
+            logger.debug("ops %s notify skipped: %s", kind, exc)
+
+    def _notify_fill(self, order: Order, price: float) -> None:
+        meta = self._position_meta.get(order.symbol, {})
+        self._notify_trade(
+            "fill",
+            symbol=order.symbol,
+            side=order.side.value,
+            quantity=order.quantity,
+            price=price,
+            stop_loss=order.stop_loss_price or meta.get("stop_loss_price"),
+            take_profit=order.take_profit_price or meta.get("take_profit_price"),
+            strategy=meta.get("strategy_id"),
+            order_id=order.id,
+            status=order.status.value,
+        )
+
+    def _notify_kill_switch(self, reason: str) -> None:
+        try:
+            from backend.config import get_telegram_settings
+            from backend.trading import ops_notifier
+            ops_notifier.notify_kill_switch(
+                get_telegram_settings(),
+                reason=reason,
+                triggered_by="worker",
+            )
+        except Exception as exc:
+            logger.debug("ops kill-switch notify skipped: %s", exc)
+
+    def _fetch_vix(self) -> Optional[float]:
+        """Fetch latest VIX close."""
+        try:
+            import yfinance as yf
+            vix = yf.Ticker("^VIX")
+            hist = vix.history(period="2d")
+            if not hist.empty:
+                return float(hist["Close"].iloc[-1])
+        except Exception:
+            pass
+        return None
+
+    def _detect_regime(self) -> Optional[Dict[str, Any]]:
+        """Detect the global market regime (SPY + VIX).
+
+        Returns the regime dict from market_regime.detect_global_market_regime(),
+        which includes a `target_allocation` used to gate total exposure. On any
+        failure we return None and the caller falls back to a neutral 0.70 cap.
+        """
+        try:
+            from backend.agents.market_regime import detect_global_market_regime
+            return detect_global_market_regime()
+        except Exception as exc:
+            logger.debug("Regime detection failed: %s", exc)
+            return None
+
+    def _cached_llm_signal(self, fund_info: Dict[str, Any]) -> Optional[str]:
+        raw = fund_info.get("llm_key_signal") or fund_info.get("llm_signal")
+        if not raw:
+            return None
+        return str(raw).strip().lower() or None
+
+    def _sentiment_veto(self, fund_info: Dict[str, Any]) -> bool:
+        """Optional Scan-cache veto. Default off. Never places orders."""
+        flag = os.getenv("WORKER_SENTIMENT_VETO", "0").strip().lower()
+        if flag not in ("1", "true", "yes"):
+            return False
+        label = str(fund_info.get("sentiment_label") or "").strip().lower()
+        if label in ("negative", "bearish"):
+            return True
+        try:
+            score = fund_info.get("sentiment_score")
+            if score is not None and float(score) < 40.0:
+                return True
+        except (TypeError, ValueError):
+            return False
+        return False
+
+    def _get_fundamental_score(self, ticker: str) -> float:
+        return float(self._get_fundamental_score_info(ticker).get("score", 50.0))
+
+    def _get_fundamental_score_info(self, ticker: str) -> Dict[str, Any]:
+        """Prefer last Scan cache; fall back to Cache then neutral 50."""
+        try:
+            from backend.api.research_jobs import get_fund_score
+
+            info = get_fund_score(ticker)
+            # Keep last real Scan score even when the book is stale (as-of flag).
+            if info.get("source") in ("last_scan", "last_scan_stale"):
+                return info
+            raw = info.get("raw_score")
+        except Exception as exc:
+            logger.debug("last_scan fund lookup failed for %s: %s", ticker, exc)
+            info = {"score": 50.0, "source": "default", "stale": True}
+            raw = None
+        try:
+            from backend.utils.cache import Cache
+
+            cache = Cache()
+            cached = cache.get(f"fund_score_{ticker}", "fundamentals", ttl=86400)
+            if cached is not None:
+                return {
+                    "score": float(cached),
+                    "raw_score": float(cached),
+                    "source": "cache",
+                    "stale": bool(info.get("stale", True)),
+                    "scan_ts": info.get("scan_ts"),
+                    "in_top5": bool(info.get("in_top5")),
+                }
+        except Exception:
+            pass
+        if raw is not None:
+            try:
+                return {**info, "score": float(raw)}
+            except (TypeError, ValueError):
+                pass
+        return {
+            "score": 50.0,
+            "raw_score": raw,
+            "source": info.get("source") or "default",
+            "stale": True,
+            "scan_ts": info.get("scan_ts"),
+            "in_top5": False,
+        }
+
+    def _get_top5_tickers(self) -> List[str]:
+        try:
+            from backend.api.research_jobs import latest_scan
+
+            scan = latest_scan()
+            if scan.get("stale"):
+                return []
+            return [str(t).upper() for t in (scan.get("top5_tickers") or []) if t]
+        except Exception:
+            return []
+
+    def _get_deep_trade_plan(self, ticker: str) -> Optional[Dict[str, Any]]:
+        try:
+            from backend.api.research_jobs import get_deep_trade_plan
+
+            return get_deep_trade_plan(ticker)
+        except Exception as exc:
+            logger.debug("deep plan lookup failed for %s: %s", ticker, exc)
+            return None
+
+    def _journal_mandate_file_reject(self, order: Order, detail: str) -> Order:
+        """Persist a REJECTED order when the mandate file is missing or unreadable.
+
+        The order is not submitted. Same durable trace as a rejected sell:
+        order store + trade journal. Does not stamp RISK_APPROVED.
+        """
+        order.status = OrderStatus.REJECTED
+        order.error_message = detail
+        order.failed_at = datetime.now(timezone.utc)
+        try:
+            self.store.save_order(order)
+        except Exception:
+            logger.exception("Failed to persist mandate reject for %s", order.symbol)
+        try:
+            from backend.utils.provenance.journal_store import record_from_order
+
+            entry = record_from_order(
+                order,
+                strategy_id=getattr(self.strategy, "strategy_id", None),
+            )
+            if not entry:
+                logger.error(
+                    "Mandate reject for %s was not journaled (no entry).",
+                    order.symbol,
+                )
+        except Exception:
+            logger.exception("Failed to journal mandate reject for %s", order.symbol)
+        return order
+
+    def _fail_sell(self, order: Order, detail: str) -> Order:
+        """Persist a rejected sell. Never stamps RISK_APPROVED."""
+        order.status = OrderStatus.REJECTED
+        order.error_message = detail
+        order.failed_at = datetime.now(timezone.utc)
+        detach_if_would_clobber_sticky(self.store, order)
+        try:
+            self.store.save_order(order)
+        except Exception:
+            logger.exception("Failed to persist rejected sell for %s", order.symbol)
+        try:
+            from backend.utils.provenance.journal_store import record_from_order
+
+            record_from_order(
+                order,
+                strategy_id=getattr(self.strategy, "strategy_id", None),
+            )
+        except Exception:
+            logger.exception("Failed to journal rejected sell for %s", order.symbol)
+        logger.error("SELL rejected %s: %s", order.symbol, detail)
+        return order
+
+    def _submit_sell(self, symbol: str, quantity: float, price: float, reason: str) -> Optional[Order]:
+        """Submit a sell only after Mandate + RiskEngine evaluate (STAMP parent).
+
+        ``RISK_APPROVED`` is stamped only via ``stamp_risk_approved`` after
+        both evaluates ran and approved. The approval/submit reference is
+        the honest positive ``price`` (exit/mark) — never a 0.995 haircut
+        that understates notional. See ``backend.trading.engine.stamp``.
+        """
+        import uuid
+
+        approval_price = positive_price(price)
+        try:
+            sticky_sell = (
+                None
+                if self.execution_mode == "shadow"
+                else find_sticky_order(self.store, symbol=symbol, side="sell")
+            )
+        except StickyLookupUnproven as exc:
+            logger.error(
+                "Sticky lookup unproven for %s sell; refusing broker submit.",
+                symbol,
+            )
+            refused = Order(
+                id=str(uuid.uuid4()),
+                symbol=symbol,
+                side=OrderSide.SELL,
+                order_type=OrderType.LIMIT,
+                quantity=quantity,
+                limit_price=approval_price,
+                idempotency_key=f"sell-{symbol}-unproven-{uuid.uuid4()}",
+            )
+            mark_acceptance_unknown(refused, exc)
+            pin_sticky(self.store, refused)
+            return refused
+        if sticky_sell is not None:
+            idem = sticky_sell.idempotency_key
+            sell_id = sticky_sell.id
+        else:
+            idem = f"sell-{symbol}-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
+            sell_id = str(uuid.uuid4())
+        order = Order(
+            id=sell_id,
+            symbol=symbol,
+            side=OrderSide.SELL,
+            order_type=OrderType.LIMIT,
+            quantity=quantity,
+            limit_price=approval_price,
+            idempotency_key=idem,
+        )
+        if approval_price is None:
+            return self._fail_sell(
+                order, "Cannot evaluate sell without a positive reference price."
+            )
+
+        account = self._safe_get_account()
+        if account is None:
+            return self._fail_sell(
+                order, "Cannot evaluate sell: account snapshot failed."
+            )
+
+        eval_order = order.model_copy()
+        eval_order.limit_price = approval_price
+
+        # Kill is not a worker-sell gate. Desk POST sell stays 409.
+        kill_blocks = kill_switch.worker_kill_blocks_side(OrderSide.SELL)
+        if kill_switch.is_halted():
+            audit.log_event(
+                "kill_switch_check",
+                {
+                    "halted": True,
+                    "reason": kill_switch.get_reason() or "kill_switch_engaged",
+                    "symbol": symbol,
+                    "side": "sell",
+                    "worker_flatten_allowed": not kill_blocks,
+                },
+                kind="kill",
+            )
+        if kill_blocks:
+            return self._fail_sell(
+                order, "Kill switch is on — worker exits blocked."
+            )
+
+        mandate_decision = self.mandate_gate.evaluate(eval_order, approval_price)
+        try:
+            notional = float(quantity) * float(approval_price)
+        except (TypeError, ValueError):
+            notional = None
+        audit.log_mandate_decision(
+            symbol, "sell", mandate_decision.approved, mandate_decision.reason,
+            notional=notional,
+        )
+        if not mandate_decision.approved:
+            return self._fail_sell(
+                order, mandate_decision.reason or "Mandate rejected this sell."
+            )
+
+        risk_decision = self.risk_engine.evaluate_order(eval_order, account)
+        if not risk_decision.approved:
+            audit.log_risk_decision(
+                symbol, "sell", float(quantity or 0), False,
+                f"Risk Gate Rejected: {risk_decision.reason}",
+            )
+            return self._fail_sell(
+                order, f"Risk Gate Rejected: {risk_decision.reason}"
+            )
+
+        if self.execution_mode == "shadow" and self.shadow_engine is None:
+            return self._fail_sell(
+                order, "Shadow mode requested but ShadowTradingEngine is not configured"
+            )
+
+        audit.log_risk_decision(
+            symbol, "sell", float(quantity or 0), True, "approved_via_worker_sell"
+        )
+        stamp_risk_approved(
+            order,
+            risk_decision=risk_decision,
+            mandate_decision=mandate_decision,
+            require_mandate=True,
+        )
+
+        try:
+            if self.execution_mode == "shadow":
+                next_bars = self._fetch_next_bar(symbol, approval_price)
+                result = self.shadow_engine.simulate_submission(
+                    order, next_bars=next_bars
+                )
+            else:
+                result = self.manager.submit_new_order(order)
+        except Exception as exc:
+            logger.error("SELL submission failed for %s: %s", symbol, exc)
+            return self._fail_sell(order, f"SELL submission failed: {exc}")
+
+        try:
+            from backend.utils.provenance.journal_store import record_from_order
+
+            entry = record_from_order(
+                result,
+                strategy_id=getattr(self.strategy, "strategy_id", None),
+            )
+            if not entry:
+                raise JournalWriteError(
+                    "record_from_order returned no entry",
+                    order=result,
+                )
+        except JournalWriteError:
+            if self.execution_mode != "shadow":
+                status_key = str(getattr(result.status, "value", result.status)).lower()
+                if status_key != "rejected":
+                    pin_sticky(self.store, result)
+            raise
+        except Exception as exc:
+            logger.exception("Failed to persist journal for sell %s", symbol)
+            if self.execution_mode != "shadow":
+                status_key = str(getattr(result.status, "value", result.status)).lower()
+                if status_key != "rejected":
+                    pin_sticky(self.store, result)
+            raise JournalWriteError(str(exc), order=result) from exc
+
+        replay_landed = (
+            sticky_sell is not None
+            and bool(getattr(sticky_sell, "idempotency_sticky", False))
+            and sticky_sell.status in VENUE_STATUSES
+        )
+        if (
+            self.execution_mode != "shadow"
+            and result.status != OrderStatus.ACCEPTANCE_UNKNOWN
+            and not replay_landed
+        ):
+            # A confirmed venue status from this call may drop the pin.
+            # Replaying an already-landed sticky order must keep it: journal
+            # success is not proof a new key may broker-submit.
+            clear_sticky(self.store, result)
+
+        audit.log_order_submission(
+            symbol, "sell", float(quantity or 0), approval_price,
+            result.id,
+            result.status.value if hasattr(result.status, "value") else str(result.status),
+        )
+        if sell_reached_venue(result):
+            mark_cooldown(symbol)
+        logger.info("SELL submitted: %s ×%.0f @ %.4f (%s)", symbol, quantity, approval_price, reason)
+        return result
+
+    def _fetch_next_bar(self, symbol: str, ref_price: float) -> Optional[pd.DataFrame]:
+        """Next US equity session bar for shadow fill (not wall-clock 24h / BTC).
+
+        *ref_price* is unused: it must not synthesize a bar. Empty OHLCV
+        returns None so shadow cannot fill at entry/limit (O1/O8).
+        Weekend/crypto dates are dropped; no session bars → no fill.
+        """
+        from backend.utils.us_equity_calendar import filter_us_equity_daily_bars
+
+        df = self._fetch_ohlcv(symbol, period="5d")
+        session_bars = filter_us_equity_daily_bars(df)
+        if session_bars is None or session_bars.empty:
+            return None
+        return session_bars.tail(1)
+
+
+# ---------------------------------------------------------------------------
+# CLI entry point — run as:  python -m backend.trading.engine.worker
+# ---------------------------------------------------------------------------
+
+def _build_worker(strategy_id: str, ticker_universe: Optional[List[str]], 
+                  execution_mode: str = "paper") -> TradingWorker:
+    """Build a fully wired TradingWorker from environment configuration."""
+    from dotenv import load_dotenv
+    from pathlib import Path
+
+    load_dotenv()
+
+    from backend.trading.alpaca_broker import AlpacaBroker
+    from backend.trading.storage import create_order_store
+    from backend.trading.reconciliation.service import ReconciliationService
+    from backend.trading.engine.order_manager import OrderManager
+    from backend.utils.constants import DATA_DIR
+
+    # Shadow mode uses a separate order ledger
+    if execution_mode == "shadow":
+        store = create_order_store(backend="sqlite", filepath=str(Path(DATA_DIR) / "shadow_orders.sqlite3"))
+    else:
+        store = create_order_store()
+    
+    broker = AlpacaBroker()
+    manager = OrderManager(broker=broker, store=store)
+    reconciler = ReconciliationService(broker)
+    
+    # Shadow engine only needed in shadow mode
+    shadow_engine = None
+    if execution_mode == "shadow":
+        shadow_engine = ShadowTradingEngine(order_manager=manager)
+
+    return TradingWorker(
+        broker=broker,
+        store=store,
+        manager=manager,
+        reconciler=reconciler,
+        strategy_id=strategy_id,
+        ticker_universe=ticker_universe,
+        execution_mode=execution_mode,
+        shadow_engine=shadow_engine,
+    )
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    """Standalone TradingWorker daemon entry point.
+
+    Design notes:
+      - Worker runs in a daemon thread (same as the Streamlit path) while the
+        main thread blocks on a shutdown Event so SIGTERM/SIGINT exit cleanly.
+      - Heartbeat is written to a JSON file (--heartbeat-file) so systemd or a
+        monitoring loop can detect a hung worker.
+      - Refuses to start with live credentials unless --allow-live is passed,
+        guarding against accidental real-money trading during validation.
+    """
+    import argparse
+    import json
+    import signal
+
+    parser = argparse.ArgumentParser(description="ALPHA//DESK standalone trading worker")
+    parser.add_argument("--strategy", default="breakout",
+                        choices=list(strategy_choices()),
+                        help="Strategy to run (default: breakout). "
+                             "leader_campaign is listed only when "
+                             "BOOMBOOM_EXPERIMENTAL_STRATEGIES=1.")
+    parser.add_argument("--mode", default="shadow", choices=["paper", "shadow"],
+                        help="Execution mode: 'paper' submits to broker, 'shadow' simulates fills locally (default: shadow)")
+    parser.add_argument("--interval", type=int, default=60,
+                        help="Polling interval in seconds (default: 60)")
+    parser.add_argument("--tickers", nargs="*", default=None,
+                        help="Override ticker universe (default: STOCK_UNIVERSE)")
+    from backend.utils.constants import DATA_DIR as _DATA_DIR
+    _default_hb = str(Path(_DATA_DIR) / "worker_heartbeat.json")
+    parser.add_argument("--heartbeat-file", default=_default_hb,
+                        help="Write a JSON heartbeat file each loop for external monitoring")
+    parser.add_argument("--allow-live", action="store_true",
+                        help="Allow running against a live (non-paper) Alpaca account")
+    parser.add_argument("--once", action="store_true",
+                        help="Run a single strategy cycle and exit (for smoke tests)")
+    parser.add_argument("--halt", metavar="REASON", nargs="?", const="Manual halt via CLI",
+                        help="Engage the kill switch (blocks new BUYs) and exit")
+    parser.add_argument("--resume", action="store_true",
+                        help="Disengage the kill switch and exit")
+    parser.add_argument("--status", action="store_true",
+                        help="Print kill switch status and exit")
+    args = parser.parse_args(argv)
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+
+    # Kill switch control commands — no worker/credentials needed.
+    from backend.trading.safety import kill_switch as _ks
+    if args.halt is not None:
+        _ks.engage(args.halt, actor="cli", source="worker --halt")
+        logger.warning("KILL SWITCH ENGAGED: %s", args.halt)
+        return 0
+    if args.resume:
+        _ks.disengage(actor="cli", source="worker --resume")
+        logger.info("Kill switch disengaged — normal trading resumes.")
+        return 0
+    if args.status:
+        if _ks.is_halted():
+            logger.warning("Kill switch is ENGAGED: %s", _ks.get_reason())
+        else:
+            logger.info("Kill switch is DISENGAGED (normal trading).")
+        return 0
+
+    from dotenv import load_dotenv
+    load_dotenv()
+
+    import os
+    is_paper = os.getenv("APCA_PAPER", "true").lower() == "true"
+    
+    # Shadow mode bypasses broker entirely, so live-guard is not applicable
+    if args.mode == "paper" and not is_paper and not args.allow_live:
+        logger.error("APCA_PAPER is not 'true'. Refusing to start standalone worker "
+                     "without --allow-live. This protects against accidental live trading.")
+        return 2
+
+    # Advertise liveness before _build_worker() — Alpaca + strategy wiring can
+    # take ~14s, longer than the old 8s start() wait (venv stub vs interpreter).
+    if args.heartbeat_file:
+        try:
+            Path(args.heartbeat_file).parent.mkdir(parents=True, exist_ok=True)
+            Path(args.heartbeat_file).write_text(
+                json.dumps(
+                    {
+                        "ts": datetime.now(timezone.utc).isoformat(),
+                        "running": True,
+                        "pid": os.getpid(),
+                        "mode": args.mode,
+                        "strategy": args.strategy,
+                        "paper": is_paper,
+                        "interval_seconds": args.interval,
+                    },
+                    indent=2,
+                    default=str,
+                ),
+                encoding="utf-8",
+            )
+        except Exception as exc:
+            logger.error("Early heartbeat write failed: %s", exc)
+
+    worker = _build_worker(args.strategy, args.tickers, execution_mode=args.mode)
+    logger.info("Worker initialized: mode=%s strategy=%s universe=%d interval=%ds paper=%s",
+                args.mode, args.strategy, len(worker.ticker_universe), args.interval, is_paper)
+
+    def _write_heartbeat() -> None:
+        if not args.heartbeat_file:
+            return
+        try:
+            counts = getattr(worker, "last_skip_counts", {})
+            if not isinstance(counts, dict):
+                counts = {}
+            payload = {
+                "ts": datetime.now(timezone.utc).isoformat(),
+                "running": worker.running,
+                "market_hours": worker.is_market_hours,
+                "last_run": worker.last_run_utc.isoformat() if worker.last_run_utc else None,
+                "last_signals": worker.last_signal_summary[-10:] if isinstance(worker.last_signal_summary, list) else [],
+                "skip_counts": counts,
+                "universe_cap": getattr(worker, "last_universe_cap", None) if isinstance(getattr(worker, "last_universe_cap", None), (int, float)) else None,
+                "universe_size": len(list(getattr(worker, "ticker_universe", []) or [])),
+                "fetched": getattr(worker, "last_fetched", None) if isinstance(getattr(worker, "last_fetched", None), (int, float)) else None,
+                "scan_stale": bool(getattr(worker, "last_scan_stale", False) is True),
+                "signal_max_age_hours": None,
+                "mode": args.mode,
+                "strategy": args.strategy,
+                "named_strategy": True,
+                "paper": is_paper,
+                "pid": os.getpid(),
+                "interval_seconds": args.interval,
+                "halted": worker.is_halted,
+                "ignore_market_hours": os.getenv("IGNORE_MARKET_HOURS", "").strip().lower()
+                in ("1", "true", "yes"),
+                "cadence": getattr(worker, "last_cadence", None) or "intraday",
+                "polygon_configured": False,
+                "ohlcv_vendor": getattr(worker, "last_ohlcv_vendor", None),
+                "ohlcv_fallback": bool(getattr(worker, "last_ohlcv_fallback", False)),
+                "calendar": "us_equity",
+                "paper_vs_spy": None,
+                "session_card": None,
+                "pending_buys": [],
+                "skip_by_ticker": {},
+            }
+            try:
+                payload["pending_buys"] = sorted(worker._pending_buy_symbols())
+            except Exception:
+                payload["pending_buys"] = []
+            card = getattr(worker, "last_session_card", None)
+            payload["session_card"] = card if isinstance(card, dict) else None
+            by_ticker = getattr(worker, "last_skip_by_ticker", {})
+            if isinstance(by_ticker, dict):
+                payload["skip_by_ticker"] = {
+                    str(k).upper(): str(v) for k, v in list(by_ticker.items())[:80] if k
+                }
+            try:
+                from backend.api.research_jobs import signal_max_age_hours as _signal_max_age
+
+                payload["signal_max_age_hours"] = _signal_max_age()
+            except Exception:
+                payload["signal_max_age_hours"] = None
+            try:
+                from backend.agents.polygon_equity import is_configured as polygon_configured
+
+                payload["polygon_configured"] = bool(polygon_configured())
+                if not payload.get("ohlcv_vendor"):
+                    payload["ohlcv_vendor"] = "polygon" if payload["polygon_configured"] else "yahoo"
+            except Exception:
+                pass
+            try:
+                from backend.api.paper_performance import load_cached_paper_report
+
+                cached = load_cached_paper_report()
+                if isinstance(cached, dict):
+                    metrics = cached.get("metrics") or {}
+                    payload["paper_vs_spy"] = {
+                        "total_return_pct": (cached.get("pnl") or {}).get("total_return_pct"),
+                        "spy_return_pct": (cached.get("benchmark") or {}).get("spy_return_pct"),
+                        "alpha_net_of_costs_pct": (cached.get("costs") or {}).get("alpha_net_of_costs_pct"),
+                        "num_trades": metrics.get("num_trades"),
+                        "generated_at": cached.get("generated_at"),
+                        "source": "performance_paper.json",
+                    }
+            except Exception:
+                pass
+            with open(args.heartbeat_file, "w") as fh:
+                json.dump(payload, fh, default=str)
+        except Exception as exc:  # pragma: no cover - best-effort monitoring
+            logger.error("Heartbeat write failed: %s", exc)
+
+    if args.once:
+        worker.is_market_hours = True
+        worker._sync_orders()
+        account = worker._safe_get_account()
+        if account:
+            worker._run_strategy_signals(account)
+            worker._consume_intents(account)
+        _write_heartbeat()
+        logger.info("Single-cycle run complete.")
+        return 0
+
+    shutdown = threading.Event()
+
+    def _signal_handler(_signum, _frame):  # pragma: no cover - exercised by OS signals
+        logger.info("Shutdown signal received, stopping worker...")
+        shutdown.set()
+
+    signal.signal(signal.SIGTERM, _signal_handler)
+    signal.signal(signal.SIGINT, _signal_handler)
+
+    worker.start(interval_seconds=args.interval)
+
+    # Report heartbeat periodically even during off-hours so monitors know we are alive.
+    try:
+        while not shutdown.is_set():
+            _write_heartbeat()
+            shutdown.wait(timeout=min(30, args.interval))
+    finally:
+        worker.stop()
+        _write_heartbeat()
+        logger.info("Worker exited cleanly.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+

@@ -1,0 +1,198 @@
+FFFFFF                                                                   [100%]
+================================== FAILURES ===================================
+_______ test_parent_rejects_contradictory_failure_phases[empty_partial] _______
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-89/test_parent_rejects_contradict0')
+case = 'empty_partial'
+
+    @pytest.mark.parametrize('case', ['empty_partial', 'subscribe_with_quotes', 'partial_without_quote_error',
+                                      'pending_without_error', 'window_without_expiry'])
+    def test_parent_rejects_contradictory_failure_phases(tmp_path, case):
+        from gabfin.providers.futu.options import inspect_options
+    
+        context = QuoteContext()
+        if case in ('partial_without_quote_error', 'pending_without_error'):
+            context.chain = [contract()]
+        if case in ('empty_partial', 'window_without_expiry'):
+            context.chain = []
+        result = inspect_options(context, SDK, checked_at=NOW, sleep=lambda n: None)
+        if case == 'empty_partial':
+            result['errors'].append('window_partial')
+        elif case == 'subscribe_with_quotes':
+            result['errors'].append('subscribe_failed')
+        elif case == 'partial_without_quote_error':
+            result['contracts'][0].update(last_price=None, data_date=None, data_time=None)
+        elif case == 'pending_without_error':
+            result['cleanup'] = 'release_pending'
+        else:
+            result['expiry'] = None
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-27', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}} != {'metadata': None}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:352: AssertionError
+___ test_parent_rejects_contradictory_failure_phases[subscribe_with_quotes] ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-89/test_parent_rejects_contradict1')
+case = 'subscribe_with_quotes'
+
+    @pytest.mark.parametrize('case', ['empty_partial', 'subscribe_with_quotes', 'partial_without_quote_error',
+                                      'pending_without_error', 'window_without_expiry'])
+    def test_parent_rejects_contradictory_failure_phases(tmp_path, case):
+        from gabfin.providers.futu.options import inspect_options
+    
+        context = QuoteContext()
+        if case in ('partial_without_quote_error', 'pending_without_error'):
+            context.chain = [contract()]
+        if case in ('empty_partial', 'window_without_expiry'):
+            context.chain = []
+        result = inspect_options(context, SDK, checked_at=NOW, sleep=lambda n: None)
+        if case == 'empty_partial':
+            result['errors'].append('window_partial')
+        elif case == 'subscribe_with_quotes':
+            result['errors'].append('subscribe_failed')
+        elif case == 'partial_without_quote_error':
+            result['contracts'][0].update(last_price=None, data_date=None, data_time=None)
+        elif case == 'pending_without_error':
+            result['cleanup'] = 'release_pending'
+        else:
+            result['expiry'] = None
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-27', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}} != {'metadata': None}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:352: AssertionError
+_ test_parent_rejects_contradictory_failure_phases[partial_without_quote_error] _
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-89/test_parent_rejects_contradict2')
+case = 'partial_without_quote_error'
+
+    @pytest.mark.parametrize('case', ['empty_partial', 'subscribe_with_quotes', 'partial_without_quote_error',
+                                      'pending_without_error', 'window_without_expiry'])
+    def test_parent_rejects_contradictory_failure_phases(tmp_path, case):
+        from gabfin.providers.futu.options import inspect_options
+    
+        context = QuoteContext()
+        if case in ('partial_without_quote_error', 'pending_without_error'):
+            context.chain = [contract()]
+        if case in ('empty_partial', 'window_without_expiry'):
+            context.chain = []
+        result = inspect_options(context, SDK, checked_at=NOW, sleep=lambda n: None)
+        if case == 'empty_partial':
+            result['errors'].append('window_partial')
+        elif case == 'subscribe_with_quotes':
+            result['errors'].append('subscribe_failed')
+        elif case == 'partial_without_quote_error':
+            result['contracts'][0].update(last_price=None, data_date=None, data_time=None)
+        elif case == 'pending_without_error':
+            result['cleanup'] = 'release_pending'
+        else:
+            result['expiry'] = None
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-27', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}} != {'metadata': None}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:352: AssertionError
+___ test_parent_rejects_contradictory_failure_phases[pending_without_error] ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-89/test_parent_rejects_contradict3')
+case = 'pending_without_error'
+
+    @pytest.mark.parametrize('case', ['empty_partial', 'subscribe_with_quotes', 'partial_without_quote_error',
+                                      'pending_without_error', 'window_without_expiry'])
+    def test_parent_rejects_contradictory_failure_phases(tmp_path, case):
+        from gabfin.providers.futu.options import inspect_options
+    
+        context = QuoteContext()
+        if case in ('partial_without_quote_error', 'pending_without_error'):
+            context.chain = [contract()]
+        if case in ('empty_partial', 'window_without_expiry'):
+            context.chain = []
+        result = inspect_options(context, SDK, checked_at=NOW, sleep=lambda n: None)
+        if case == 'empty_partial':
+            result['errors'].append('window_partial')
+        elif case == 'subscribe_with_quotes':
+            result['errors'].append('subscribe_failed')
+        elif case == 'partial_without_quote_error':
+            result['contracts'][0].update(last_price=None, data_date=None, data_time=None)
+        elif case == 'pending_without_error':
+            result['cleanup'] = 'release_pending'
+        else:
+            result['expiry'] = None
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-27', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}} != {'metadata': None}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:352: AssertionError
+___ test_parent_rejects_contradictory_failure_phases[window_without_expiry] ___
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-89/test_parent_rejects_contradict4')
+case = 'window_without_expiry'
+
+    @pytest.mark.parametrize('case', ['empty_partial', 'subscribe_with_quotes', 'partial_without_quote_error',
+                                      'pending_without_error', 'window_without_expiry'])
+    def test_parent_rejects_contradictory_failure_phases(tmp_path, case):
+        from gabfin.providers.futu.options import inspect_options
+    
+        context = QuoteContext()
+        if case in ('partial_without_quote_error', 'pending_without_error'):
+            context.chain = [contract()]
+        if case in ('empty_partial', 'window_without_expiry'):
+            context.chain = []
+        result = inspect_options(context, SDK, checked_at=NOW, sleep=lambda n: None)
+        if case == 'empty_partial':
+            result['errors'].append('window_partial')
+        elif case == 'subscribe_with_quotes':
+            result['errors'].append('subscribe_failed')
+        elif case == 'partial_without_quote_error':
+            result['contracts'][0].update(last_price=None, data_date=None, data_time=None)
+        elif case == 'pending_without_error':
+            result['cleanup'] = 'release_pending'
+        else:
+            result['expiry'] = None
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...': None, ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': None, ...}} != {'metadata': None}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:352: AssertionError
+______ test_does_not_start_subscription_if_discovery_used_cleanup_budget ______
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-89/test_does_not_start_subscripti0')
+
+    def test_does_not_start_subscription_if_discovery_used_cleanup_budget(tmp_path):
+        from gabfin.providers.futu.options import inspect_options
+    
+        context = QuoteContext()
+>       result = inspect_options(context, SDK, checked_at=NOW, deadline=100, monotonic=lambda: 30,
+                                 sleep=lambda n: pytest.fail('no subscription'))
+E       TypeError: inspect_options() got an unexpected keyword argument 'deadline'
+
+tests\gabfin\test_options_smoke.py:359: TypeError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_options_smoke.py::test_parent_rejects_contradictory_failure_phases[empty_partial]
+FAILED tests/gabfin/test_options_smoke.py::test_parent_rejects_contradictory_failure_phases[subscribe_with_quotes]
+FAILED tests/gabfin/test_options_smoke.py::test_parent_rejects_contradictory_failure_phases[partial_without_quote_error]
+FAILED tests/gabfin/test_options_smoke.py::test_parent_rejects_contradictory_failure_phases[pending_without_error]
+FAILED tests/gabfin/test_options_smoke.py::test_parent_rejects_contradictory_failure_phases[window_without_expiry]
+FAILED tests/gabfin/test_options_smoke.py::test_does_not_start_subscription_if_discovery_used_cleanup_budget
+6 failed, 56 deselected in 2.64s

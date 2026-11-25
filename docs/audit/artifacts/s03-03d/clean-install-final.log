@@ -1,0 +1,6 @@
+Using Python 3.12.16 environment at: .tools\s03-03d-wheel-check
+Resolved 13 packages in 1.17s
+Prepared 1 package in 92ms
+Uninstalled 1 package in 24ms
+Installed 1 package in 50ms
+ ~ gabfin==0.1.0 (from file:///C:/Users/001/Desktop/GabFin-ai-trade/docs/audit/artifacts/s03-03d/wheels/gabfin-0.1.0-py3-none-any.whl)

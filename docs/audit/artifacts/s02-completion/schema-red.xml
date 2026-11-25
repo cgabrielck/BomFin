@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.744" timestamp="2026-11-25T14:56:21.100891+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_schema_artifact" name="test_schema_generated_from_python" time="1.373"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.schema'">tests\gabfin\test_schema_artifact.py:4: in test_schema_generated_from_python
+    from gabfin.contracts.schema import generate_schema
+E   ModuleNotFoundError: No module named 'gabfin.contracts.schema'</failure></testcase></testsuite></testsuites>

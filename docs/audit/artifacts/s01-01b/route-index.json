@@ -1,0 +1,450 @@
+[
+  {
+    "method": "GET",
+    "route": "/api/meta",
+    "file": "backend/api/app.py",
+    "line": 203,
+    "handler": "meta"
+  },
+  {
+    "method": "GET",
+    "route": "/api/account",
+    "file": "backend/api/app.py",
+    "line": 237,
+    "handler": "account"
+  },
+  {
+    "method": "GET",
+    "route": "/api/positions",
+    "file": "backend/api/app.py",
+    "line": 247,
+    "handler": "positions"
+  },
+  {
+    "method": "GET",
+    "route": "/api/orders",
+    "file": "backend/api/app.py",
+    "line": 264,
+    "handler": "orders"
+  },
+  {
+    "method": "POST",
+    "route": "/api/orders",
+    "file": "backend/api/app.py",
+    "line": 295,
+    "handler": "submit_order"
+  },
+  {
+    "method": "POST",
+    "route": "/api/orders/{order_id}/cancel",
+    "file": "backend/api/app.py",
+    "line": 318,
+    "handler": "cancel_order"
+  },
+  {
+    "method": "GET",
+    "route": "/api/ops",
+    "file": "backend/api/app.py",
+    "line": 328,
+    "handler": "ops"
+  },
+  {
+    "method": "POST",
+    "route": "/api/ops/kill",
+    "file": "backend/api/app.py",
+    "line": 342,
+    "handler": "ops_kill"
+  },
+  {
+    "method": "POST",
+    "route": "/api/ops/resume",
+    "file": "backend/api/app.py",
+    "line": 348,
+    "handler": "ops_resume"
+  },
+  {
+    "method": "GET",
+    "route": "/api/ai-mode",
+    "file": "backend/api/app.py",
+    "line": 354,
+    "handler": "get_ai_mode"
+  },
+  {
+    "method": "PUT",
+    "route": "/api/ai-mode",
+    "file": "backend/api/app.py",
+    "line": 362,
+    "handler": "put_ai_mode"
+  },
+  {
+    "method": "GET",
+    "route": "/api/worker/status",
+    "file": "backend/api/app.py",
+    "line": 389,
+    "handler": "worker_status"
+  },
+  {
+    "method": "POST",
+    "route": "/api/worker/start",
+    "file": "backend/api/app.py",
+    "line": 421,
+    "handler": "worker_start"
+  },
+  {
+    "method": "POST",
+    "route": "/api/worker/stop",
+    "file": "backend/api/app.py",
+    "line": 450,
+    "handler": "worker_stop"
+  },
+  {
+    "method": "GET",
+    "route": "/api/guide",
+    "file": "backend/api/app.py",
+    "line": 461,
+    "handler": "guide"
+  },
+  {
+    "method": "POST",
+    "route": "/api/help-chat",
+    "file": "backend/api/app.py",
+    "line": 466,
+    "handler": "help_chat"
+  },
+  {
+    "method": "GET",
+    "route": "/api/watchlist",
+    "file": "backend/api/app.py",
+    "line": 472,
+    "handler": "get_watchlist"
+  },
+  {
+    "method": "POST",
+    "route": "/api/watchlist",
+    "file": "backend/api/app.py",
+    "line": 481,
+    "handler": "add_watch"
+  },
+  {
+    "method": "DELETE",
+    "route": "/api/watchlist/{symbol}",
+    "file": "backend/api/app.py",
+    "line": 491,
+    "handler": "del_watch"
+  },
+  {
+    "method": "GET",
+    "route": "/api/universe",
+    "file": "backend/api/app.py",
+    "line": 499,
+    "handler": "universe"
+  },
+  {
+    "method": "GET",
+    "route": "/api/quotes",
+    "file": "backend/api/app.py",
+    "line": 504,
+    "handler": "quotes"
+  },
+  {
+    "method": "GET",
+    "route": "/api/chart/{symbol}",
+    "file": "backend/api/app.py",
+    "line": 527,
+    "handler": "chart"
+  },
+  {
+    "method": "POST",
+    "route": "/api/scan",
+    "file": "backend/api/app.py",
+    "line": 534,
+    "handler": "scan_start"
+  },
+  {
+    "method": "GET",
+    "route": "/api/scan/status",
+    "file": "backend/api/app.py",
+    "line": 547,
+    "handler": "scan_status"
+  },
+  {
+    "method": "GET",
+    "route": "/api/scan/latest",
+    "file": "backend/api/app.py",
+    "line": 554,
+    "handler": "scan_latest"
+  },
+  {
+    "method": "POST",
+    "route": "/api/deep",
+    "file": "backend/api/app.py",
+    "line": 559,
+    "handler": "deep_start"
+  },
+  {
+    "method": "GET",
+    "route": "/api/deep/status",
+    "file": "backend/api/app.py",
+    "line": 572,
+    "handler": "deep_status"
+  },
+  {
+    "method": "GET",
+    "route": "/api/deep/latest",
+    "file": "backend/api/app.py",
+    "line": 579,
+    "handler": "deep_latest"
+  },
+  {
+    "method": "GET",
+    "route": "/api/research/{symbol}",
+    "file": "backend/api/app.py",
+    "line": 584,
+    "handler": "research"
+  },
+  {
+    "method": "GET",
+    "route": "/api/options/{symbol}",
+    "file": "backend/api/app.py",
+    "line": 589,
+    "handler": "options"
+  },
+  {
+    "method": "GET",
+    "route": "/api/calendar",
+    "file": "backend/api/app.py",
+    "line": 610,
+    "handler": "calendar"
+  },
+  {
+    "method": "GET",
+    "route": "/api/journal",
+    "file": "backend/api/app.py",
+    "line": 632,
+    "handler": "journal"
+  },
+  {
+    "method": "GET",
+    "route": "/api/journal/audit/{event_id}",
+    "file": "backend/api/app.py",
+    "line": 643,
+    "handler": "journal_audit"
+  },
+  {
+    "method": "GET",
+    "route": "/api/journal/entry/{log_id}",
+    "file": "backend/api/app.py",
+    "line": 653,
+    "handler": "journal_entry"
+  },
+  {
+    "method": "POST",
+    "route": "/api/journal",
+    "file": "backend/api/app.py",
+    "line": 663,
+    "handler": "add_journal"
+  },
+  {
+    "method": "GET",
+    "route": "/api/digest",
+    "file": "backend/api/app.py",
+    "line": 685,
+    "handler": "daily_digest"
+  },
+  {
+    "method": "GET",
+    "route": "/api/performance",
+    "file": "backend/api/app.py",
+    "line": 699,
+    "handler": "performance"
+  },
+  {
+    "method": "GET",
+    "route": "/api/strategy-bakeoff",
+    "file": "backend/api/app.py",
+    "line": 785,
+    "handler": "strategy_bakeoff"
+  },
+  {
+    "method": "GET",
+    "route": "/api/lab/status",
+    "file": "backend/api/app.py",
+    "line": 821,
+    "handler": "lab_status_api"
+  },
+  {
+    "method": "GET",
+    "route": "/api/lab/ab-report",
+    "file": "backend/api/app.py",
+    "line": 832,
+    "handler": "lab_ab_report"
+  },
+  {
+    "method": "POST",
+    "route": "/api/lab/advisory",
+    "file": "backend/api/app.py",
+    "line": 840,
+    "handler": "lab_advisory"
+  },
+  {
+    "method": "GET",
+    "route": "/api/lab/tear",
+    "file": "backend/api/app.py",
+    "line": 865,
+    "handler": "lab_tear_get"
+  },
+  {
+    "method": "GET",
+    "route": "/api/lab/tear.html",
+    "file": "backend/api/app.py",
+    "line": 884,
+    "handler": "lab_tear_html"
+  },
+  {
+    "method": "POST",
+    "route": "/api/lab/tear",
+    "file": "backend/api/app.py",
+    "line": 896,
+    "handler": "lab_tear"
+  },
+  {
+    "method": "GET",
+    "route": "/api/health",
+    "file": "backend/api/app.py",
+    "line": 908,
+    "handler": "health"
+  },
+  {
+    "method": "GET",
+    "route": "/",
+    "file": "backend/api/app.py",
+    "line": 913,
+    "handler": "index"
+  },
+  {
+    "method": "GET",
+    "route": "/m",
+    "file": "backend/api/app.py",
+    "line": 918,
+    "handler": "mobile_index"
+  },
+  {
+    "method": "GET",
+    "route": "/m/manifest.webmanifest",
+    "file": "backend/api/app.py",
+    "line": 924,
+    "handler": "mobile_manifest"
+  },
+  {
+    "method": "GET",
+    "route": "/static/vendor/{filename}",
+    "file": "backend/api/app.py",
+    "line": 936,
+    "handler": "desk_vendor"
+  },
+  {
+    "method": "GET",
+    "route": "/api/observe/quote/{symbol}",
+    "file": "backend/api/desk_observe.py",
+    "line": 80,
+    "handler": "observe_quote"
+  },
+  {
+    "method": "GET",
+    "route": "/api/observe/bars/{symbol}",
+    "file": "backend/api/desk_observe.py",
+    "line": 85,
+    "handler": "observe_bars"
+  },
+  {
+    "method": "POST",
+    "route": "/api/observe/leave",
+    "file": "backend/api/desk_observe.py",
+    "line": 95,
+    "handler": "observe_leave"
+  },
+  {
+    "method": "WEBSOCKET",
+    "route": "/api/observe/stream",
+    "file": "backend/api/desk_observe.py",
+    "line": 107,
+    "handler": "observe_stream"
+  },
+  {
+    "method": "GET",
+    "route": "/api/desk/zones",
+    "file": "backend/api/desk_zones.py",
+    "line": 537,
+    "handler": "list_zones_api"
+  },
+  {
+    "method": "PUT",
+    "route": "/api/desk/zones/snapshot",
+    "file": "backend/api/desk_zones.py",
+    "line": 553,
+    "handler": "snapshot_zones_api"
+  },
+  {
+    "method": "GET",
+    "route": "/api/desk/zones/{zone_id}",
+    "file": "backend/api/desk_zones.py",
+    "line": 574,
+    "handler": "get_zone_api"
+  },
+  {
+    "method": "PATCH",
+    "route": "/api/desk/zones/{zone_id}",
+    "file": "backend/api/desk_zones.py",
+    "line": 582,
+    "handler": "patch_zone_api"
+  },
+  {
+    "method": "GET",
+    "route": "/api/intents",
+    "file": "backend/api/intents.py",
+    "line": 79,
+    "handler": "list_intents"
+  },
+  {
+    "method": "GET",
+    "route": "/api/intents/{intent_id}",
+    "file": "backend/api/intents.py",
+    "line": 92,
+    "handler": "get_intent"
+  },
+  {
+    "method": "POST",
+    "route": "/api/intents",
+    "file": "backend/api/intents.py",
+    "line": 101,
+    "handler": "write_intent"
+  },
+  {
+    "method": "POST",
+    "route": "/api/intents/{intent_id}/cancel",
+    "file": "backend/api/intents.py",
+    "line": 133,
+    "handler": "cancel_intent"
+  },
+  {
+    "method": "GET",
+    "route": "/api/mobile/snapshot",
+    "file": "backend/api/mobile_desk.py",
+    "line": 667,
+    "handler": "mobile_snapshot"
+  },
+  {
+    "method": "POST",
+    "route": "/api/mobile/paper/continue",
+    "file": "backend/api/mobile_desk.py",
+    "line": 673,
+    "handler": "mobile_continue"
+  },
+  {
+    "method": "POST",
+    "route": "/api/mobile/paper/pause",
+    "file": "backend/api/mobile_desk.py",
+    "line": 682,
+    "handler": "mobile_pause"
+  }
+]

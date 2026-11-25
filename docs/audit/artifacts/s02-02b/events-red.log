@@ -1,0 +1,178 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 33 items
+
+tests\gabfin\test_market_events.py FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF     [100%]
+
+================================== FAILURES ===================================
+____________ test_market_event_has_typed_roundtrip_payload[quote] _____________
+tests\gabfin\test_market_events.py:28: in test_market_event_has_typed_roundtrip_payload
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+____________ test_market_event_has_typed_roundtrip_payload[trade] _____________
+tests\gabfin\test_market_events.py:28: in test_market_event_has_typed_roundtrip_payload
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_____________ test_market_event_has_typed_roundtrip_payload[bar] ______________
+tests\gabfin\test_market_events.py:28: in test_market_event_has_typed_roundtrip_payload
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+___________ test_event_requires_an_opaque_nonempty_dedup_key[None] ____________
+tests\gabfin\test_market_events.py:40: in test_event_requires_an_opaque_nonempty_dedup_key
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_____________ test_event_requires_an_opaque_nonempty_dedup_key[] ______________
+tests\gabfin\test_market_events.py:40: in test_event_requires_an_opaque_nonempty_dedup_key
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_____________ test_event_requires_an_opaque_nonempty_dedup_key[ ] _____________
+tests\gabfin\test_market_events.py:40: in test_event_requires_an_opaque_nonempty_dedup_key
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+__________ test_event_requires_an_opaque_nonempty_dedup_key[ event] ___________
+tests\gabfin\test_market_events.py:40: in test_event_requires_an_opaque_nonempty_dedup_key
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+__________ test_event_requires_an_opaque_nonempty_dedup_key[event ] ___________
+tests\gabfin\test_market_events.py:40: in test_event_requires_an_opaque_nonempty_dedup_key
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+__________ test_event_requires_an_opaque_nonempty_dedup_key[event\n] __________
+tests\gabfin\test_market_events.py:40: in test_event_requires_an_opaque_nonempty_dedup_key
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_______________ test_nullable_sequence_still_requires_dedup_key _______________
+tests\gabfin\test_market_events.py:52: in test_nullable_sequence_still_requires_dedup_key
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+___________ test_large_sequence_and_case_sensitive_key_survive_wire ___________
+tests\gabfin\test_market_events.py:63: in test_large_sequence_and_case_sensitive_key_survive_wire
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_______________ test_sequence_cannot_be_a_lossy_json_number[1] ________________
+tests\gabfin\test_market_events.py:78: in test_sequence_cannot_be_a_lossy_json_number
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+________ test_sequence_cannot_be_a_lossy_json_number[9007199254740993] ________
+tests\gabfin\test_market_events.py:78: in test_sequence_cannot_be_a_lossy_json_number
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+______________ test_sequence_cannot_be_a_lossy_json_number[True] ______________
+tests\gabfin\test_market_events.py:78: in test_sequence_cannot_be_a_lossy_json_number
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+________________ test_sequence_cannot_be_a_lossy_json_number[] ________________
+tests\gabfin\test_market_events.py:78: in test_sequence_cannot_be_a_lossy_json_number
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+__________________ test_event_instrument_must_match_payload ___________________
+tests\gabfin\test_market_events.py:87: in test_event_instrument_must_match_payload
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_________________ test_wrong_kind_cannot_reinterpret_payload __________________
+tests\gabfin\test_market_events.py:96: in test_wrong_kind_cannot_reinterpret_payload
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+________________ test_event_requires_known_explicit_kind[None] ________________
+tests\gabfin\test_market_events.py:106: in test_event_requires_known_explicit_kind
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+____________ test_event_requires_known_explicit_kind[broker_fill] _____________
+tests\gabfin\test_market_events.py:106: in test_event_requires_known_explicit_kind
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_ test_source_clock_skew_and_late_events_are_not_discarded[2000-01-01T00:00:00Z] _
+tests\gabfin\test_market_events.py:119: in test_source_clock_skew_and_late_events_are_not_discarded
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_ test_source_clock_skew_and_late_events_are_not_discarded[2027-01-01T00:00:00Z] _
+tests\gabfin\test_market_events.py:119: in test_source_clock_skew_and_late_events_are_not_discarded
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+____________ test_local_event_availability_cannot_precede_receipt _____________
+tests\gabfin\test_market_events.py:128: in test_local_event_availability_cannot_precede_receipt
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+__________ test_bar_event_must_preserve_payload_timestamps[event_at] __________
+tests\gabfin\test_market_events.py:138: in test_bar_event_must_preserve_payload_timestamps
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+________ test_bar_event_must_preserve_payload_timestamps[received_at] _________
+tests\gabfin\test_market_events.py:138: in test_bar_event_must_preserve_payload_timestamps
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+________ test_bar_event_must_preserve_payload_timestamps[available_at] ________
+tests\gabfin\test_market_events.py:138: in test_bar_event_must_preserve_payload_timestamps
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_______________ test_quote_event_cannot_publish_before_capture ________________
+tests\gabfin\test_market_events.py:147: in test_quote_event_cannot_publish_before_capture
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+___ test_nested_trade_prices_and_quantity_keep_decimal_constraints[price-0] ___
+tests\gabfin\test_market_events.py:157: in test_nested_trade_prices_and_quantity_keep_decimal_constraints
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_ test_nested_trade_prices_and_quantity_keep_decimal_constraints[quantity-0] __
+tests\gabfin\test_market_events.py:157: in test_nested_trade_prices_and_quantity_keep_decimal_constraints
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_ test_nested_trade_prices_and_quantity_keep_decimal_constraints[quantity--1] _
+tests\gabfin\test_market_events.py:157: in test_nested_trade_prices_and_quantity_keep_decimal_constraints
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_ test_nested_trade_prices_and_quantity_keep_decimal_constraints[price-100.15] _
+tests\gabfin\test_market_events.py:157: in test_nested_trade_prices_and_quantity_keep_decimal_constraints
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_______________ test_nested_quote_does_not_accept_a_float_price _______________
+tests\gabfin\test_market_events.py:165: in test_nested_quote_does_not_accept_a_float_price
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+___________ test_market_events_cannot_receive_order_approval_fields ___________
+tests\gabfin\test_market_events.py:173: in test_market_events_cannot_receive_order_approval_fields
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+__________ test_market_event_schema_preserves_kind_specific_payloads __________
+tests\gabfin\test_market_events.py:182: in test_market_event_schema_preserves_kind_specific_payloads
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-02b\events-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_market_events.py::test_market_event_has_typed_roundtrip_payload[quote]
+FAILED tests/gabfin/test_market_events.py::test_market_event_has_typed_roundtrip_payload[trade]
+FAILED tests/gabfin/test_market_events.py::test_market_event_has_typed_roundtrip_payload[bar]
+FAILED tests/gabfin/test_market_events.py::test_event_requires_an_opaque_nonempty_dedup_key[None]
+FAILED tests/gabfin/test_market_events.py::test_event_requires_an_opaque_nonempty_dedup_key[]
+FAILED tests/gabfin/test_market_events.py::test_event_requires_an_opaque_nonempty_dedup_key[ ]
+FAILED tests/gabfin/test_market_events.py::test_event_requires_an_opaque_nonempty_dedup_key[ event]
+FAILED tests/gabfin/test_market_events.py::test_event_requires_an_opaque_nonempty_dedup_key[event ]
+FAILED tests/gabfin/test_market_events.py::test_event_requires_an_opaque_nonempty_dedup_key[event\n]
+FAILED tests/gabfin/test_market_events.py::test_nullable_sequence_still_requires_dedup_key
+FAILED tests/gabfin/test_market_events.py::test_large_sequence_and_case_sensitive_key_survive_wire
+FAILED tests/gabfin/test_market_events.py::test_sequence_cannot_be_a_lossy_json_number[1]
+FAILED tests/gabfin/test_market_events.py::test_sequence_cannot_be_a_lossy_json_number[9007199254740993]
+FAILED tests/gabfin/test_market_events.py::test_sequence_cannot_be_a_lossy_json_number[True]
+FAILED tests/gabfin/test_market_events.py::test_sequence_cannot_be_a_lossy_json_number[]
+FAILED tests/gabfin/test_market_events.py::test_event_instrument_must_match_payload
+FAILED tests/gabfin/test_market_events.py::test_wrong_kind_cannot_reinterpret_payload
+FAILED tests/gabfin/test_market_events.py::test_event_requires_known_explicit_kind[None]
+FAILED tests/gabfin/test_market_events.py::test_event_requires_known_explicit_kind[broker_fill]
+FAILED tests/gabfin/test_market_events.py::test_source_clock_skew_and_late_events_are_not_discarded[2000-01-01T00:00:00Z]
+FAILED tests/gabfin/test_market_events.py::test_source_clock_skew_and_late_events_are_not_discarded[2027-01-01T00:00:00Z]
+FAILED tests/gabfin/test_market_events.py::test_local_event_availability_cannot_precede_receipt
+FAILED tests/gabfin/test_market_events.py::test_bar_event_must_preserve_payload_timestamps[event_at]
+FAILED tests/gabfin/test_market_events.py::test_bar_event_must_preserve_payload_timestamps[received_at]
+FAILED tests/gabfin/test_market_events.py::test_bar_event_must_preserve_payload_timestamps[available_at]
+FAILED tests/gabfin/test_market_events.py::test_quote_event_cannot_publish_before_capture
+FAILED tests/gabfin/test_market_events.py::test_nested_trade_prices_and_quantity_keep_decimal_constraints[price-0]
+FAILED tests/gabfin/test_market_events.py::test_nested_trade_prices_and_quantity_keep_decimal_constraints[quantity-0]
+FAILED tests/gabfin/test_market_events.py::test_nested_trade_prices_and_quantity_keep_decimal_constraints[quantity--1]
+FAILED tests/gabfin/test_market_events.py::test_nested_trade_prices_and_quantity_keep_decimal_constraints[price-100.15]
+FAILED tests/gabfin/test_market_events.py::test_nested_quote_does_not_accept_a_float_price
+FAILED tests/gabfin/test_market_events.py::test_market_events_cannot_receive_order_approval_fields
+FAILED tests/gabfin/test_market_events.py::test_market_event_schema_preserves_kind_specific_payloads
+============================= 33 failed in 2.25s ==============================

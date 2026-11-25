@@ -1,0 +1,18 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 1 item
+
+tests\gabfin\test_schema_artifact.py F                                   [100%]
+
+================================== FAILURES ===================================
+______________________ test_schema_generated_from_python ______________________
+tests\gabfin\test_schema_artifact.py:4: in test_schema_generated_from_python
+    from gabfin.contracts.schema import generate_schema
+E   ModuleNotFoundError: No module named 'gabfin.contracts.schema'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-completion\schema-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_schema_artifact.py::test_schema_generated_from_python
+============================== 1 failed in 1.75s ==============================

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="2.408" timestamp="2026-11-25T15:45:12.576068+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_equity_smoke" name="test_smoke_wait_cleanup_and_allowlist" time="1.997"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'">tests\gabfin\test_equity_smoke.py:13: in test_smoke_wait_cleanup_and_allowlist
+    from gabfin.providers.futu.equity import inspect_equity
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'</failure></testcase><testcase classname="tests.gabfin.test_equity_smoke" name="test_subscribe_failure_no_wait" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'">tests\gabfin\test_equity_smoke.py:19: in test_subscribe_failure_no_wait
+    from gabfin.providers.futu.equity import inspect_equity
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'</failure></testcase><testcase classname="tests.gabfin.test_equity_smoke" name="test_parent_rejects_private_fields" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'">tests\gabfin\test_equity_smoke.py:23: in test_parent_rejects_private_fields
+    from gabfin.providers.futu.equity import validate_smoke
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.equity'</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,58 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 24 items
+
+tests\gabfin\test_quote_stream.py .F.............F.                      [ 70%]
+tests\gabfin\test_futu_quote_callback.py .F.....                         [100%]
+
+================================== FAILURES ===================================
+_____ test_slow_consumer_has_one_pending_latest_and_snapshot_is_defensive _____
+tests\gabfin\test_quote_stream.py:49: in test_slow_consumer_has_one_pending_latest_and_snapshot_is_defensive
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_quote_stream.py:44: in scenario
+    event.payload.last.price = Decimal('1')
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pydantic\main.py:1116: in __setattr__
+    elif (setattr_handler := self._setattr_handler(name, value)) is not None:
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pydantic\main.py:1152: in _setattr_handler
+    _check_frozen(cls, name, value)
+.venv\Lib\site-packages\pydantic\main.py:104: in _check_frozen
+    raise ValidationError.from_exception_data(
+E   pydantic_core._pydantic_core.ValidationError: 1 validation error for QuotePoint
+E   price
+E     Instance is frozen [type=frozen_instance, input_value=Decimal('1'), input_type=Decimal]
+E       For further information visit https://errors.pydantic.dev/2.14/v/frozen_instance
+________ test_late_and_duplicate_quotes_do_not_regress_or_refresh_age _________
+tests\gabfin\test_quote_stream.py:71: in test_late_and_duplicate_quotes_do_not_regress_or_refresh_age
+    assert not stream.accept(wire('100.250'), available_at=NOW + timedelta(minutes=1))
+E   AssertionError: assert not True
+E    +  where True = accept({'version': 1, 'kind': 'quote', 'code': 'US.AAPL', 'price': '100.250', ...}, available_at=(datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=60)))
+E    +    where accept = <gabfin.market.stream.QuoteStream object at 0x0000015DFC5DDC40>.accept
+E    +    and   {'version': 1, 'kind': 'quote', 'code': 'US.AAPL', 'price': '100.250', ...} = wire('100.250')
+E    +    and   datetime.timedelta(seconds=60) = timedelta(minutes=1)
+___ test_worker_mailbox_coalesces_without_losing_a_newer_source_observation ___
+tests\gabfin\test_futu_quote_callback.py:88: in test_worker_mailbox_coalesces_without_losing_a_newer_source_observation
+    assert box.take()['price'] == '100.25'
+E   AssertionError: assert '99' == '100.25'
+E     
+E     - 100.25
+E     + 99
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s03-03g\red-ordering.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_quote_stream.py::test_slow_consumer_has_one_pending_latest_and_snapshot_is_defensive
+FAILED tests/gabfin/test_quote_stream.py::test_late_and_duplicate_quotes_do_not_regress_or_refresh_age
+FAILED tests/gabfin/test_futu_quote_callback.py::test_worker_mailbox_coalesces_without_losing_a_newer_source_observation
+======================== 3 failed, 21 passed in 2.03s =========================

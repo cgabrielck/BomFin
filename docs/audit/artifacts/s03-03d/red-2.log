@@ -1,0 +1,22 @@
+.F                                                                       [100%]
+================================== FAILURES ===================================
+__________ test_options_result_survives_real_parent_process_boundary __________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-79/test_options_result_survives_r0')
+
+    def test_options_result_survives_real_parent_process_boundary(tmp_path):
+        from gabfin.providers.futu.options import inspect_options
+    
+        result = inspect_options(QuoteContext(), SDK, checked_at=NOW, sleep=lambda n: None)
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'ok', 'metadata': result}
+E       AssertionError: assert {'status': 'i...tadata': None} == {'status': 'o...-11-27', ...}}
+E         
+E         Differing items:
+E         {'status': 'invalid_config'} != {'status': 'ok'}
+E         {'metadata': None} != {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:97: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_options_smoke.py::test_options_result_survives_real_parent_process_boundary
+1 failed, 1 passed in 2.94s

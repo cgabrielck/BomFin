@@ -1,0 +1,38 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 5 items
+
+tests\gabfin\test_support_contracts.py FFFFF                             [100%]
+
+================================== FAILURES ===================================
+_____________________ test_model_unknown_cost_and_failure _____________________
+tests\gabfin\test_support_contracts.py:8: in test_model_unknown_cost_and_failure
+    from gabfin.contracts.support import ModelResult
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'
+____________________________ test_candidate_expiry ____________________________
+tests\gabfin\test_support_contracts.py:13: in test_candidate_expiry
+    from gabfin.contracts.support import CandidateObservation
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'
+______________________ test_strategy_future_bar_rejected ______________________
+tests\gabfin\test_support_contracts.py:17: in test_strategy_future_bar_rejected
+    from gabfin.contracts.support import StrategyContext
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'
+__________________ test_reconciliation_cannot_allow_mismatch __________________
+tests\gabfin\test_support_contracts.py:20: in test_reconciliation_cannot_allow_mismatch
+    from gabfin.contracts.support import ReconciliationResult
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'
+_____________________ test_proposal_unapproved_by_default _____________________
+tests\gabfin\test_support_contracts.py:23: in test_proposal_unapproved_by_default
+    from gabfin.contracts.support import HarnessProposal
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-completion\support-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_support_contracts.py::test_model_unknown_cost_and_failure
+FAILED tests/gabfin/test_support_contracts.py::test_candidate_expiry - Module...
+FAILED tests/gabfin/test_support_contracts.py::test_strategy_future_bar_rejected
+FAILED tests/gabfin/test_support_contracts.py::test_reconciliation_cannot_allow_mismatch
+FAILED tests/gabfin/test_support_contracts.py::test_proposal_unapproved_by_default
+============================== 5 failed in 1.95s ==============================

@@ -1,0 +1,11 @@
+Obtaining file:///C:/Users/001/Desktop/GabFin-ai-trade/.worktrees/gabfin-s01
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  error: backend-unavailable
+  
+  Cannot import build backend 'setuptools.build_meta'.
+  
+  ModuleNotFoundError: No module named 'setuptools'
+  
+  note: This is likely not a problem with pip.
+ERROR: Failed to build 'file:///C:/Users/001/Desktop/GabFin-ai-trade/.worktrees/gabfin-s01' when calling build backend hook supports_feature

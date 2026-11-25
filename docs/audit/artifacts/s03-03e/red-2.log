@@ -1,0 +1,22 @@
+.F                                                                       [100%]
+================================== FAILURES ===================================
+_____________ test_history_result_crosses_parent_process_boundary _____________
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-101/test_history_result_crosses_pa0')
+
+    def test_history_result_crosses_parent_process_boundary(tmp_path):
+        from gabfin.providers.futu.history import inspect_history
+    
+        payload = {'status': 'ok', 'metadata': inspect_history(QuoteContext(), SDK, checked_at=NOW)}
+>       assert run_child(tmp_path, payload) == payload
+E       AssertionError: assert {'status': 'i...tadata': None} == {'status': 'o...-11-24', ...}}
+E         
+E         Differing items:
+E         {'status': 'invalid_config'} != {'status': 'ok'}
+E         {'metadata': None} != {'metadata': {'kind': 'history_smoke', 'code': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'requested_date': '2026-11-24', ...}}
+E         Use -v to get more diff
+
+tests\gabfin\test_history_smoke.py:78: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_history_smoke.py::test_history_result_crosses_parent_process_boundary
+1 failed, 1 passed in 3.07s

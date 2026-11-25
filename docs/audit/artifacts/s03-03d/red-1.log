@@ -1,0 +1,12 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+__________ test_bounded_call_put_quote_and_own_subscription_release ___________
+
+    def test_bounded_call_put_quote_and_own_subscription_release():
+>       from gabfin.providers.futu.options import inspect_options
+E       ModuleNotFoundError: No module named 'gabfin.providers.futu.options'
+
+tests\gabfin\test_options_smoke.py:63: ModuleNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_options_smoke.py::test_bounded_call_put_quote_and_own_subscription_release
+1 failed in 2.20s

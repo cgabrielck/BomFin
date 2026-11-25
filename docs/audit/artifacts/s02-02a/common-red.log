@@ -1,0 +1,218 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 41 items
+
+tests\gabfin\test_contracts.py FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [100%]
+
+================================== FAILURES ===================================
+_________________________ test_money_roundtrip_exact __________________________
+tests\gabfin\test_contracts.py:11: in test_money_roundtrip_exact
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_____________ test_money_preserves_signed_values_and_precision[0] _____________
+tests\gabfin\test_contracts.py:23: in test_money_preserves_signed_values_and_precision
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+__________ test_money_preserves_signed_values_and_precision[-23.50] ___________
+tests\gabfin\test_contracts.py:23: in test_money_preserves_signed_values_and_precision
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+__ test_money_preserves_signed_values_and_precision[1000000000000000.000001] __
+tests\gabfin\test_contracts.py:23: in test_money_preserves_signed_values_and_precision
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_ test_money_preserves_signed_values_and_precision[0.10000000000000000000001] _
+tests\gabfin\test_contracts.py:23: in test_money_preserves_signed_values_and_precision
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+________________ test_exact_integer_python_input_is_supported _________________
+tests\gabfin\test_contracts.py:31: in test_exact_integer_python_input_is_supported
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_____________ test_money_rejects_inexact_or_nonfinite_values[0.1] _____________
+tests\gabfin\test_contracts.py:38: in test_money_rejects_inexact_or_nonfinite_values
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+____________ test_money_rejects_inexact_or_nonfinite_values[True] _____________
+tests\gabfin\test_contracts.py:38: in test_money_rejects_inexact_or_nonfinite_values
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+____________ test_money_rejects_inexact_or_nonfinite_values[False] ____________
+tests\gabfin\test_contracts.py:38: in test_money_rejects_inexact_or_nonfinite_values
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+____________ test_money_rejects_inexact_or_nonfinite_values[None] _____________
+tests\gabfin\test_contracts.py:38: in test_money_rejects_inexact_or_nonfinite_values
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_____________ test_money_rejects_inexact_or_nonfinite_values[NaN] _____________
+tests\gabfin\test_contracts.py:38: in test_money_rejects_inexact_or_nonfinite_values
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+__________ test_money_rejects_inexact_or_nonfinite_values[Infinity] ___________
+tests\gabfin\test_contracts.py:38: in test_money_rejects_inexact_or_nonfinite_values
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+__________ test_money_rejects_inexact_or_nonfinite_values[-Infinity] __________
+tests\gabfin\test_contracts.py:38: in test_money_rejects_inexact_or_nonfinite_values
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+___________ test_money_rejects_inexact_or_nonfinite_values[amount7] ___________
+tests\gabfin\test_contracts.py:38: in test_money_rejects_inexact_or_nonfinite_values
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+________________ test_decimal_json_input_must_be_a_string[0.1] ________________
+tests\gabfin\test_contracts.py:46: in test_decimal_json_input_must_be_a_string
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+________________ test_decimal_json_input_must_be_a_string[10] _________________
+tests\gabfin\test_contracts.py:46: in test_decimal_json_input_must_be_a_string
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_______________ test_decimal_json_input_must_be_a_string[True] ________________
+tests\gabfin\test_contracts.py:46: in test_decimal_json_input_must_be_a_string
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_______________ test_decimal_json_input_must_be_a_string[None] ________________
+tests\gabfin\test_contracts.py:46: in test_decimal_json_input_must_be_a_string
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+________________ test_money_rejects_malformed_currency_codes[] ________________
+tests\gabfin\test_contracts.py:54: in test_money_rejects_malformed_currency_codes
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+______________ test_money_rejects_malformed_currency_codes[usd] _______________
+tests\gabfin\test_contracts.py:54: in test_money_rejects_malformed_currency_codes
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_______________ test_money_rejects_malformed_currency_codes[US] _______________
+tests\gabfin\test_contracts.py:54: in test_money_rejects_malformed_currency_codes
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+______________ test_money_rejects_malformed_currency_codes[USDD] ______________
+tests\gabfin\test_contracts.py:54: in test_money_rejects_malformed_currency_codes
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+______________ test_money_rejects_malformed_currency_codes[US1] _______________
+tests\gabfin\test_contracts.py:54: in test_money_rejects_malformed_currency_codes
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_______________ test_money_rejects_unknown_fields_and_mutation ________________
+tests\gabfin\test_contracts.py:61: in test_money_rejects_unknown_fields_and_mutation
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+_________________ test_ratio_accepts_closed_unit_interval[0] __________________
+tests\gabfin\test_contracts.py:72: in test_ratio_accepts_closed_unit_interval
+    from gabfin.contracts.common import Ratio
+E   ModuleNotFoundError: No module named 'gabfin'
+________________ test_ratio_accepts_closed_unit_interval[0.4] _________________
+tests\gabfin\test_contracts.py:72: in test_ratio_accepts_closed_unit_interval
+    from gabfin.contracts.common import Ratio
+E   ModuleNotFoundError: No module named 'gabfin'
+_________________ test_ratio_accepts_closed_unit_interval[1] __________________
+tests\gabfin\test_contracts.py:72: in test_ratio_accepts_closed_unit_interval
+    from gabfin.contracts.common import Ratio
+E   ModuleNotFoundError: No module named 'gabfin'
+_________ test_ratio_rejects_out_of_range_or_inexact_values[-0.0001] __________
+tests\gabfin\test_contracts.py:82: in test_ratio_rejects_out_of_range_or_inexact_values
+    from gabfin.contracts.common import Ratio
+E   ModuleNotFoundError: No module named 'gabfin'
+__________ test_ratio_rejects_out_of_range_or_inexact_values[1.0001] __________
+tests\gabfin\test_contracts.py:82: in test_ratio_rejects_out_of_range_or_inexact_values
+    from gabfin.contracts.common import Ratio
+E   ModuleNotFoundError: No module named 'gabfin'
+___________ test_ratio_rejects_out_of_range_or_inexact_values[0.4] ____________
+tests\gabfin\test_contracts.py:82: in test_ratio_rejects_out_of_range_or_inexact_values
+    from gabfin.contracts.common import Ratio
+E   ModuleNotFoundError: No module named 'gabfin'
+___________ test_ratio_rejects_out_of_range_or_inexact_values[True] ___________
+tests\gabfin\test_contracts.py:82: in test_ratio_rejects_out_of_range_or_inexact_values
+    from gabfin.contracts.common import Ratio
+E   ModuleNotFoundError: No module named 'gabfin'
+___________ test_ratio_rejects_out_of_range_or_inexact_values[NaN] ____________
+tests\gabfin\test_contracts.py:82: in test_ratio_rejects_out_of_range_or_inexact_values
+    from gabfin.contracts.common import Ratio
+E   ModuleNotFoundError: No module named 'gabfin'
+_______________________ test_timezone_required[value0] ________________________
+tests\gabfin\test_contracts.py:90: in test_timezone_required
+    from gabfin.contracts.common import UtcTimestamp
+E   ModuleNotFoundError: No module named 'gabfin'
+_________________ test_timezone_required[2026-11-25T09:30:00] _________________
+tests\gabfin\test_contracts.py:90: in test_timezone_required
+    from gabfin.contracts.common import UtcTimestamp
+E   ModuleNotFoundError: No module named 'gabfin'
+_____________________ test_timezone_required[2026-11-25] ______________________
+tests\gabfin\test_contracts.py:90: in test_timezone_required
+    from gabfin.contracts.common import UtcTimestamp
+E   ModuleNotFoundError: No module named 'gabfin'
+__________________________ test_timezone_required[0] __________________________
+tests\gabfin\test_contracts.py:90: in test_timezone_required
+    from gabfin.contracts.common import UtcTimestamp
+E   ModuleNotFoundError: No module named 'gabfin'
+_____________________ test_timezone_required[1795599000] ______________________
+tests\gabfin\test_contracts.py:90: in test_timezone_required
+    from gabfin.contracts.common import UtcTimestamp
+E   ModuleNotFoundError: No module named 'gabfin'
+________________________ test_timezone_required[True] _________________________
+tests\gabfin\test_contracts.py:90: in test_timezone_required
+    from gabfin.contracts.common import UtcTimestamp
+E   ModuleNotFoundError: No module named 'gabfin'
+_________ test_timestamp_normalizes_to_utc[2026-11-25T09:30:00-05:00] _________
+tests\gabfin\test_contracts.py:98: in test_timestamp_normalizes_to_utc
+    from gabfin.contracts.common import UtcTimestamp
+E   ModuleNotFoundError: No module named 'gabfin'
+__________________ test_timestamp_normalizes_to_utc[value1] ___________________
+tests\gabfin\test_contracts.py:98: in test_timestamp_normalizes_to_utc
+    from gabfin.contracts.common import UtcTimestamp
+E   ModuleNotFoundError: No module named 'gabfin'
+_____________ test_json_schema_describes_money_as_decimal_string ______________
+tests\gabfin\test_contracts.py:108: in test_json_schema_describes_money_as_decimal_string
+    from gabfin.contracts.common import Money
+E   ModuleNotFoundError: No module named 'gabfin'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-02a\common-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_contracts.py::test_money_roundtrip_exact - ModuleNot...
+FAILED tests/gabfin/test_contracts.py::test_money_preserves_signed_values_and_precision[0]
+FAILED tests/gabfin/test_contracts.py::test_money_preserves_signed_values_and_precision[-23.50]
+FAILED tests/gabfin/test_contracts.py::test_money_preserves_signed_values_and_precision[1000000000000000.000001]
+FAILED tests/gabfin/test_contracts.py::test_money_preserves_signed_values_and_precision[0.10000000000000000000001]
+FAILED tests/gabfin/test_contracts.py::test_exact_integer_python_input_is_supported
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_inexact_or_nonfinite_values[0.1]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_inexact_or_nonfinite_values[True]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_inexact_or_nonfinite_values[False]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_inexact_or_nonfinite_values[None]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_inexact_or_nonfinite_values[NaN]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_inexact_or_nonfinite_values[Infinity]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_inexact_or_nonfinite_values[-Infinity]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_inexact_or_nonfinite_values[amount7]
+FAILED tests/gabfin/test_contracts.py::test_decimal_json_input_must_be_a_string[0.1]
+FAILED tests/gabfin/test_contracts.py::test_decimal_json_input_must_be_a_string[10]
+FAILED tests/gabfin/test_contracts.py::test_decimal_json_input_must_be_a_string[True]
+FAILED tests/gabfin/test_contracts.py::test_decimal_json_input_must_be_a_string[None]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_malformed_currency_codes[]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_malformed_currency_codes[usd]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_malformed_currency_codes[US]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_malformed_currency_codes[USDD]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_malformed_currency_codes[US1]
+FAILED tests/gabfin/test_contracts.py::test_money_rejects_unknown_fields_and_mutation
+FAILED tests/gabfin/test_contracts.py::test_ratio_accepts_closed_unit_interval[0]
+FAILED tests/gabfin/test_contracts.py::test_ratio_accepts_closed_unit_interval[0.4]
+FAILED tests/gabfin/test_contracts.py::test_ratio_accepts_closed_unit_interval[1]
+FAILED tests/gabfin/test_contracts.py::test_ratio_rejects_out_of_range_or_inexact_values[-0.0001]
+FAILED tests/gabfin/test_contracts.py::test_ratio_rejects_out_of_range_or_inexact_values[1.0001]
+FAILED tests/gabfin/test_contracts.py::test_ratio_rejects_out_of_range_or_inexact_values[0.4]
+FAILED tests/gabfin/test_contracts.py::test_ratio_rejects_out_of_range_or_inexact_values[True]
+FAILED tests/gabfin/test_contracts.py::test_ratio_rejects_out_of_range_or_inexact_values[NaN]
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[value0] - Modul...
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[2026-11-25T09:30:00]
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[2026-11-25] - M...
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[0] - ModuleNotF...
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[1795599000] - M...
+FAILED tests/gabfin/test_contracts.py::test_timezone_required[True] - ModuleN...
+FAILED tests/gabfin/test_contracts.py::test_timestamp_normalizes_to_utc[2026-11-25T09:30:00-05:00]
+FAILED tests/gabfin/test_contracts.py::test_timestamp_normalizes_to_utc[value1]
+FAILED tests/gabfin/test_contracts.py::test_json_schema_describes_money_as_decimal_string
+============================= 41 failed in 3.19s ==============================

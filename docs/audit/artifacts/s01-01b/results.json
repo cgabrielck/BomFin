@@ -1,0 +1,90 @@
+{
+  "section": "S01",
+  "unit": "01b",
+  "source_sha": "42f96b3b8a39e40f2e4e579aa9e619814dc80e7b",
+  "python": "3.12.16",
+  "node": "24.19.0",
+  "npm": "11.17.0",
+  "uv": "0.13.9",
+  "pytest": {
+    "command": "python -m pytest -ra --tb=short --junitxml=<artifact>/pytest-baseline.xml",
+    "exit_code": 0,
+    "collected": 1212,
+    "passed": 1208,
+    "skipped": 4,
+    "failed": 0,
+    "errors": 0,
+    "warnings": 1,
+    "console_seconds": 82.18,
+    "junit_seconds": 82.079
+  },
+  "pip_check": {
+    "exit_code": 0,
+    "message": "No broken requirements found."
+  },
+  "npm_install": {
+    "command": "npm install --no-audit --no-fund",
+    "exit_code": 0
+  },
+  "vite_build": {
+    "command": "npm run build",
+    "exit_code": 0
+  },
+  "typescript": {
+    "command": "npm exec -- tsc --noEmit",
+    "exit_code": 2,
+    "errors": [
+      {
+        "file": "web/src/App.tsx",
+        "line": 369,
+        "column": 38,
+        "code": "TS7006"
+      },
+      {
+        "file": "web/src/App.tsx",
+        "line": 413,
+        "column": 22,
+        "code": "TS7006"
+      }
+    ]
+  },
+  "python_packages": {
+    "pytest": "9.2.0",
+    "fastapi": "0.165.0",
+    "starlette": "1.10.0",
+    "numpy": "2.5.5",
+    "pandas": "3.1.1",
+    "pydantic": "2.14.4",
+    "yfinance": "1.8.0",
+    "openai": "3.59.0",
+    "alpaca-py": "0.45.0"
+  },
+  "frontend_packages": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "vite": "6.4.6",
+    "typescript": "5.9.3",
+    "esbuild": "0.25.12"
+  },
+  "artifacts_sha256": {
+    "python-freeze.txt": "be351f00705d9b01143d0b821d2621a0029beeb0f32cc2efed96bbaa0d7014d2",
+    "python-install.json": "475ad70c71b7a5efc83178a49f58839ba0bb26d0a0b45d0fd254eb5283c43bc5",
+    "pytest-baseline.log": "a4dfa9398349b7ffed7e9bcf34924d1b3ae16460e2e5f9412d5de9bfc5daa1c0",
+    "pytest-baseline.xml": "d45d8233a42ba42345c68dd660ad150b803c95741991ad2ce39f599f966d81aa",
+    "vite-build.log": "cb46663cf63c9055328b272589498ef6da581d76281bb21c23cdc0eebf9129de",
+    "typescript-check.log": "a57fc8672f44f5ad6f9e2199a8c2849dfb8b149c99cd1e34324e549c966d99a1"
+  },
+  "package_lock_sha256": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6",
+  "source_tracked_changes": false,
+  "source_untracked_files": [
+    "web/package-lock.json"
+  ],
+  "test_side_effect": "new backend/data/trade_journal.json archived as test-generated-trade-journal.json; absent before pytest",
+  "scope_limits": [
+    "no real broker/feed integration",
+    "no app or trading worker launch",
+    "Postgres cases skipped without psycopg",
+    "no browser QA or security scan",
+    "no application source fixes"
+  ]
+}

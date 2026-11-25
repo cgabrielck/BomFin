@@ -1,0 +1,12 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____ test_namespaced_symbol_resolution_preserves_equity_option_identity ______
+
+    def test_namespaced_symbol_resolution_preserves_equity_option_identity():
+>       from gabfin.providers.futu.symbols import InstrumentCatalog
+E       ModuleNotFoundError: No module named 'gabfin.providers.futu.symbols'
+
+tests\gabfin\test_symbols.py:25: ModuleNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_symbols.py::test_namespaced_symbol_resolution_preserves_equity_option_identity
+1 failed in 2.29s

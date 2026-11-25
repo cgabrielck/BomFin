@@ -1,0 +1,56 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ test_parent_rejects_impossible_skipped_query_phases[market_skipped_but_read] _
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-115/test_parent_rejects_impossible0')
+case = 'market_skipped_but_read'
+
+    @pytest.mark.parametrize('case', ['market_skipped_but_read', 'before_skipped_but_after_read'])
+    def test_parent_rejects_impossible_skipped_query_phases(tmp_path, case):
+        from gabfin.providers.futu.history import inspect_history
+    
+        if case == 'market_skipped_but_read':
+            result = inspect_history(QuoteContext(), SDK, checked_at=NOW)
+            result.update(market_state=None, errors=['market_state_skipped'])
+        else:
+            result = inspect_history(QuoteContext(), SDK, checked_at=NOW, deadline=100, monotonic=lambda: 99)
+            result.update(market_state='PRE_MARKET_BEGIN', errors=['quota_before_skipped'],
+                          quota_after={'used': 5, 'remaining': 295})
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-24', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'metadata': {'kind': 'history_smoke', 'code': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00Z', 'requested_date': '2026-11-24', ...}} != {'metadata': None}
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         Use -v to get more diff
+
+tests\gabfin\test_history_smoke.py:397: AssertionError
+_ test_parent_rejects_impossible_skipped_query_phases[before_skipped_but_after_read] _
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-115/test_parent_rejects_impossible1')
+case = 'before_skipped_but_after_read'
+
+    @pytest.mark.parametrize('case', ['market_skipped_but_read', 'before_skipped_but_after_read'])
+    def test_parent_rejects_impossible_skipped_query_phases(tmp_path, case):
+        from gabfin.providers.futu.history import inspect_history
+    
+        if case == 'market_skipped_but_read':
+            result = inspect_history(QuoteContext(), SDK, checked_at=NOW)
+            result.update(market_state=None, errors=['market_state_skipped'])
+        else:
+            result = inspect_history(QuoteContext(), SDK, checked_at=NOW, deadline=100, monotonic=lambda: 99)
+            result.update(market_state='PRE_MARKET_BEGIN', errors=['quota_before_skipped'],
+                          quota_after={'used': 5, 'remaining': 295})
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-24', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'metadata': {'kind': 'history_smoke', 'code': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00Z', 'requested_date': '2026-11-24', ...}} != {'metadata': None}
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         Use -v to get more diff
+
+tests\gabfin\test_history_smoke.py:397: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_impossible_skipped_query_phases[market_skipped_but_read]
+FAILED tests/gabfin/test_history_smoke.py::test_parent_rejects_impossible_skipped_query_phases[before_skipped_but_after_read]
+2 failed, 62 deselected in 2.28s

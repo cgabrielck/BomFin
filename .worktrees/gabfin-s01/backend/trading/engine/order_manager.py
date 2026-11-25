@@ -1,0 +1,292 @@
+import logging
+from typing import Dict, List, Optional, Protocol
+from datetime import datetime, timezone
+
+from backend.trading.models import Order, OrderStatus
+from backend.trading.broker import BrokerAdapter
+from backend.trading.engine.stamp import VENUE_STATUSES
+from backend.trading.fill_honesty import apply_recorded_fill, is_fill_status, recorded_fill_price
+from backend.trading.engine.sticky_idempotency import (
+    StickyLookupUnproven,
+    find_sticky_order,
+    is_acceptance_unknown_exception,
+    is_client_order_id_conflict,
+    is_sticky_open,
+    mark_acceptance_unknown,
+    message_is_client_order_id_conflict,
+    order_side_value,
+)
+
+logger = logging.getLogger(__name__)
+
+
+def _honestly_terminal(order: Order) -> bool:
+    """True only when a terminal status is backed by evidence.
+
+    ``FILLED`` with no real avg is not terminal — sync must re-fetch or demote
+    so the ledger is not display-only honest.
+    """
+    if order.status in (
+        OrderStatus.CANCELLED,
+        OrderStatus.REJECTED,
+        OrderStatus.EXPIRED,
+    ):
+        return True
+    if order.status == OrderStatus.FILLED and recorded_fill_price(order) is not None:
+        return True
+    return False
+
+class OrderStore(Protocol):
+    """Protocol for durable storage of orders and fills."""
+    def save_order(self, order: Order) -> None: ...
+    def get_order_by_idempotency_key(self, key: str) -> Optional[Order]: ...
+    def get_order(self, order_id: str) -> Optional[Order]: ...
+    def get_recent_orders(self, limit: int = 50) -> List[Order]: ...
+
+class InMemoryOrderStore:
+    """A simple in-memory store for development and testing."""
+    def __init__(self):
+        self._orders_by_id: Dict[str, Order] = {}
+        self._orders_by_idem_key: Dict[str, Order] = {}
+
+    def save_order(self, order: Order) -> None:
+        self._orders_by_id[order.id] = order
+        self._orders_by_idem_key[order.idempotency_key] = order
+
+    def get_order_by_idempotency_key(self, key: str) -> Optional[Order]:
+        return self._orders_by_idem_key.get(key)
+
+    def get_order(self, order_id: str) -> Optional[Order]:
+        return self._orders_by_id.get(order_id)
+
+    def get_recent_orders(self, limit: int = 50) -> List[Order]:
+        """Return the most recent orders (by updated_at, descending)."""
+        all_orders = list(self._orders_by_id.values())
+        all_orders.sort(key=lambda o: o.updated_at or o.created_at, reverse=True)
+        return all_orders[:limit]
+
+    def iter_all_orders(self) -> List[Order]:
+        """Full ledger. Sticky lookup must not use the recent-N window."""
+        return list(self._orders_by_id.values())
+
+
+class OrderManager:
+    """
+    Manages the lifecycle of an order, enforcing state transitions and idempotency.
+    """
+    def __init__(self, broker: BrokerAdapter, store: OrderStore):
+        self.broker = broker
+        self.store = store
+
+    def submit_new_order(self, draft_order: Order) -> Order:
+        """
+        Attempts to submit a new order. Includes idempotency checks.
+
+        Does **not** stamp RISK_APPROVED. Callers that actually ran RiskEngine
+        (Desk place-order, SignalProcessor) must set that status themselves
+        before submit. A DRAFT stays DRAFT until the broker responds.
+        """
+        if draft_order.status not in (OrderStatus.DRAFT, OrderStatus.RISK_APPROVED):
+            raise ValueError(
+                f"Can only submit DRAFT or RISK_APPROVED orders. Current status: {draft_order.status}"
+            )
+
+        # 1. Blind new key while a 502-class place is still open: do not submit.
+        try:
+            sticky = find_sticky_order(
+                self.store, symbol=draft_order.symbol, side=order_side_value(draft_order)
+            )
+        except StickyLookupUnproven as exc:
+            existing = self.store.get_order_by_idempotency_key(draft_order.idempotency_key)
+            if existing is not None and is_sticky_open(existing):
+                sticky = existing
+            else:
+                logger.error(
+                    "Sticky lookup unproven for %s %s; refusing broker submit of %s.",
+                    draft_order.symbol,
+                    order_side_value(draft_order),
+                    draft_order.idempotency_key,
+                )
+                mark_acceptance_unknown(draft_order, exc)
+                self.store.save_order(draft_order)
+                return draft_order
+        if sticky is not None and sticky.idempotency_key != draft_order.idempotency_key:
+            logger.warning(
+                "Blind retry blocked for %s %s. Reuse idempotency_key=%s (refused %s).",
+                draft_order.symbol,
+                order_side_value(draft_order),
+                sticky.idempotency_key,
+                draft_order.idempotency_key,
+            )
+            return sticky
+
+        # 2. Same-key idempotency. Unknown-accept may safe-retry with that key.
+        existing_order = self.store.get_order_by_idempotency_key(draft_order.idempotency_key)
+        safe_resubmit = (
+            existing_order is not None
+            and existing_order.idempotency_sticky
+            and existing_order.status == OrderStatus.ACCEPTANCE_UNKNOWN
+        )
+        if existing_order is not None and not safe_resubmit:
+            logger.info(
+                "Order with idempotency key %s already exists. Skipping submission.",
+                draft_order.idempotency_key,
+            )
+            return existing_order
+
+        if safe_resubmit and existing_order is not None:
+            draft_order.id = existing_order.id
+            draft_order.idempotency_key = existing_order.idempotency_key
+            draft_order.idempotency_sticky = True
+        else:
+            # Persist caller status as-is (no invented RISK_APPROVED).
+            self.store.save_order(draft_order)
+
+        logger.info(
+            "Submitting order to broker: %s %s %s key=%s",
+            draft_order.symbol,
+            draft_order.side,
+            draft_order.quantity,
+            draft_order.idempotency_key,
+        )
+
+        # 3. Broker Submission
+        try:
+            submitted_order = self.broker.submit_order(draft_order)
+        except Exception as e:
+            # 422 client_order_id unique means the id already landed. A safe
+            # retry that fails any other way also keeps the pin: the first
+            # request may have been accepted. Only a non-retry definite
+            # failure may clear the way for a new key.
+            if (
+                safe_resubmit
+                or is_acceptance_unknown_exception(e)
+                or is_client_order_id_conflict(e)
+            ):
+                logger.error(
+                    "Broker acceptance unknown for %s key=%s: %s",
+                    draft_order.symbol,
+                    draft_order.idempotency_key,
+                    e,
+                )
+                mark_acceptance_unknown(draft_order, e)
+                self.store.save_order(draft_order)
+                return draft_order
+            logger.error(f"Failed to submit order to broker: {str(e)}")
+            draft_order.status = OrderStatus.REJECTED
+            draft_order.idempotency_sticky = False
+            draft_order.error_message = f"Broker Adapter Error: {str(e)}"
+            draft_order.failed_at = datetime.now(timezone.utc)
+            self.store.save_order(draft_order)
+            return draft_order
+
+        # 4. Post-submission update. 502 mapped by the adapter is not a reject
+        # and not a fill. A 422 unique mapped as REJECTED is the same hole.
+        if submitted_order.status == OrderStatus.ACCEPTANCE_UNKNOWN:
+            if not submitted_order.error_message:
+                mark_acceptance_unknown(submitted_order)
+            else:
+                submitted_order.idempotency_sticky = True
+                submitted_order.filled_at = None
+                submitted_order.filled_avg_price = None
+            self.store.save_order(submitted_order)
+            return submitted_order
+        apply_recorded_fill(submitted_order)
+        if submitted_order.status in VENUE_STATUSES:
+            self.store.save_order(submitted_order)
+            return submitted_order
+        if safe_resubmit or message_is_client_order_id_conflict(submitted_order.error_message):
+            logger.error(
+                "Safe retry for %s key=%s did not confirm a venue accept (%s). Keeping sticky.",
+                submitted_order.symbol,
+                submitted_order.idempotency_key,
+                submitted_order.status,
+            )
+            mark_acceptance_unknown(submitted_order)
+            self.store.save_order(submitted_order)
+            return submitted_order
+        if submitted_order.status == OrderStatus.REJECTED:
+            submitted_order.idempotency_sticky = False
+        self.store.save_order(submitted_order)
+
+        return submitted_order
+
+    def sync_order_status(self, internal_order_id: str) -> Optional[Order]:
+        """
+        Fetches the latest status from the broker and updates the internal store.
+        """
+        local_order = self.store.get_order(internal_order_id)
+        if not local_order:
+             logger.warning(f"Order {internal_order_id} not found in local store during sync.")
+             return None
+        
+        if _honestly_terminal(local_order):
+             return local_order
+            
+        broker_order = self.broker.get_order(local_order.id)
+        
+        if broker_order:
+            fill_px = recorded_fill_price(broker_order)
+            if is_fill_status(broker_order.status) and fill_px is None:
+                logger.warning(
+                    "Broker reported %s for %s without a positive fill price; "
+                    "not promoting to filled (limit is not a fill).",
+                    broker_order.status,
+                    local_order.id,
+                )
+                local_order.cancelled_at = broker_order.cancelled_at
+                local_order.failed_at = broker_order.failed_at
+                local_order.error_message = broker_order.error_message
+                # Keep a non-fill local status. Do not copy limit as avg fill.
+                if is_fill_status(local_order.status):
+                    local_order.status = OrderStatus.SUBMITTED
+                local_order.filled_avg_price = None
+                local_order.filled_at = None
+                self.store.save_order(local_order)
+                return local_order
+            if (
+                broker_order.status != local_order.status
+                or fill_px != local_order.filled_avg_price
+            ):
+                logger.info(f"Order {local_order.id} status changed: {local_order.status} -> {broker_order.status}")
+                local_order.status = broker_order.status
+                local_order.cancelled_at = broker_order.cancelled_at
+                local_order.failed_at = broker_order.failed_at
+                local_order.error_message = broker_order.error_message
+                apply_recorded_fill(local_order, broker_order)
+                self.store.save_order(local_order)
+            return local_order
+        else:
+             logger.error(f"Order {local_order.id} exists locally but not found on broker during sync.")
+             if is_fill_status(local_order.status) and recorded_fill_price(local_order) is None:
+                 local_order.status = OrderStatus.SUBMITTED
+                 local_order.filled_avg_price = None
+                 local_order.filled_at = None
+                 self.store.save_order(local_order)
+             return local_order
+
+    def cancel_active_order(self, internal_order_id: str) -> Optional[Order]:
+        """
+        Attempts to cancel an active order.
+        """
+        local_order = self.store.get_order(internal_order_id)
+        if not local_order:
+             logger.warning(f"Cannot cancel: Order {internal_order_id} not found.")
+             return None
+            
+        if _honestly_terminal(local_order):
+            logger.info(f"Order {internal_order_id} is already in terminal state: {local_order.status}")
+            return local_order
+
+        try:
+            updated_order = self.broker.cancel_order(local_order.id)
+            # Sync the cancelled state back to our local object
+            local_order.status = updated_order.status
+            local_order.cancelled_at = updated_order.cancelled_at
+            local_order.error_message = updated_order.error_message
+            self.store.save_order(local_order)
+            return local_order
+        except Exception as e:
+            logger.error(f"Failed to cancel order {internal_order_id}: {str(e)}")
+            # Fetch latest state in case it was filled while we tried to cancel
+            return self.sync_order_status(internal_order_id)

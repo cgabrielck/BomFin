@@ -1,0 +1,112 @@
+.............................................FFFFF                       [100%]
+================================== FAILURES ===================================
+____________ test_options_cli_default_allows_subscription_release _____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000017E2D29AF00>
+capsys = <_pytest.capture.CaptureFixture object at 0x0000017E2D29A6F0>
+
+    def test_options_cli_default_allows_subscription_release(monkeypatch, capsys):
+        from gabfin.providers.futu import runner
+    
+        calls = []
+        def run(python, **kwargs):
+            calls.append(kwargs)
+            return {'status': 'sdk_unavailable', 'metadata': None}
+        monkeypatch.setattr(runner, 'run_probe', run)
+        monkeypatch.setattr(sys, 'argv', ['runner', '--python', sys.executable, '--host', '127.0.0.1',
+                                         '--port', '11111', '--operation', 'options_smoke'])
+        assert runner.main() == 2
+>       assert calls[0]['timeout'] == 110
+E       assert 10 == 110
+
+tests\gabfin\test_options_smoke.py:250: AssertionError
+---------------------------- Captured stdout call -----------------------------
+{
+  "status": "sdk_unavailable",
+  "metadata": null
+}
+________ test_options_rejects_explicit_deadline_too_short_for_release _________
+
+    def test_options_rejects_explicit_deadline_too_short_for_release():
+        from gabfin.providers.futu.runner import run_probe
+    
+>       assert run_probe(Path(sys.executable), host='127.0.0.1', port=11111,
+                         timeout=10, operation='options_smoke')['status'] == 'invalid_config'
+E       AssertionError: assert 'sdk_unavailable' == 'invalid_config'
+E         
+E         - invalid_config
+E         + sdk_unavailable
+
+tests\gabfin\test_options_smoke.py:257: AssertionError
+___ test_single_direction_is_reported_as_partial_without_broadening_window ____
+
+    def test_single_direction_is_reported_as_partial_without_broadening_window():
+        from gabfin.providers.futu.options import inspect_options
+    
+        context = QuoteContext()
+        context.chain = [contract()]
+        result = inspect_options(context, SDK, checked_at=NOW, sleep=lambda n: None)
+>       assert result['errors'] == ['window_partial']
+E       AssertionError: assert ['window_empty'] == ['window_partial']
+E         
+E         At index 0 diff: 'window_empty' != 'window_partial'
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:267: AssertionError
+_ test_parent_validates_cleanup_state_even_when_errors_exist[False-contracts0-unsubscribed] _
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-83/test_parent_validates_cleanup_0')
+chain_verified = False, contracts = [], cleanup = 'unsubscribed'
+
+    @pytest.mark.parametrize('chain_verified,contracts,cleanup', [
+        (False, [], 'unsubscribed'),
+        (True, None, 'not_subscribed'),
+    ])
+    def test_parent_validates_cleanup_state_even_when_errors_exist(tmp_path, chain_verified, contracts, cleanup):
+        from gabfin.providers.futu.options import inspect_options
+    
+        result = inspect_options(QuoteContext(), SDK, checked_at=NOW, sleep=lambda n: None)
+        result.update(chain_verified=chain_verified, cleanup=cleanup, errors=['expiry_failed'])
+        if contracts is not None:
+            result['contracts'] = contracts
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-27', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}} != {'metadata': None}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:284: AssertionError
+_ test_parent_validates_cleanup_state_even_when_errors_exist[True-None-not_subscribed] _
+
+tmp_path = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-83/test_parent_validates_cleanup_1')
+chain_verified = True, contracts = None, cleanup = 'not_subscribed'
+
+    @pytest.mark.parametrize('chain_verified,contracts,cleanup', [
+        (False, [], 'unsubscribed'),
+        (True, None, 'not_subscribed'),
+    ])
+    def test_parent_validates_cleanup_state_even_when_errors_exist(tmp_path, chain_verified, contracts, cleanup):
+        from gabfin.providers.futu.options import inspect_options
+    
+        result = inspect_options(QuoteContext(), SDK, checked_at=NOW, sleep=lambda n: None)
+        result.update(chain_verified=chain_verified, cleanup=cleanup, errors=['expiry_failed'])
+        if contracts is not None:
+            result['contracts'] = contracts
+>       assert run_child(tmp_path, {'status': 'ok', 'metadata': result}) == {'status': 'invalid_result', 'metadata': None}
+E       AssertionError: assert {'status': 'o...-11-27', ...}} == {'status': 'i...tadata': None}
+E         
+E         Differing items:
+E         {'status': 'ok'} != {'status': 'invalid_result'}
+E         {'metadata': {'kind': 'options_smoke', 'underlying': 'US.AAPL', 'checked_at': '2026-11-25T15:00:00+00:00', 'expiry': '2026-11-27', ...}} != {'metadata': None}
+E         Use -v to get more diff
+
+tests\gabfin\test_options_smoke.py:284: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_options_smoke.py::test_options_cli_default_allows_subscription_release
+FAILED tests/gabfin/test_options_smoke.py::test_options_rejects_explicit_deadline_too_short_for_release
+FAILED tests/gabfin/test_options_smoke.py::test_single_direction_is_reported_as_partial_without_broadening_window
+FAILED tests/gabfin/test_options_smoke.py::test_parent_validates_cleanup_state_even_when_errors_exist[False-contracts0-unsubscribed]
+FAILED tests/gabfin/test_options_smoke.py::test_parent_validates_cleanup_state_even_when_errors_exist[True-None-not_subscribed]
+5 failed, 45 passed in 4.84s

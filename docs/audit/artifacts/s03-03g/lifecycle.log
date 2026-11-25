@@ -1,0 +1,16 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 97 items
+
+tests\gabfin\test_quote_stream.py .................                      [ 17%]
+tests\gabfin\test_futu_quote_callback.py .............                   [ 30%]
+tests\gabfin\test_futu_quote_adapter.py ..........                       [ 41%]
+tests\gabfin\test_symbols.py ................                            [ 57%]
+tests\gabfin\test_subscription_planner.py .............................. [ 88%]
+...........                                                              [100%]
+
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s03-03g\lifecycle.xml -
+============================= 97 passed in 3.03s ==============================

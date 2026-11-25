@@ -1,0 +1,10 @@
+{
+  "name": "Cgab paper desk",
+  "short_name": "Cgab",
+  "start_url": "/m",
+  "scope": "/m",
+  "display": "standalone",
+  "background_color": "#071016",
+  "theme_color": "#071016",
+  "lang": "zh-Hant"
+}

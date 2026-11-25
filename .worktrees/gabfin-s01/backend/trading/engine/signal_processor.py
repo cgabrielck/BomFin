@@ -1,0 +1,214 @@
+"""
+SignalProcessor — research/strategy signals → risk → execution.
+
+Supports paper/live submission via OrderManager and shadow fills via
+ShadowTradingEngine so the worker has a single execution entry point.
+"""
+from __future__ import annotations
+
+import logging
+import uuid
+from typing import Any, Dict, Optional
+
+from backend.trading.broker import BrokerAdapter
+from backend.trading.engine.order_manager import OrderManager
+from backend.trading.engine.shadow import ShadowTradingEngine
+from backend.trading.engine.stamp import VENUE_STATUSES, stamp_risk_approved
+from backend.trading.engine.sticky_idempotency import (
+    clear_sticky,
+    detach_if_would_clobber_sticky,
+    pin_sticky,
+)
+from backend.trading.models import Order, OrderSide, OrderStatus, OrderType
+from backend.trading.risk.gates import RiskEngine
+
+logger = logging.getLogger(__name__)
+
+JOURNAL_WRITE_FAILED = "journal_write_failed"
+
+
+class JournalWriteError(RuntimeError):
+    """Journal did not persist. Callers must not treat this as honest success.
+
+    Aligns with Desk place-order: after broker accept, a journal raise is
+    observable failure (HTTP 502), not a happy SUBMITTED. The broker may
+    already have the order — this is not a fill and not verified/live.
+    """
+
+    def __init__(self, detail: str, *, order: Optional[Order] = None):
+        super().__init__(f"{JOURNAL_WRITE_FAILED}: {detail}")
+        self.order = order
+        self.detail = detail
+
+
+class SignalProcessor:
+    """
+    Connects upstream strategy signals to the execution pipeline.
+
+    Flow: draft Order → RiskEngine → (shadow simulate | OrderManager submit).
+    """
+
+    def __init__(
+        self,
+        broker: BrokerAdapter,
+        risk_engine: RiskEngine,
+        order_manager: OrderManager,
+        *,
+        execution_mode: str = "paper",
+        shadow_engine: Optional[ShadowTradingEngine] = None,
+    ):
+        self.broker = broker
+        self.risk_engine = risk_engine
+        self.order_manager = order_manager
+        self.execution_mode = execution_mode
+        self.shadow_engine = shadow_engine
+
+    def process_signal(
+        self,
+        signal: Dict[str, Any],
+        *,
+        account_summary: Optional[Any] = None,
+        risk_extras: Optional[Dict[str, Any]] = None,
+        next_bars: Optional[Any] = None,
+    ) -> Order:
+        """
+        Args:
+            signal: Dict with symbol, side, quantity, optional limit_price,
+                    stop_price, take_profit_price, stop_loss_price,
+                    idempotency_key, strategy_id.
+            account_summary: Optional pre-fetched AccountSummary.
+            risk_extras: Extra kwargs for RiskEngine.evaluate_order
+                         (vix_level, price_history, cooldown_tickers, ...).
+            next_bars: Shadow fill context for next-session open simulation.
+        """
+        symbol = signal["symbol"].upper()
+        side = OrderSide.BUY if str(signal["side"]).lower() == "buy" else OrderSide.SELL
+
+        order_type = OrderType.LIMIT if signal.get("limit_price") else OrderType.MARKET
+        if signal.get("order_type"):
+            order_type = OrderType(str(signal["order_type"]).lower())
+
+        draft_order = Order(
+            id=str(signal.get("id") or uuid.uuid4()),
+            symbol=symbol,
+            side=side,
+            order_type=order_type,
+            quantity=float(signal.get("quantity", 0)),
+            limit_price=signal.get("limit_price"),
+            stop_price=signal.get("stop_price") or signal.get("stop_loss_price"),
+            take_profit_price=signal.get("take_profit_price"),
+            stop_loss_price=signal.get("stop_loss_price") or signal.get("stop_price"),
+            order_class=str(signal.get("order_class") or "simple"),
+            idempotency_key=signal.get("idempotency_key", str(uuid.uuid4())),
+        )
+
+        logger.info("Processing Signal: %s %s %s", side.value, draft_order.quantity, symbol)
+
+        summary = account_summary if account_summary is not None else self.broker.get_account_summary()
+        extras = dict(risk_extras or {})
+        # Auto path (worker strategy buys and H1 consume) does not treat the
+        # 25% per-name cap as binding. Desk place_desk_order never comes here.
+        if side == OrderSide.BUY:
+            extras.setdefault("enforce_name_concentration", False)
+        risk_decision = self.risk_engine.evaluate_order(draft_order, summary, **extras)
+
+        if not risk_decision.approved:
+            logger.warning("Signal rejected by Risk Engine: %s", risk_decision.reason)
+            draft_order.status = OrderStatus.REJECTED
+            draft_order.error_message = f"Risk Gate Rejected: {risk_decision.reason}"
+            detach_if_would_clobber_sticky(self.order_manager.store, draft_order)
+            self.order_manager.store.save_order(draft_order)
+            audit_id = None
+            try:
+                from backend.trading.safety import audit
+
+                audit_id = audit.log_risk_decision(
+                    symbol,
+                    side.value,
+                    float(draft_order.quantity or 0),
+                    False,
+                    draft_order.error_message,
+                )
+            except Exception:
+                logger.exception("Failed to persist risk-reject audit for %s", symbol)
+            self._record_journal(draft_order, signal, audit_id=audit_id)
+            return draft_order
+
+        # RISK_APPROVED only after RiskEngine.evaluate_order approved.
+        # Mandate is the caller's job (worker buy/sell). See stamp.py.
+        stamp_risk_approved(
+            draft_order,
+            risk_decision=risk_decision,
+            require_mandate=False,
+        )
+
+        if self.execution_mode == "shadow":
+            if self.shadow_engine is None:
+                draft_order.status = OrderStatus.REJECTED
+                draft_order.error_message = "Shadow mode requested but ShadowTradingEngine is not configured"
+                self.order_manager.store.save_order(draft_order)
+                self._record_journal(draft_order, signal)
+                return draft_order
+            logger.info("Signal Risk-Approved. Forwarding to ShadowTradingEngine.")
+            bars = next_bars if next_bars is not None else None
+            result = self.shadow_engine.simulate_submission(draft_order, next_bars=bars)
+            self._record_journal(result, signal)
+            return result
+
+        logger.info("Signal Risk-Approved. Forwarding to Order Manager.")
+        # Keep RISK_APPROVED from the evaluate above. OrderManager must not invent it.
+        prior = None
+        getter = getattr(self.order_manager.store, "get_order_by_idempotency_key", None)
+        if callable(getter):
+            try:
+                prior = getter(draft_order.idempotency_key)
+            except Exception:
+                logger.exception(
+                    "Sticky prior lookup failed for %s", draft_order.idempotency_key
+                )
+                prior = None
+        replay_landed = (
+            prior is not None
+            and bool(getattr(prior, "idempotency_sticky", False))
+            and prior.status in VENUE_STATUSES
+        )
+        result = self.order_manager.submit_new_order(draft_order)
+        try:
+            self._record_journal(result, signal)
+        except JournalWriteError:
+            # Broker may already have the order. Pin the key before the
+            # exception leaves this call so the next cycle cannot mint a new one.
+            status_key = str(getattr(result.status, "value", result.status)).lower()
+            if status_key != "rejected":
+                pin_sticky(self.order_manager.store, result)
+            raise
+        if result.status in VENUE_STATUSES and not replay_landed:
+            # Journal catching up on an already-landed sticky order must not
+            # clear the pin. A fresh venue accept on this call still may.
+            clear_sticky(self.order_manager.store, result)
+        return result
+
+    @staticmethod
+    def _record_journal(order: Order, signal: Dict[str, Any], *, audit_id: Optional[str] = None) -> None:
+        """Persist TradeLogEntry with intent_id. Never swallow — fail the call.
+
+        Desk contract: journal raise / empty write is not honest success.
+        Intent H1 maps JournalWriteError to consumed_journal_failed (not consumed).
+        """
+        from backend.utils.provenance.journal_store import record_from_order
+
+        try:
+            entry = record_from_order(
+                order,
+                audit_id=audit_id,
+                strategy_id=signal.get("strategy_id"),
+                intent_id=signal.get("intent_id"),
+            )
+        except Exception as exc:
+            logger.exception("Failed to persist journal for %s", getattr(order, "symbol", "?"))
+            raise JournalWriteError(str(exc), order=order) from exc
+        if not entry:
+            raise JournalWriteError(
+                "record_from_order returned no entry",
+                order=order,
+            )

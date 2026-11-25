@@ -1,0 +1,952 @@
+"""Cgab API — paper-first trading desk for the React UI."""
+from __future__ import annotations
+
+import json
+import os
+import uuid
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from contextlib import asynccontextmanager
+
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field
+
+load_dotenv()
+
+from backend.pathsetup import ensure_backend_on_path
+
+ensure_backend_on_path()
+
+from backend.api import desk_observe, desk_zones, intents as intents_api
+from backend.api import mobile_desk, research_jobs, worker_ctl
+from backend.api.desk_auth import is_operator, require_operator
+from backend.api.help_chat import HelpChatIn, answer_help_chat, guide_payload
+from backend.api.desk_display import compose_performance_kpis, dual_book_envelope, orders_book
+from backend.trading.fill_honesty import recorded_fill_price
+from backend.trading import telegram_inbox
+from backend.trading.alpaca_broker import AlpacaBroker
+from backend.trading.engine.cadence import normalize_cadence
+from backend.trading.engine.desk_orders import ops_mandate_payload, place_desk_order
+from backend.trading.models import Order, OrderSide, OrderType
+from backend.trading.safety import kill_switch
+from backend.trading.storage import create_order_store
+from backend.trading.strategies.registry import KNOWN_STRATEGIES
+from backend.utils.constants import DATA_DIR, STOCK_UNIVERSE
+
+APP_NAME = "Cgab"
+AI_MODE_PATH = Path(DATA_DIR) / "ai_mode.json"
+WATCHLIST_PATH = Path(DATA_DIR) / "watchlist.json"
+
+DEFAULT_AI_MODE = {
+    "strategy": "breakout",
+    "llm_influence": 20,
+    "entry_threshold": 70,
+    "max_positions": 10,
+    "risk_tolerance": "medium",
+    "worker_enabled": False,
+    "ignore_market_hours": os.getenv("IGNORE_MARKET_HOURS", "false").lower() in ("1", "true", "yes"),
+    "cadence": "intraday",
+}
+
+DEFAULT_WATCHLIST = ["AAPL", "MSFT", "NVDA", "AMZN", "META"]
+_WATCH_ALIASES = {"APPL": "AAPL"}
+
+
+def _normalize_watchlist(raw: Any) -> List[str]:
+    if not isinstance(raw, list):
+        return list(DEFAULT_WATCHLIST)
+    tokens = [str(s).upper().strip() for s in raw if str(s).strip()]
+    # Lone typo APPL was a broken Market page, not an intentional one-name list.
+    if tokens == ["APPL"]:
+        return list(DEFAULT_WATCHLIST)
+    out: List[str] = []
+    for token in tokens:
+        token = _WATCH_ALIASES.get(token, token)
+        if token and token not in out:
+            out.append(token)
+    return out or list(DEFAULT_WATCHLIST)
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    stop_inbox = telegram_inbox.start_background()
+    from backend.api import scan_scheduler
+
+    stop_scan = scan_scheduler.start_background()
+    try:
+        yield
+    finally:
+        desk_observe.shutdown()
+        stop_scan()
+        stop_inbox()
+
+
+app = FastAPI(title=APP_NAME, version="1.0.0", lifespan=lifespan)
+mobile_desk.install_mobile_guard(app)
+app.include_router(intents_api.router)
+app.include_router(desk_zones.router)
+app.include_router(mobile_desk.router)
+app.include_router(desk_observe.router)
+STATIC_DIR = Path(__file__).resolve().parents[2] / "web" / "static"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+_broker = AlpacaBroker()
+_store = create_order_store()
+mobile_desk.set_order_store(_store)
+
+
+def _read_json(path: Path, default):
+    if not path.exists():
+        return default
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return default
+
+
+def _write_json(path: Path, payload) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, default=str), encoding="utf-8")
+
+
+def _require_paper() -> None:
+    if os.getenv("APCA_PAPER", "true").lower() not in ("1", "true", "yes"):
+        raise HTTPException(status_code=403, detail="Live trading is blocked. Keep APCA_PAPER=true.")
+
+
+def _require_paper_operator(_auth: None = Depends(require_operator)) -> None:
+    """Guests cannot read or mutate the paper book. Loopback or token only."""
+    _require_paper()
+
+
+def _guest_tear_stub(ticker: str) -> Dict[str, Any]:
+    return {
+        "available": False,
+        "complete": False,
+        "scope": "ticker",
+        "ticker": ticker,
+        "notes": ["guest_ticker_only"],
+        "places_order": False,
+    }
+
+
+class OrderIn(BaseModel):
+    symbol: str
+    side: str = "buy"
+    quantity: float = Field(gt=0)
+    order_type: str = "market"
+    limit_price: Optional[float] = None
+    # Optional. Omit on a first place. After HTTP 502, a safe retry must send
+    # the same key; a missing or different key is a blind retry and is refused.
+    idempotency_key: Optional[str] = None
+
+
+class AiModeIn(BaseModel):
+    strategy: str = "breakout"
+    llm_influence: float = 20
+    entry_threshold: float = 70
+    max_positions: int = 10
+    risk_tolerance: str = "medium"
+    worker_enabled: bool = False
+    ignore_market_hours: bool = False
+    cadence: str = "intraday"
+
+
+class WatchIn(BaseModel):
+    symbol: str
+
+
+class JournalIn(BaseModel):
+    symbol: str
+    note: str
+    side: Optional[str] = None
+    zone_id: Optional[str] = None
+
+
+class WorkerStartIn(BaseModel):
+    strategy: str = "breakout"
+    interval: int = 60
+    restart: bool = False
+
+
+class ScanIn(BaseModel):
+    lang: str = "en"
+    llm_weight: float = 0.2
+    use_llm: bool = True
+    force_refresh: bool = False
+
+
+class DeepIn(BaseModel):
+    tickers: List[str] = Field(default_factory=list)
+    lang: str = "en"
+    force_refresh: bool = False
+
+
+@app.get("/api/meta")
+def meta(request: Request) -> Dict[str, Any]:
+    scan = research_jobs.latest_scan()
+    from backend.api import scan_scheduler
+
+    sched = scan_scheduler.status()
+    operator = is_operator(request)
+    return {
+        "name": APP_NAME,
+        "paper": os.getenv("APCA_PAPER", "true").lower() in ("1", "true", "yes"),
+        "paper_controls": operator,
+        "role": "operator" if operator else "guest",
+        "ignore_market_hours": os.getenv("IGNORE_MARKET_HOURS", "").lower() in ("1", "true", "yes"),
+        "scan_available": bool(scan.get("available")),
+        "scan_stale": bool(scan.get("stale", True)),
+        "scan_ts": scan.get("ts"),
+        "scan_as_of": scan.get("ts"),
+        "scan_auto": sched.get("scan_auto"),
+        "next_scan_at": sched.get("next_scan_at"),
+        "universe_size": len(STOCK_UNIVERSE),
+        "llm": _llm_public(),
+    }
+
+
+def _llm_public() -> Dict[str, Any]:
+    try:
+        ensure_backend_on_path()
+        from agents.llm_agent import get_public_config
+
+        return get_public_config()
+    except Exception as exc:
+        return {"configured": False, "error": str(exc)}
+
+
+@app.get("/api/account")
+def account(_auth: None = Depends(_require_paper_operator)) -> Dict[str, Any]:
+    _require_paper()
+    try:
+        summary = _broker.get_account_summary()
+        return summary.model_dump(mode="json")
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.get("/api/positions")
+def positions(_auth: None = Depends(_require_paper_operator)) -> Dict[str, Any]:
+    data = account()
+    rows = data.get("positions") or []
+    equity = float(data.get("equity") or data.get("portfolio_value") or 0)
+    for row in rows:
+        mv = float(row.get("market_value") or 0)
+        row["weight_pct"] = round(100.0 * mv / equity, 2) if equity else 0.0
+    return {
+        "positions": rows,
+        "count": len(rows),
+        "books": dual_book_envelope(),
+        "verified": False,
+        "live": False,
+    }
+
+
+@app.get("/api/orders")
+def orders(status: str = "all", limit: int = 50, _auth: None = Depends(_require_paper_operator)) -> Dict[str, Any]:
+    _require_paper()
+    out: List[Dict[str, Any]] = []
+    try:
+        from alpaca.trading.enums import QueryOrderStatus
+        from alpaca.trading.requests import GetOrdersRequest
+
+        qstatus = QueryOrderStatus.OPEN if status == "open" else QueryOrderStatus.ALL
+        raw = _broker.api.get_orders(filter=GetOrdersRequest(status=qstatus, limit=limit))
+        for o in raw:
+            out.append(
+                {
+                    "id": str(o.id),
+                    "symbol": o.symbol,
+                    "side": getattr(o.side, "value", o.side),
+                    "type": getattr(o.type, "value", o.type),
+                    "qty": float(o.qty or 0),
+                    "status": getattr(o.status, "value", o.status),
+                    "limit_price": float(o.limit_price) if o.limit_price else None,
+                    "filled_avg_price": recorded_fill_price(o),
+                    "submitted_at": str(o.submitted_at) if o.submitted_at else None,
+                }
+            )
+        return orders_book(out, source="broker", degraded=False, unverified=False)
+    except Exception:
+        recent = _store.get_recent_orders(limit=limit)
+        out = [o.model_dump(mode="json") for o in recent]
+        return orders_book(out, source="local_store", degraded=True, unverified=True, status=status)
+
+
+@app.post("/api/orders")
+def submit_order(body: OrderIn, _auth: None = Depends(_require_paper_operator)) -> Dict[str, Any]:
+    _require_paper()
+    try:
+        side = OrderSide(body.side.lower())
+        otype = OrderType(body.order_type.lower())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    order = Order(
+        id=str(uuid.uuid4()),
+        symbol=body.symbol.upper().strip(),
+        side=side,
+        order_type=otype,
+        quantity=float(body.quantity),
+        limit_price=body.limit_price,
+        idempotency_key=(body.idempotency_key or "").strip() or f"cgab-{uuid.uuid4()}",
+    )
+    result = place_desk_order(order, broker=_broker, store=_store)
+    if result.http_status != 200:
+        raise HTTPException(status_code=result.http_status, detail=result.detail)
+    return result.order.model_dump(mode="json")
+
+
+@app.post("/api/orders/{order_id}/cancel")
+def cancel_order(order_id: str, _auth: None = Depends(_require_paper_operator)) -> Dict[str, Any]:
+    _require_paper()
+    try:
+        updated = _broker.cancel_order(order_id)
+        return updated.model_dump(mode="json")
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.get("/api/ops")
+def ops(_auth: None = Depends(require_operator)) -> Dict[str, Any]:
+    payload = {
+        "kill_switch": kill_switch.is_halted(),
+        "kill_reason": kill_switch.get_reason(),
+        "paper": True,
+    }
+    payload.update(ops_mandate_payload())
+    payload["books"] = dual_book_envelope()
+    payload["verified"] = False
+    payload["live"] = False
+    return payload
+
+
+@app.post("/api/ops/kill")
+def ops_kill(reason: str = "Manual halt from Cgab", _auth: None = Depends(require_operator)) -> Dict[str, Any]:
+    kill_switch.engage(reason, actor="desk_ops", source="POST /api/ops/kill")
+    return ops()
+
+
+@app.post("/api/ops/resume")
+def ops_resume(_auth: None = Depends(require_operator)) -> Dict[str, Any]:
+    kill_switch.disengage(actor="desk_ops", source="POST /api/ops/resume")
+    return ops()
+
+
+@app.get("/api/ai-mode")
+def get_ai_mode(_auth: None = Depends(require_operator)) -> Dict[str, Any]:
+    data = {**DEFAULT_AI_MODE, **_read_json(AI_MODE_PATH, {})}
+    data["cadence"] = normalize_cadence(data.get("cadence"))
+    data["kill_switch"] = kill_switch.is_halted()
+    return data
+
+
+@app.put("/api/ai-mode")
+def put_ai_mode(body: AiModeIn, _auth: None = Depends(require_operator)) -> Dict[str, Any]:
+    if body.strategy not in KNOWN_STRATEGIES:
+        raise HTTPException(status_code=400, detail="Unknown strategy")
+    payload = body.model_dump()
+    payload["llm_influence"] = max(0, min(40, float(body.llm_influence)))
+    payload["max_positions"] = max(1, min(25, int(body.max_positions)))
+    payload["cadence"] = normalize_cadence(payload.get("cadence"))
+    # entry_threshold only gates research_list fund floor (desk knob)
+    if payload.get("strategy") == "research_list":
+        try:
+            from backend.trading.strategies.registry import get_strategy
+
+            get_strategy("research_list").MIN_FUND_SCORE = float(payload.get("entry_threshold") or 65)
+        except Exception:
+            pass
+    _write_json(AI_MODE_PATH, payload)
+    return get_ai_mode()
+
+
+def _position_count() -> int:
+    try:
+        return len((_broker.get_account_summary().positions) or [])
+    except Exception:
+        return 0
+
+
+@app.get("/api/worker/status")
+def worker_status(_auth: None = Depends(_require_paper_operator)) -> Dict[str, Any]:
+    _require_paper()
+    status = worker_ctl.status(position_count=_position_count(), halted=kill_switch.is_halted())
+    scan = research_jobs.latest_scan()
+    as_of = scan.get("ts") or "—"
+    next_scan = status.get("next_scan_at") or "—"
+    auto = "on" if status.get("scan_auto") else "off"
+    status["research"] = {
+        "scan_available": bool(scan.get("available")),
+        "scan_stale": bool(scan.get("stale", True)),
+        "scan_ts": scan.get("ts"),
+        "scan_as_of": scan.get("ts"),
+        "scan_auto": status.get("scan_auto"),
+        "next_scan_at": status.get("next_scan_at"),
+        "top5_tickers": scan.get("top5_tickers") or [],
+        "message_en": (
+            f"Scan as-of {as_of} is past SIGNAL max-age — no new buys; "
+            f"last real fund scores kept. Auto-scan={auto}; next={next_scan}."
+            if scan.get("stale", True)
+            else f"Fresh scan as-of {as_of} feeding paper worker. Auto-scan={auto}; next={next_scan}."
+        ),
+        "message_zh": (
+            f"掃描 as-of {as_of} 已過 SIGNAL 新鮮度視窗 — 不開新倉；上次真實分數保留。"
+            f"自動掃描={auto}；下次={next_scan}。"
+            if scan.get("stale", True)
+            else f"掃描 as-of {as_of} 新鮮，正提供紙上自動交易分數。自動掃描={auto}；下次={next_scan}。"
+        ),
+    }
+    return status
+
+
+@app.post("/api/worker/start")
+def worker_start(body: Optional[WorkerStartIn] = None, _auth: None = Depends(_require_paper_operator)) -> Dict[str, Any]:
+    _require_paper()
+    body = body or WorkerStartIn()
+    cfg = {**DEFAULT_AI_MODE, **_read_json(AI_MODE_PATH, {})}
+    strategy = body.strategy or cfg.get("strategy") or "breakout"
+    try:
+        if body.restart:
+            result = worker_ctl.restart(strategy=strategy, interval=body.interval)
+        else:
+            result = worker_ctl.start(strategy=strategy, interval=body.interval)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    cfg["worker_enabled"] = True
+    cfg["strategy"] = strategy
+    if strategy == "research_list":
+        try:
+            from backend.trading.strategies.registry import get_strategy
+
+            get_strategy("research_list").MIN_FUND_SCORE = float(cfg.get("entry_threshold") or 65)
+        except Exception:
+            pass
+    _write_json(AI_MODE_PATH, cfg)
+    result["ai_mode"] = get_ai_mode()
+    return result
+
+
+@app.post("/api/worker/stop")
+def worker_stop(_auth: None = Depends(_require_paper_operator)) -> Dict[str, Any]:
+    _require_paper()
+    result = worker_ctl.stop()
+    cfg = {**DEFAULT_AI_MODE, **_read_json(AI_MODE_PATH, {})}
+    cfg["worker_enabled"] = False
+    _write_json(AI_MODE_PATH, cfg)
+    result["ai_mode"] = get_ai_mode()
+    return result
+
+
+@app.get("/api/guide")
+def guide() -> Dict[str, Any]:
+    return guide_payload()
+
+
+@app.post("/api/help-chat")
+def help_chat(body: HelpChatIn, request: Request) -> Dict[str, Any]:
+    """Ask Cgab — teaching/guide only. Does not trade or start the worker."""
+    return answer_help_chat(request, body.message, lang=body.lang)
+
+
+@app.get("/api/watchlist")
+def get_watchlist() -> Dict[str, Any]:
+    raw = _read_json(WATCHLIST_PATH, list(DEFAULT_WATCHLIST))
+    symbols = _normalize_watchlist(raw)
+    if symbols != raw:
+        _write_json(WATCHLIST_PATH, symbols)
+    return {"symbols": symbols}
+
+
+@app.post("/api/watchlist")
+def add_watch(body: WatchIn) -> Dict[str, Any]:
+    symbols = _normalize_watchlist(_read_json(WATCHLIST_PATH, list(DEFAULT_WATCHLIST)))
+    sym = _WATCH_ALIASES.get(body.symbol.upper().strip(), body.symbol.upper().strip())
+    if sym and sym not in symbols:
+        symbols.append(sym)
+        _write_json(WATCHLIST_PATH, symbols)
+    return {"symbols": symbols}
+
+
+@app.delete("/api/watchlist/{symbol}")
+def del_watch(symbol: str) -> Dict[str, Any]:
+    want = _WATCH_ALIASES.get(symbol.upper().strip(), symbol.upper().strip())
+    symbols = [s for s in _normalize_watchlist(_read_json(WATCHLIST_PATH, [])) if s != want]
+    _write_json(WATCHLIST_PATH, symbols)
+    return {"symbols": symbols}
+
+
+@app.get("/api/universe")
+def universe() -> Dict[str, Any]:
+    return {"universe": STOCK_UNIVERSE}
+
+
+@app.get("/api/quotes")
+def quotes(limit: int = 24) -> Dict[str, Any]:
+    import yfinance as yf
+
+    tickers = [s["ticker"] for s in STOCK_UNIVERSE[:limit]]
+    rows = []
+    try:
+        data = yf.download(tickers, period="5d", interval="1d", group_by="ticker", progress=False, threads=True)
+        for t in tickers:
+            try:
+                frame = data[t] if len(tickers) > 1 else data
+                close = float(frame["Close"].dropna().iloc[-1])
+                prev = float(frame["Close"].dropna().iloc[-2]) if len(frame["Close"].dropna()) > 1 else close
+                chg = (close - prev) / prev * 100 if prev else 0
+                meta = next((s for s in STOCK_UNIVERSE if s["ticker"] == t), {})
+                rows.append({"symbol": t, "name": meta.get("name_en", t), "sector": meta.get("sector"), "last": close, "chg_pct": round(chg, 2)})
+            except Exception:
+                continue
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Quote fetch failed: {exc}") from exc
+    return {"quotes": rows}
+
+
+@app.get("/api/chart/{symbol}")
+def chart(symbol: str, period: str = "6mo") -> Dict[str, Any]:
+    from backend.api.desk_chart import chart_payload
+
+    return chart_payload(symbol, period=period)
+
+
+@app.post("/api/scan")
+def scan_start(body: Optional[ScanIn] = None) -> Dict[str, Any]:
+    body = body or ScanIn()
+    llm_weight = max(0.0, min(0.4, float(body.llm_weight)))
+    job = research_jobs.start_scan(
+        lang=body.lang,
+        llm_weight=llm_weight,
+        use_llm=body.use_llm,
+        force_refresh=body.force_refresh,
+    )
+    return {"accepted": True, "job": job}
+
+
+@app.get("/api/scan/status")
+def scan_status(job_id: Optional[str] = None) -> Dict[str, Any]:
+    if job_id:
+        return {"job": research_jobs.resolve_job("scan", job_id)}
+    return {"job": research_jobs.latest_job("scan"), "latest": research_jobs.latest_scan()}
+
+
+@app.get("/api/scan/latest")
+def scan_latest() -> Dict[str, Any]:
+    return research_jobs.latest_scan()
+
+
+@app.post("/api/deep")
+def deep_start(body: DeepIn) -> Dict[str, Any]:
+    try:
+        job = research_jobs.start_deep(
+            tickers=body.tickers,
+            lang=body.lang,
+            force_refresh=body.force_refresh,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return {"accepted": True, "job": job}
+
+
+@app.get("/api/deep/status")
+def deep_status(job_id: Optional[str] = None) -> Dict[str, Any]:
+    if job_id:
+        return {"job": research_jobs.resolve_job("deep", job_id)}
+    return {"job": research_jobs.latest_job("deep"), "latest": research_jobs.latest_deep()}
+
+
+@app.get("/api/deep/latest")
+def deep_latest() -> Dict[str, Any]:
+    return research_jobs.latest_deep()
+
+
+@app.get("/api/research/{symbol}")
+def research(symbol: str) -> Dict[str, Any]:
+    return research_jobs.research_bundle(symbol)
+
+
+@app.get("/api/options/{symbol}")
+def options(symbol: str) -> Dict[str, Any]:
+    import yfinance as yf
+
+    t = yf.Ticker(symbol.upper())
+    try:
+        expiries = list(t.options or [])
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    if not expiries:
+        return {"symbol": symbol.upper(), "expiry": None, "calls": [], "puts": []}
+    expiry = expiries[0]
+    chain = t.option_chain(expiry)
+    def _trim(df):
+        if df is None or df.empty:
+            return []
+        cols = [c for c in ("contractSymbol", "strike", "lastPrice", "bid", "ask", "impliedVolatility", "volume", "openInterest") if c in df.columns]
+        return df[cols].head(20).fillna(0).to_dict(orient="records")
+    return {"symbol": symbol.upper(), "expiry": expiry, "expiries": expiries[:8], "calls": _trim(chain.calls), "puts": _trim(chain.puts)}
+
+
+@app.get("/api/calendar")
+def calendar() -> Dict[str, Any]:
+    import yfinance as yf
+
+    events: List[Dict[str, Any]] = [
+        {"date": datetime.now(timezone.utc).strftime("%Y-%m-%d"), "event": "US session", "impact": "Med", "symbol": "SPY", "kind": "macro"},
+    ]
+    for ticker in ["AAPL", "MSFT", "NVDA", "AMZN", "META", "JPM"]:
+        try:
+            cal = yf.Ticker(ticker).calendar
+            if cal is None:
+                continue
+            earn = None
+            if hasattr(cal, "get"):
+                earn = cal.get("Earnings Date")
+            if earn is not None:
+                events.append({"date": str(earn)[:10], "event": f"{ticker} earnings", "impact": "High", "symbol": ticker, "kind": "earnings"})
+        except Exception:
+            continue
+    return {"events": events[:30]}
+
+
+@app.get("/api/journal")
+def journal(limit: int = 100, kind: str = "all") -> Dict[str, Any]:
+    from backend.api import trade_journal
+
+    return trade_journal.build_journal_response(
+        order_store=_store,
+        limit=max(1, min(int(limit or 100), 400)),
+        kind=str(kind or "all"),
+    )
+
+
+@app.get("/api/journal/audit/{event_id}")
+def journal_audit(event_id: str) -> Dict[str, Any]:
+    from backend.api import trade_journal
+
+    event = trade_journal.get_audit_event(event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Audit event not found")
+    return event
+
+
+@app.get("/api/journal/entry/{log_id}")
+def journal_entry(log_id: str) -> Dict[str, Any]:
+    from backend.api import trade_journal
+
+    entry = trade_journal.get_entry(log_id, order_store=_store)
+    if not entry:
+        raise HTTPException(status_code=404, detail="Journal entry not found")
+    return {"entry": entry, "audit": trade_journal.linked_audit_for_entry(entry)}
+
+
+@app.post("/api/journal")
+def add_journal(body: JournalIn) -> Dict[str, Any]:
+    from backend.api import trade_journal
+
+    zone_id = str(body.zone_id or "").strip()
+    cite = None
+    if zone_id:
+        zone = desk_zones.get_zone(zone_id)
+        if zone is None:
+            raise HTTPException(status_code=404, detail=desk_zones.UNABLE)
+        zone_id = str(zone.get("zone_id") or "")
+        cite = str(zone.get("cite") or "")
+    trade_journal.add_note(
+        body.symbol,
+        body.note,
+        body.side,
+        zone_id=zone_id or None,
+        zone_cite=cite,
+    )
+    return trade_journal.build_journal_response(order_store=_store, limit=100)
+
+
+@app.get("/api/digest")
+def daily_digest(refresh: bool = False, _auth: None = Depends(require_operator)) -> Dict[str, Any]:
+    """Desk/Telegram daily blotter: filled vs pending, skips, paper vs SPY net of costs."""
+    from backend.api import paper_performance
+
+    paper = None
+    if refresh:
+        try:
+            paper = paper_performance.build_paper_report(persist=True)
+        except Exception:
+            paper = None
+    return paper_performance.build_daily_digest(paper=paper, persist_paper=False)
+
+
+@app.get("/api/performance")
+def performance(refresh: bool = False, _auth: None = Depends(require_operator)) -> Dict[str, Any]:
+    """Paper book vs SPY (preferred) plus optional stable backtest summary."""
+    from backend.api import paper_performance
+
+    paper = paper_performance.build_paper_report(persist=True) if refresh else None
+    if paper is None:
+        cached = paper_performance.load_cached_paper_report()
+        if cached:
+            metrics = cached.get("metrics") or {}
+            trading_days = (cached.get("period") or {}).get("trading_days") or 0
+            num_trades = metrics.get("num_trades") or 0
+            empty_book = int(trading_days) == 0 and int(num_trades) == 0
+            paper = {
+                "available": True,
+                "empty_book": empty_book,
+                "source": "performance_paper.json",
+                "generated_at": cached.get("generated_at"),
+                "period": cached.get("period") or {},
+                "pnl": cached.get("pnl") or {},
+                "risk": {
+                    "sharpe_ratio": metrics.get("sharpe_ratio"),
+                    "max_drawdown_pct": metrics.get("max_drawdown_pct"),
+                },
+                "trading": {
+                    "num_trades": metrics.get("num_trades"),
+                    "turnover_pct": (cached.get("costs") or {}).get("turnover_pct"),
+                },
+                "benchmark": {
+                    "spy_return_pct": (cached.get("benchmark") or {}).get("spy_return_pct"),
+                    "alpha_gross_pct": (cached.get("costs") or {}).get("alpha_gross_pct"),
+                    "alpha_net_of_costs_pct": (cached.get("costs") or {}).get("alpha_net_of_costs_pct"),
+                    "assumed_cost_bps": (cached.get("costs") or {}).get("assumed_round_trip_bps"),
+                    "beats_spy_net": None if empty_book else cached.get("beats_spy_net"),
+                },
+                "seal_preview": {
+                    "passed": cached.get("seal_passed"),
+                    "reasons": cached.get("seal_reasons") or [],
+                },
+                "disclaimer": cached.get("disclaimer"),
+            }
+        else:
+            paper = paper_performance.build_paper_report(persist=True)
+
+    summary_path = Path(DATA_DIR) / "strategy_backtest_stable_summary.json"
+    summary = _read_json(summary_path, {})
+    from backend.trading.performance.display import attach_display
+
+    paper = attach_display(paper or {})
+    empty = bool(paper.get("empty_book")) if paper else True
+    kpis = compose_performance_kpis(paper, summary)
+    view = paper.get("display") if isinstance(paper.get("display"), dict) else {}
+    claims_ok = bool(view.get("claims_allowed")) and not empty
+    return {
+        "paper": paper,
+        "source": paper.get("source") if paper else "none",
+        "kpi_source": kpis["kpi_source"],
+        "kpi_label": kpis["kpi_label"],
+        "kpi_cue": kpis.get("kpi_cue"),
+        "empty_book": kpis["empty_book"],
+        "win_rate_pct": kpis["win_rate_pct"],
+        "profit_factor": kpis["profit_factor"],
+        "sharpe_ratio": kpis["sharpe_ratio"],
+        "max_drawdown_pct": kpis["max_drawdown_pct"],
+        "total_return_pct": kpis["total_return_pct"] if claims_ok else None,
+        "num_trades": kpis["num_trades"],
+        "spy_return_pct": view.get("spy_return_pct") if claims_ok else None,
+        "alpha_net_of_costs_pct": view.get("alpha_net_of_costs_pct") if claims_ok else None,
+        "beats_spy_net": view.get("beats_spy_net") if claims_ok else None,
+        "annualized_return_pct": view.get("annualized_return_pct") if claims_ok else None,
+        "annualized_label": view.get("annualized_label") or "n/a",
+        "performance_display": view,
+        "backtest": {
+            "source": "stable_strategy_backtest" if summary else "none",
+            "win_rate_pct": summary.get("win_rate_pct"),
+            "profit_factor": summary.get("profit_factor"),
+            "sharpe_ratio": summary.get("sharpe_ratio"),
+            "max_drawdown_pct": summary.get("max_drawdown_pct"),
+            "total_return_pct": summary.get("total_return_pct"),
+            "num_trades": summary.get("num_trades"),
+        },
+        "verified": False,
+        "live": False,
+    }
+
+
+@app.get("/api/strategy-bakeoff")
+def strategy_bakeoff() -> Dict[str, Any]:
+    """Desk Strategies page: rows from scripts/run_strategy_bakeoff.py output."""
+    path = Path(DATA_DIR) / "strategy_bakeoff_summary.json"
+    raw = _read_json(path, [])
+    if isinstance(raw, dict):
+        rows = raw.get("rows") or []
+        disclaimer = raw.get("disclaimer")
+    elif isinstance(raw, list):
+        rows = raw
+        disclaimer = None
+    else:
+        rows, disclaimer = [], None
+    return {
+        "available": bool(rows),
+        "rows": rows,
+        "disclaimer": disclaimer,
+        "path": str(path.name),
+    }
+
+
+class LabAdvisoryIn(BaseModel):
+    ticker: str = "AAPL"
+    fund_score: float = 50.0
+    scan_rank: Optional[int] = None
+    context: str = ""
+    top_n: List[str] = Field(default_factory=list)
+    use_llm: bool = False
+    product: bool = True
+
+
+class LabTearIn(BaseModel):
+    ticker: Optional[str] = None
+    period: str = "1y"
+
+
+@app.get("/api/lab/status")
+def lab_status_api() -> Dict[str, Any]:
+    """Lab citation-try flags/imports. Never places orders."""
+    from backend.lab.advisory_debate import advisory_budget
+    from backend.lab.flags import lab_status
+
+    payload = lab_status()
+    payload["advisory_budget_used"] = advisory_budget()
+    return payload
+
+
+@app.get("/api/lab/ab-report")
+def lab_ab_report() -> Dict[str, Any]:
+    """Schema / sentiment / advisory / tear completeness — not SPY bakeoff."""
+    from backend.lab.ab_metrics import collect_ab_report
+
+    return collect_ab_report()
+
+
+@app.post("/api/lab/advisory")
+def lab_advisory(body: LabAdvisoryIn) -> Dict[str, Any]:
+    """Bull/Bear/Risk research draft. Does not call OrderManager."""
+    from backend.lab.advisory_debate import compose_research_memo, run_advisory_debate
+
+    debate = run_advisory_debate(
+        body.ticker,
+        fund_score=float(body.fund_score),
+        scan_rank=body.scan_rank,
+        context=body.context,
+        top_n_before=list(body.top_n or []),
+        product=bool(body.product),
+        use_llm=bool(body.use_llm),
+    )
+    try:
+        deep = research_jobs.latest_deep()
+        report = (deep.get("reports") or {}).get((body.ticker or "").upper())
+        if isinstance(report, dict) and not report.get("error"):
+            debate["memo"] = compose_research_memo(report, debate)
+    except Exception:
+        pass
+    debate["places_order"] = False
+    return debate
+
+
+@app.get("/api/lab/tear")
+def lab_tear_get(request: Request, ticker: Optional[str] = None) -> Dict[str, Any]:
+    """Last cached QuantStats-style tear (JSON stub if lab deps missing)."""
+    from backend.lab.quantstats_tear import load_latest_tear
+
+    want = (ticker or "").strip().upper() or None
+    if not want:
+        require_operator(request)
+        return load_latest_tear(ticker=None)
+    data = load_latest_tear(ticker=want)
+    if is_operator(request):
+        return data
+    scope = str(data.get("scope") or "").lower()
+    cached = str(data.get("ticker") or "").upper() or None
+    if scope == "paper" or (cached and cached != want):
+        return _guest_tear_stub(want)
+    return data
+
+
+@app.get("/api/lab/tear.html")
+def lab_tear_html(_auth: None = Depends(require_operator)):
+    """Serve QuantStats HTML when LAB_QUANTSTATS produced a file; else 404."""
+    from backend.lab.quantstats_tear import load_latest_tear
+
+    latest = load_latest_tear()
+    path = Path(str(latest.get("path") or ""))
+    if not latest.get("html_available") or path.suffix.lower() != ".html" or not path.exists():
+        raise HTTPException(status_code=404, detail="Tear HTML not generated (stub only).")
+    return FileResponse(path, media_type="text/html", headers={"Cache-Control": "no-store"})
+
+
+@app.post("/api/lab/tear")
+def lab_tear(request: Request, body: Optional[LabTearIn] = None) -> Dict[str, Any]:
+    """QuantStats/HTML or JSON stub for the paper book or one ticker."""
+    from backend.lab.quantstats_tear import build_desk_tear
+
+    body = body or LabTearIn()
+    ticker = (body.ticker or "").strip() or None
+    if not ticker:
+        require_operator(request)
+    return build_desk_tear(ticker=ticker, period=body.period or "1y")
+
+
+@app.get("/api/health")
+def health() -> Dict[str, str]:
+    return {"status": "ok", "name": APP_NAME}
+
+
+@app.get("/")
+def index():
+    return FileResponse(STATIC_DIR / "index.html", headers={"Cache-Control": "no-store"})
+
+
+@app.get("/m")
+def mobile_index():
+    """Read-only phone shell. Does not serve the desktop trading desk."""
+    return FileResponse(STATIC_DIR / "mobile.html", headers={"Cache-Control": "no-store"})
+
+
+@app.get("/m/manifest.webmanifest")
+def mobile_manifest():
+    path = STATIC_DIR / "mobile.webmanifest"
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(
+        path,
+        media_type="application/manifest+json",
+        headers={"Cache-Control": "no-store"},
+    )
+
+
+@app.get("/static/vendor/{filename}")
+def desk_vendor(filename: str):
+    """Serve vendored Chart JS only (lightweight-charts). Not a generic dump."""
+    allowed = {
+        "lightweight-charts.standalone.production.js",
+        "LICENSE.lightweight-charts.txt",
+    }
+    if filename not in allowed:
+        raise HTTPException(status_code=404, detail="Not found")
+    path = STATIC_DIR / "vendor" / filename
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Not found")
+    media = "application/javascript" if path.suffix == ".js" else "text/plain"
+    return FileResponse(
+        path,
+        media_type=media,
+        headers={"Cache-Control": "public, max-age=86400"},
+    )

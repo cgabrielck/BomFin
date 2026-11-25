@@ -1,0 +1,23 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.16, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01
+configfile: pytest.ini
+plugins: anyio-4.16.0, platformdirs-4.14.8
+collected 2 items
+
+tests\gabfin\test_market_events.py FF                                    [100%]
+
+================================== FAILURES ===================================
+________ test_event_cannot_relabel_payload_as_a_different_feed[quote] _________
+tests\gabfin\test_market_events.py:106: in test_event_cannot_relabel_payload_as_a_different_feed
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+_________ test_event_cannot_relabel_payload_as_a_different_feed[bar] __________
+tests\gabfin\test_market_events.py:106: in test_event_cannot_relabel_payload_as_a_different_feed
+    from gabfin.contracts.events import MarketEvent
+E   ModuleNotFoundError: No module named 'gabfin.contracts.events'
+- generated xml file: C:\Users\001\Desktop\GabFin-ai-trade\docs\audit\artifacts\s02-02b\events-source-red.xml -
+=========================== short test summary info ===========================
+FAILED tests/gabfin/test_market_events.py::test_event_cannot_relabel_payload_as_a_different_feed[quote]
+FAILED tests/gabfin/test_market_events.py::test_event_cannot_relabel_payload_as_a_different_feed[bar]
+============================== 2 failed in 1.82s ==============================
