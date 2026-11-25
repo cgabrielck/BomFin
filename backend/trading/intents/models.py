@@ -1,6 +1,6 @@
 """Intent v0 model — L1 runtime intent (H3 write / H1 consume).
 
-Binds under ADR-003 Addendum A and MODULAR_ARCHITECTURE §5.6.
+Legacy implementation model; the new GabFin design defines future contracts.
 Intents are NOT orders. Final qty is produced only by the M8 sizer.
 """
 from __future__ import annotations

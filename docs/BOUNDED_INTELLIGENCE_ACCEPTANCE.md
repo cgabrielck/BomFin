@@ -1,7 +1,10 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # 有界智能接受頁｜Bounded Intelligence Acceptance
 
 > **Status:** Draft（plan-14／AUDIT remediation item 5）— 待 Owner／PM 審；**未 Accepted、未 merge 前唔作產品宣稱依據。**  
-> **Binds under:** [ADR-003 + Addendum A](ADR-003-live-ai-trading-desk.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)。  
+> **Binds under:** [ADR-003 + Addendum A](ARCHITECTURE_DECISION.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)。\
 > **Index:** [ARCHITECTURE_DECISION.md](ARCHITECTURE_DECISION.md)。**ADR-002 is VOID.**  
 > **Does not elevate:** PATH、D7（參考訊號仍 planning）、O5、flatten — 本頁唔升格呢啲決策。  
 > **Date:** 2026-10-23（Asia/Hong_Kong）

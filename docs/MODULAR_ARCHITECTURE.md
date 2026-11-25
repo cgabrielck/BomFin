@@ -1,6 +1,9 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # MODULAR_ARCHITECTURE — 版塊式系統架構（建庫前）
 
-> **Binds under ADR-003 + Addendum A (Accepted).** Index: [`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md). Canonical ADR: [`ADR-003-live-ai-trading-desk.md`](ADR-003-live-ai-trading-desk.md). Audit: [`AUDIT_REMEDIATION_PLAN_2026-10-21.md`](AUDIT_REMEDIATION_PLAN_2026-10-21.md) (**Confirmed by Gabriel 2026-10-21**). **ADR-002 is VOID.** Product UI = FastAPI Desk (`web/static`); Streamlit = lab/legacy. `backend/lab/advisory_debate.py` **≠ product M7** and must **not** wire to `OrderManager`.
+> **Binds under ADR-003 + Addendum A (Accepted).** Index: [`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md). Canonical ADR: [`ADR-003-live-ai-trading-desk.md`](ARCHITECTURE_DECISION.md). Audit: [`AUDIT_REMEDIATION_PLAN_2026-10-21.md`](AUDIT_REMEDIATION_PLAN_2026-10-21.md) (**Confirmed by Gabriel 2026-10-21**). **ADR-002 is VOID.** Product UI = FastAPI Desk (`web/static`); Streamlit = lab/legacy. `backend/lab/advisory_debate.py` **≠ product M7** and must **not** wire to `OrderManager`.
 
 **Status:** Draft for build planning（對齊 ADR-003 Accepted）  
 **Date:** 2026-10-21  
@@ -693,7 +696,7 @@ flowchart LR
 
 ## 9. Related docs
 
-- [`ADR-003-live-ai-trading-desk.md`](ADR-003-live-ai-trading-desk.md) — **Accepted** 決策（含 **Addendum A** Proposal 治理）  
+- [`ADR-003-live-ai-trading-desk.md`](ARCHITECTURE_DECISION.md) — **Accepted** 決策（含 **Addendum A** Proposal 治理）\
 - [`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md) — 決策索引（002 VOID）  
 - [`AUDIT_REMEDIATION_PLAN_2026-10-21.md`](AUDIT_REMEDIATION_PLAN_2026-10-21.md) — **Confirmed** 2026-10-21  
 - [`BOUNDED_INTELLIGENCE_ACCEPTANCE.md`](BOUNDED_INTELLIGENCE_ACCEPTANCE.md) — **Draft** AUDIT item 5 / plan-14（pending Owner/PM; not Accepted）  

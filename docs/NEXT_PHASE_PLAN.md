@@ -1,3 +1,6 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # ALPHA//DESK — 下一阶段详细计划 (Next Phase Plan)
 
 > ## 已凍結／已被取代 (2026-10-21)
@@ -5,7 +8,7 @@
 > **本文件已凍結。** 僅作歷史提案，**不是**架構、產品或排程權威。
 >
 > 衝突依下列順序解決：
-> 1. **ADR-003 + Addendum A（Accepted）** — [`ADR-003-live-ai-trading-desk.md`](ADR-003-live-ai-trading-desk.md)（索引：[`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md)）
+> 1. **ADR-003 + Addendum A（Accepted）** — [`ADR-003-live-ai-trading-desk.md`](ARCHITECTURE_DECISION.md)（索引：[`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md)）
 > 2. [`MODULAR_ARCHITECTURE.md`](MODULAR_ARCHITECTURE.md)
 > 3. [`AUDIT_REMEDIATION_PLAN_2026-10-21.md`](AUDIT_REMEDIATION_PLAN_2026-10-21.md)（**Gabriel 2026-10-21 Confirmed**）
 >

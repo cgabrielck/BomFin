@@ -1,7 +1,10 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # 參考訊號設計頁｜Reference Signals Design
 
 > **Status:** Draft（ns-2 / reference-signals）— 待 Owner／PM 審；**未 Accepted、未 merge 前唔作產品宣稱依據。Draft ≠ Accepted。Merge ≠ Accepted。**  
-> **Binds under:** [ADR-003 + Addendum A](ADR-003-live-ai-trading-desk.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)（Confirmed items 1–5 **only**）> related Drafts：[BOUNDED_INTELLIGENCE_ACCEPTANCE.md](BOUNDED_INTELLIGENCE_ACCEPTANCE.md)（有界智能）／ [ACCOUNT_MANAGEMENT_DESIGN.md](ACCOUNT_MANAGEMENT_DESIGN.md)（管戶範圍）／ [LAB_PRODUCT_M7_BINDING.md](LAB_PRODUCT_M7_BINDING.md)（lab≠M7）／ [CHARTS_INDICATORS_DESIGN.md](CHARTS_INDICATORS_DESIGN.md)（ns-1 圖表／指標）。  
+> **Binds under:** [ADR-003 + Addendum A](ARCHITECTURE_DECISION.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)（Confirmed items 1–5 **only**）> related Drafts：[BOUNDED_INTELLIGENCE_ACCEPTANCE.md](BOUNDED_INTELLIGENCE_ACCEPTANCE.md)（有界智能）／ [ACCOUNT_MANAGEMENT_DESIGN.md](ACCOUNT_MANAGEMENT_DESIGN.md)（管戶範圍）／ [LAB_PRODUCT_M7_BINDING.md](LAB_PRODUCT_M7_BINDING.md)（lab≠M7）／ [CHARTS_INDICATORS_DESIGN.md](CHARTS_INDICATORS_DESIGN.md)（ns-1 圖表／指標）。\
 > **Index:** [ARCHITECTURE_DECISION.md](ARCHITECTURE_DECISION.md)。**ADR-002 is VOID.**  
 > **North star（鎖定）：** 遠端交易台（TradingView-style 圖表／指標；Desk **v0 日線 K 線**已喺 `main` PR #36，唔等於官方 TradingView）；用戶可見可追溯日誌；**App 提供參考訊號**（建議買入／賣出、指標解讀、策略——**細節仍 planning**）；AI 幫管戶；迷你富途式 UX；**唔係**淨後台 Python 指標工具；真倉要過證據閘；Code Review 擋假 source／hardcode。  
 > **Does not elevate:** Intent→M8／H1–H3、D7-DESIGN（雙目錄；**≠** ADR-003 D7 參考訊號）、Desk flatten product exception（G2）、fake verified／live、lab→`OrderManager`、產品 M7 實作已交付、參考訊號／SignalCard schema 已定、真倉已就緒。Issue #10 stays OPEN.  

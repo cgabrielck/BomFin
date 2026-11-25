@@ -1,3 +1,6 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # Paper Validation Runbook (Stage 3 Gate)
 
 > ## FROZEN / SUPERSEDED (2026-10-21)
@@ -5,7 +8,7 @@
 > **This document is frozen.** It is historical evidence procedure only. It is **not** architecture, product, or sequencing authority.
 >
 > Conflicts are resolved by, in order:
-> 1. **ADR-003 + Addendum A (Accepted)** — [`ADR-003-live-ai-trading-desk.md`](ADR-003-live-ai-trading-desk.md) (index: [`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md))
+> 1. **ADR-003 + Addendum A (Accepted)** — [`ADR-003-live-ai-trading-desk.md`](ARCHITECTURE_DECISION.md) (index: [`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md))
 > 2. [`MODULAR_ARCHITECTURE.md`](MODULAR_ARCHITECTURE.md)
 > 3. [`AUDIT_REMEDIATION_PLAN_2026-10-21.md`](AUDIT_REMEDIATION_PLAN_2026-10-21.md) (**Confirmed by Gabriel 2026-10-21**)
 >

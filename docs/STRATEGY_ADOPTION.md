@@ -1,3 +1,6 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # ALPHA//DESK — 策略引用採納報告（Strategy Adoption）
 
 **Last updated:** 2026-09-16  

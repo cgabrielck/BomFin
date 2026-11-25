@@ -4,8 +4,8 @@ Path A P0: morning / agents / activity. Continue and Pause post only to the
 paper worker. This module does not place orders, approve live, edit live
 rules, run Scan or Deep, or touch the broker kill switch.
 
-ADR-005 stays Draft. Shipping this route does not Accept the ADR and does
-not open live trading.
+Legacy implementation only; its old architecture decisions are retired.
+The adr_005 response metadata is retained for compatibility, not design authority.
 """
 from __future__ import annotations
 

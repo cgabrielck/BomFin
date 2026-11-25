@@ -1,6 +1,9 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # Cgab — World-class upgrade plan
 
-> **Architecture authority (2026-10-21):** [`ADR-003-live-ai-trading-desk.md`](ADR-003-live-ai-trading-desk.md) **Accepted + Addendum A**. Index: [`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md). Audit: [`AUDIT_REMEDIATION_PLAN_2026-10-21.md`](AUDIT_REMEDIATION_PLAN_2026-10-21.md) (Confirmed). **ADR-002 is VOID.** This file remains the OSS catalog / grade history; it is **not** binding. See [`MODULAR_ARCHITECTURE.md`](MODULAR_ARCHITECTURE.md).
+> **Architecture authority (2026-10-21):** [`ADR-003-live-ai-trading-desk.md`](ARCHITECTURE_DECISION.md) **Accepted + Addendum A**. Index: [`ARCHITECTURE_DECISION.md`](ARCHITECTURE_DECISION.md). Audit: [`AUDIT_REMEDIATION_PLAN_2026-10-21.md`](AUDIT_REMEDIATION_PLAN_2026-10-21.md) (Confirmed). **ADR-002 is VOID.** This file remains the OSS catalog / grade history; it is **not** binding. See [`MODULAR_ARCHITECTURE.md`](MODULAR_ARCHITECTURE.md).
 
 **Last updated:** 2026-09-17 (wait-state: Waves 1–5 landed; Wave 6 next)  
 **Status:** Frozen operating-strategy notes. **No trading-code changes until you approve a coding slice.**  
@@ -286,4 +289,3 @@ queue. This file remains the grade / OSS catalog; Waves are the coding sequence.
 **Landed (Waves 0–5):** ADR-002 (now VOID; restated under ADR-003); Slice A paper-truth; session-timed auto Scan + keep-real-scores; Desk evidence (provenance, paper vs SPY net of costs, digest/tear/advisory); Polygon+calendar path; factor IC/IR lab; optional `defensive_gld`; trading-AI redesign (Stage-2 `trend`, regime `adaptive`, Connors `stable`/`reversion`, breakout+RS, risk-pct sizing, bakeoff vs SPY). Default paper strategy remains `research_list`.
 
 **Do not start next (Wave 6+):** Lean/Nautilus sidecars; FinBERT as a trading gate; live; silently rewriting `research_list` / Stable. Those wait for their Wave.
-

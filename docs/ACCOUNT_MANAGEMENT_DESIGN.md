@@ -1,7 +1,10 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # 管戶設計頁｜Account Management Design
 
 > **Status:** Draft（plan-15）— 待 Owner／PM 審；**未 Accepted、未 merge 前唔作產品宣稱依據。**  
-> **Binds under:** [ADR-003 + Addendum A](ADR-003-live-ai-trading-desk.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)（Confirmed items 1–5）> [BOUNDED_INTELLIGENCE_ACCEPTANCE.md](BOUNDED_INTELLIGENCE_ACCEPTANCE.md)（Draft：有界智能接受條件；本頁寫管戶**產品範圍**）。  
+> **Binds under:** [ADR-003 + Addendum A](ARCHITECTURE_DECISION.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)（Confirmed items 1–5）> [BOUNDED_INTELLIGENCE_ACCEPTANCE.md](BOUNDED_INTELLIGENCE_ACCEPTANCE.md)（Draft：有界智能接受條件；本頁寫管戶**產品範圍**）。\
 > **Index:** [ARCHITECTURE_DECISION.md](ARCHITECTURE_DECISION.md)。**ADR-002 is VOID.**  
 > **North star（鎖定）：** 遠端交易台（迷你富途＋TradingView 可讀性）；用戶可見可追溯日誌；AI 幫管戶（美股／期權，之後可加黃金）；**唔係**淨後台 Python 指標工具；真倉要過證據閘。  
 > **Does not elevate:** Intent→M8／H1–H3、D7-DESIGN（雙目錄合併）、Desk flatten product exception、fake verified／live、lab `advisory_debate`→`OrderManager`。Issue #10 stays OPEN.  

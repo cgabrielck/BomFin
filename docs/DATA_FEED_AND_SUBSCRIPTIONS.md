@@ -1,3 +1,6 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # 資料訂閱建議 — 能長期用的 API，不是爬蟲
 
 **Status:** Recommendation revised to the owner's budget（2026-10-26 Asia/Hong_Kong）。方法頁已 Accepted；**本頁不是訂單。** **本 PR 不購買、不寫入金鑰、不改 runtime。**  
@@ -245,4 +248,4 @@ Candidates and option quotes still do not open positions.
 - [PROCUREMENT_GUIDE.md](PROCUREMENT_GUIDE.md) — older buy-order (VPS, Alpaca paper, Polygon daily). This page is the 2026-10-26 price check for scout feeds and the options-capable comparison. It does not replace the VPS / broker section. Where the older guide says "IBKR later" and "do not buy Bloomberg," that still matches §9.
 - [PAID_DATA_PIT_PLAN.md](PAID_DATA_PIT_PLAN.md) — worker already prefers Polygon bars when the key is real.
 - [ACCOUNT_MANAGEMENT_DESIGN.md](ACCOUNT_MANAGEMENT_DESIGN.md) §8.1 — options UI is research until a separate evidence gate.
-- [ADR-006-futu-opend-desk-observe.md](ADR-006-futu-opend-desk-observe.md) — **Accepted**（Gabriel 2026-11-10 Asia/Hong_Kong / HKT；**Accepted ≠ runtime**；不是採購）。Owner 自營的富途 OpenD 觀察路徑（Desk 細時框／報價）。不是本頁的購買 SKU，也不取代上文 Massive Stocks Starter 稍後再買的建議。Alpaca paper 仍是券商。觀察 adapter 若在後續草稿，仍不是本頁採購、§5 未勾、未在 `main` 上執行。
+- [ADR-006-futu-opend-desk-observe.md](ARCHITECTURE_DECISION.md) — **Accepted**（Gabriel 2026-11-10 Asia/Hong_Kong / HKT；**Accepted ≠ runtime**；不是採購）。Owner 自營的富途 OpenD 觀察路徑（Desk 細時框／報價）。不是本頁的購買 SKU，也不取代上文 Massive Stocks Starter 稍後再買的建議。Alpaca paper 仍是券商。觀察 adapter 若在後續草稿，仍不是本頁採購、§5 未勾、未在 `main` 上執行。

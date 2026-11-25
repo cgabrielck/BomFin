@@ -1,3 +1,6 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](../../docs/ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # ALPHA//DESK Trading Engine
 
 This module contains the core execution logic for the auto-trading upgrade. It is designed to be safe, auditable, and decoupled from the specific brokerage implementation.

@@ -1,4 +1,7 @@
-﻿# AUDIT_REMEDIATION_PLAN (2026-10-21)
+﻿> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
+# AUDIT_REMEDIATION_PLAN (2026-10-21)
 
 審計補救計劃／Audit Remediation Plan — 交易應用（Trading Apps）
 

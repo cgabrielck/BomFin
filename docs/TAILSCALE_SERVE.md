@@ -1,3 +1,6 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # Tailscale Serve — 手機 Desk 唯讀（路徑 A）
 
 **狀態：** 操作說明。**ADR-005 仍是 Draft**，本文件不把它標成 Accepted，也不開 live。  

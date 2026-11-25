@@ -1,7 +1,10 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # Lab ≠ Product M7 綁定頁｜Lab Advisory Isolation Binding
 
 > **Status:** Draft（plan-16）— 待 Owner／PM 審；**未 Accepted、未 merge 前唔作產品宣稱依據。Merge ≠ Accepted。**  
-> **Binds under:** [ADR-003 + Addendum A](ADR-003-live-ai-trading-desk.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)（Confirmed items 1–5）> [BOUNDED_INTELLIGENCE_ACCEPTANCE.md](BOUNDED_INTELLIGENCE_ACCEPTANCE.md)（Draft：有界智能）> [ACCOUNT_MANAGEMENT_DESIGN.md](ACCOUNT_MANAGEMENT_DESIGN.md)（Draft：管戶範圍）。  
+> **Binds under:** [ADR-003 + Addendum A](ARCHITECTURE_DECISION.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > [AUDIT_REMEDIATION_PLAN_2026-10-21.md](AUDIT_REMEDIATION_PLAN_2026-10-21.md)（Confirmed items 1–5）> [BOUNDED_INTELLIGENCE_ACCEPTANCE.md](BOUNDED_INTELLIGENCE_ACCEPTANCE.md)（Draft：有界智能）> [ACCOUNT_MANAGEMENT_DESIGN.md](ACCOUNT_MANAGEMENT_DESIGN.md)（Draft：管戶範圍）。\
 > **Index:** [ARCHITECTURE_DECISION.md](ARCHITECTURE_DECISION.md)。**ADR-002 is VOID.**  
 > **North star（鎖定）：** 遠端交易台（圖表／指標／可追溯日誌／參考訊號 planning）；AI 幫管戶；硬風控之上先判斷；**真倉要過證據閘**；Code Review 擋假 source／假 summary／hardcoded 結論。  
 > **Does not elevate:** Intent→M8／H1–H3、D7-DESIGN、Desk flatten product exception、fake verified／live、產品 M7 實作已交付。Issue #10 stays OPEN.  

@@ -1,6 +1,6 @@
 """Mobile Desk RO P0 — zero-order shell, paper continue/pause, Tailscale copy.
 
-ADR-005 stays Draft. These checks do not Accept it and do not open live trading.
+Legacy behavior regression; retired ADR labels do not govern the new architecture.
 """
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[2]
 MOBILE = ROOT / "web" / "static" / "mobile.html"
 INDEX = ROOT / "web" / "static" / "index.html"
 SERVE_DOC = ROOT / "docs" / "TAILSCALE_SERVE.md"
-ADR = ROOT / "docs" / "ADR-005-mobile-desk-readonly.md"
+ARCHITECTURE_INDEX = ROOT / "docs" / "ARCHITECTURE_DECISION.md"
 
 FORBIDDEN_MOBILE = (
     "Approve live",
@@ -231,17 +231,18 @@ def test_narrow_desktop_redirects_to_mobile_shell():
     assert "display:none" in media
 
 
-def test_serve_doc_is_private_mesh_and_adr_stays_draft():
+def test_serve_doc_is_private_mesh_and_legacy_architecture_retired():
     doc = SERVE_DOC.read_text(encoding="utf-8")
     assert "tailscale serve" in doc
     assert "請開啟 Tailscale 後重新整理" in doc
     assert "/m" in doc
-    assert "Draft" in doc
+    assert "LEGACY / SUPERSEDED" in doc
     assert "加入主畫面" in doc
     assert not re.search(r"tailscale\s+funnel", doc, flags=re.I)
     assert "ngrok http" not in doc.lower()
-    adr = ADR.read_text(encoding="utf-8").splitlines()
-    assert any("**Status:** **Draft**" in line for line in adr[:8])
+    architecture = ARCHITECTURE_INDEX.read_text(encoding="utf-8")
+    assert "SUPERSEDED" in architecture
+    assert "2026-11-25-gabfin-system-design.md" in architecture
     assert not (ROOT / "capacitor.config.ts").exists()
     assert not (ROOT / "capacitor.config.json").exists()
 

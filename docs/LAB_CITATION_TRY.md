@@ -1,3 +1,6 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # Lab citation-try（`lab/citation-try`）
 
 > **Hard boundary (ADR-003):** `backend/lab/advisory_debate.py` **≠ 產品 M7**。Lab debate 係研究草稿，**禁止**接到 `OrderManager`／M9。產品 M7 = 閉合 veto + conviction + digest-for-Proposal（見 [`MODULAR_ARCHITECTURE.md`](MODULAR_ARCHITECTURE.md) M7、§4.5.5）。Proposal Approve 同 IntentStore 係兩條路；lab debate 兩條都唔好走。

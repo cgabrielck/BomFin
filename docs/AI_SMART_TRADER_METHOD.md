@@ -1,8 +1,11 @@
+> LEGACY / SUPERSEDED — describes the previous implementation; not instructions for the new GabFin architecture.
+> See [current architecture authority](ARCHITECTURE_DECISION.md). Historical rules below do not govern the redesign.
+
 # AI Smart Trader Method — Harness 全日智能交易員
 
 **Status:** **Accepted** — Owner Approved by Gabriel 2026-10-26（Asia/Hong_Kong）。**Merge ≠ runtime。** 本頁獲准的是方法文件，不是開 live、不是購買資料、不是改 RiskEngine／mandate／kill。  
 **Date:** 2026-10-26  
-**Binds under:** [ADR-003 + Addendum A](ADR-003-live-ai-trading-desk.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > 本頁。衝突時 ADR-003 D1／Addendum A 勝出。  
+**Binds under:** [ADR-003 + Addendum A](ARCHITECTURE_DECISION.md)（Accepted）> [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) > 本頁。衝突時 ADR-003 D1／Addendum A 勝出。\
 **Does not:** 改 RiskEngine／Kelly／mandate／kill 語意、開 live、接 `OrderManager` 到 Ask Cgab 或 `lab/advisory_debate`、把本頁升格為已驗證 alpha。  
 **Index:** [ARCHITECTURE_DECISION.md](ARCHITECTURE_DECISION.md)。**ADR-002 is VOID**，不引用作約束。  
 **Starting point improved:** PM brief v1（2026-10-26，Gabriel／BoomBoom Desk）。差異見 §11。  
@@ -534,7 +537,7 @@ A Phase 1 code PR that needs any of those is out of method and needs its own own
 
 ## 13. Related docs
 
-- [ADR-003-live-ai-trading-desk.md](ADR-003-live-ai-trading-desk.md) — D1–D4, Addendum A clocks and proposals.
+- [ADR-003-live-ai-trading-desk.md](ARCHITECTURE_DECISION.md) — D1–D4, Addendum A clocks and proposals.
 - [MODULAR_ARCHITECTURE.md](MODULAR_ARCHITECTURE.md) — §4.4 clocks, §4.5 governance, §5.5 proposal, §5.6 intent.
 - [BOUNDED_INTELLIGENCE_ACCEPTANCE.md](BOUNDED_INTELLIGENCE_ACCEPTANCE.md) — Draft acceptance for veto / expectancy. Not Accepted.
 - [LAB_PRODUCT_M7_BINDING.md](LAB_PRODUCT_M7_BINDING.md) — Lab debate is not the product path.
