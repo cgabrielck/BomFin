@@ -21,7 +21,14 @@ def main():
                 SysConfig.enable_proto_encrypt(True)
                 SysConfig.set_init_rsa_file(config['rsa_file'])
             context=OpenQuoteContext(host=config['host'],port=config['port'],is_encrypt=config['encrypted'])
-            result={'status':'ok','metadata':inspect_quote_context(context,checked_at=datetime.now(timezone.utc))}
+            if config.get('operation')=='equity_smoke':
+                from futu import Market,SecurityType,SubType,AuType,Session
+                from types import SimpleNamespace
+                from gabfin.providers.futu.equity import inspect_equity
+                sdk=SimpleNamespace(US=Market.US,STOCK=SecurityType.STOCK,QUOTE=SubType.QUOTE,K_DAY=SubType.K_DAY,NONE=AuType.NONE,RTH=Session.RTH)
+                result={'status':'ok','metadata':inspect_equity(context,sdk)}
+            else:
+                result={'status':'ok','metadata':inspect_quote_context(context,checked_at=datetime.now(timezone.utc))}
     except Exception:
         result={'status':'worker_failed','metadata':None}
     output.write_text(json.dumps(result),encoding='utf-8')
