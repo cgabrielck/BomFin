@@ -4,12 +4,7 @@ import re
 from uuid import UUID
 
 from gabfin.contracts.market import AssetClass, Instrument
-
-TICKER = r'[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*'
-
-
-def valid_us_symbol(symbol: str) -> bool:
-    return re.fullmatch(r'US\.' + TICKER, symbol) is not None
+from gabfin.providers.futu.symbols_wire import TICKER, valid_us_symbol
 
 
 class InstrumentCatalog:
