@@ -1,4 +1,4 @@
-# ALPHA//DESK — Institutional-Grade Equity Research Terminal
+# GabFin legacy source — ALPHA//DESK
 
 [![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)](https://python.org)
 [![Tests](https://img.shields.io/badge/tests-191_passing-22d3c5)](#testing--測試)
@@ -11,7 +11,7 @@
 
 ## Product surfaces / 產品介面
 
-**Product name: Cgab.** Binding architecture: [ADR-003 + Addendum A](docs/ADR-003-live-ai-trading-desk.md) (Accepted; [index](docs/ARCHITECTURE_DECISION.md)). [Modular architecture](docs/MODULAR_ARCHITECTURE.md) · [audit plan](docs/AUDIT_REMEDIATION_PLAN_2026-10-21.md) (Confirmed) · [visual map](docs/boomboom-modular-architecture.html). **ADR-002 is VOID.**
+**Legacy implementation name: Cgab.** The surfaces below describe existing source, not the target product. The new GabFin follows the [confirmed design](../../docs/superpowers/specs/2026-11-25-gabfin-system-design.md) and [upgrade plan](../../docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md). The frontend rewrite is planned, not implemented here.
 
 | Surface | What it is | How to run |
 |---------|------------|------------|
@@ -27,7 +27,7 @@ cd C:\Users\001\cgabrielck-stock-analyzer
 
 **Lab / legacy Streamlit (not the product):** [stock-analyzergit-ijue4vuwb7kuvizn62fema.streamlit.app](https://stock-analyzergit-ijue4vuwb7kuvizn62fema.streamlit.app/)
 
-Architecture authority is ADR-003, not the frozen [QUALITY_ROADMAP](docs/QUALITY_ROADMAP.md) or [AUTO_TRADING_ROADMAP](docs/AUTO_TRADING_ROADMAP.md).
+Current authority: the [new GabFin design and execution pointers](docs/ARCHITECTURE_DECISION.md). Old roadmaps and architecture labels are historical evidence only.
 
 ## What's New / 近期更新
 
@@ -232,7 +232,7 @@ New product features land on the Desk. Streamlit receives critical lab fixes onl
 
 ## Architecture / 系統架構
 
-ADR-003: Desk = product; Streamlit = lab / legacy; L1 Intent vs L2 Order; dual-clock H1–H3. Details in [docs/MODULAR_ARCHITECTURE.md](docs/MODULAR_ARCHITECTURE.md).
+Legacy source layout: FastAPI serves the Desk shell; Streamlit is the lab interface. Existing Intent and Order paths are documented as implementation history in [MODULAR_ARCHITECTURE.md](docs/MODULAR_ARCHITECTURE.md), not as constraints on the new architecture.
 
 ```text
 stock-analyzer/
@@ -247,7 +247,7 @@ stock-analyzer/
 │   ├── trading/                       L2 worker, RiskEngine, mandate, kill, Alpaca
 │   ├── backtesting/                   Walk-forward + factor lab
 │   └── utils/                         Universe, selection, session quotes, cache
-├── docs/ARCHITECTURE_DECISION.md      ADR-003 (binding)
+├── docs/ARCHITECTURE_DECISION.md      Pointer to the new design
 ├── docs/MODULAR_ARCHITECTURE.md       Intent v0, dual-clock, L1/L2
 ├── tests/
 ├── requirements.txt

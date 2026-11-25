@@ -1,72 +1,25 @@
-# Stock Analyzer — Enhancement Plan
+# GabFin source checkout instructions
 
-## Architecture Decision (ADR-003)
+This checkout contains legacy source and the starting point for the new GabFin.
+Current user instructions and the confirmed new design govern all work.
 
-**Desk (FastAPI + `web/static`) is the product UI; Streamlit is lab / legacy. Keep RiskEngine / Kelly / mandate / kill / Alpaca. Two SKUs (research + paper auto). Do not greenfield-rewrite.** Modular L1 Intent vs L2 Order; dual-clock H1–H3; `lab/advisory_debate` ≠ product M7 and must not wire to `OrderManager`.
+## Before working
 
-**ADR-002 is VOID. ADR-001 is history.** Older roadmaps (`AUTO_TRADING_ROADMAP`, `NEXT_PHASE_PLAN`, `QUALITY_ROADMAP`, `PAPER_VALIDATION_RUNBOOK`, `PROGRESS_LOG`) are frozen.
+1. Read the [workspace instructions](../../AGENTS.md).
+2. Read [tasks](../../docs/memory/tasks.md) and the [execution checkpoint](../../docs/memory/execution.md).
+3. Read only the relevant section of the [confirmed design](../../docs/superpowers/specs/2026-11-25-gabfin-system-design.md)
+   and [main upgrade plan](../../docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md).
+4. Check branch, HEAD and existing changes. Preserve unrelated work and local evidence.
 
-See [`docs/ADR-003-live-ai-trading-desk.md`](docs/ADR-003-live-ai-trading-desk.md) (Accepted + Addendum A), [`docs/ARCHITECTURE_DECISION.md`](docs/ARCHITECTURE_DECISION.md) (index; ADR-002 VOID), [`docs/MODULAR_ARCHITECTURE.md`](docs/MODULAR_ARCHITECTURE.md), [`docs/AUDIT_REMEDIATION_PLAN_2026-10-21.md`](docs/AUDIT_REMEDIATION_PLAN_2026-10-21.md) (Confirmed), [`docs/boomboom-modular-architecture.html`](docs/boomboom-modular-architecture.html).
+All legacy ADRs and historical roadmaps are retired as product constraints.
+Their old Accepted, binding, or Draft labels do not override the new design.
+Legacy source, tests and notes may be used as evidence, not as new requirements.
+The new frontend is to be rewritten; reuse of backend modules follows the new plan.
 
-**What to buy (VPS / broker / paid APIs):** [`docs/PROCUREMENT_GUIDE.md`](docs/PROCUREMENT_GUIDE.md) — Phase 1 Alpaca Paper + Hetzner CPX21 + Telegram; Phase 2 Polygon daily bars; Phase 3 live only after paper gate.
+## Working agreement
 
-**Local Cursor handoff (plans / todos / reports pack):** [`docs/LOCAL_CURSOR_HANDOFF.md`](docs/LOCAL_CURSOR_HANDOFF.md) — paste into local Agent to continue this work.
-
-**Strategy adoption (what to cite / not cite):** [`docs/STRATEGY_ADOPTION.md`](docs/STRATEGY_ADOPTION.md) — three-pass audit; binding for Agents.
-
-**World-class upgrade (grade vs OSS, two SKUs, P0–P4):** [`docs/CGAB_WORLD_CLASS_UPGRADE.md`](docs/CGAB_WORLD_CLASS_UPGRADE.md).
-
-## Quick Wins (1-2 hours total)
-
-| # | Task | File | Status |
-|---|------|------|--------|
-| QW1 | Fix test_constants.py stock count 30→44 | `tests/test_constants.py:10` | ✅ |
-| QW2 | Add altair to requirements.txt | `requirements.txt` | ✅ |
-| QW3 | Cache thread safety (threading.Lock) | `backend/utils/cache.py` | ✅ |
-| QW4 | LLM score as modifier (80/20 blend) | `backend/agents/llm_agent.py:164-165` | ✅ |
-| QW5 | Fix valuation tab broken P/S P/B labels | `backend/app.py:1454-1455` + `backend/i18n.py` | ✅ |
-| QW6 | Parallelize technical analysis | `backend/agents/technical_analyzer.py:200-206` | ✅ |
-| QW7 | Extract duplicate `_get_latest_price()` | `backend/utils/price_utils.py` (new) | ✅ |
-| QW8 | Rotate API key | `.env` (manual, user action) | 🔑 manual |
-
-## Critical Enhancements (ordered by impact)
-
-### Plan 1: Backtesting System (2-3 weeks)
-- Validate scoring system's predictive power historically
-- New module: `backend/backtesting/engine.py`
-- Walk-forward validation across 5 years
-- Monthly rebalancing simulation vs SPY
-
-### Plan 2: LLM as Assistant ✅
-- 80/20 quant/LLM score blend (already QW4)
-- Sidebar slider for LLM influence %
-- Score breakdown in UI — `fund_score` / `llm_score` / `total_score` side by side
-- Divergence flag — warning when |fund_score - llm_score| > 25
-- i18n keys in all 3 languages
-
-### Plan 3: Portfolio Management ✅
-- New module: `backend/agents/portfolio_manager.py`
-- Kelly Criterion position sizing (capped at 25% per position, 90% total)
-- Trade journal (JSON file) + automated buy logging
-- P&L tracking on each position + portfolio level
-- Correlation check (flags pairs with ρ ≥ 0.80)
-- Stop-loss management (beta-based, default 10%, capped at 25%)
-- Portfolio capital config in sidebar ($1K–$10M)
-- Portfolio tab with position table, risk alerts, trade journal, reset button
-- i18n keys in all 3 languages
-
-### Plan 4: Risk Metrics (3 days)
-- New module: `backend/agents/risk_analyzer.py`
-- VaR 95%, Sharpe/Sortino, Max DD, Beta, Volatility
-- Risk badge per recommendation
-- Correlation matrix heatmap
-
-### Plan 5: Market Regime in Core Pipeline (2 days)
-- `detect_global_market_regime()` using SPY + VIX
-- Adjust ENTRY_THRESHOLD and weights by regime
-- Regime banner in UI
-
-### Plan 6: News Sentiment Improvement (2 hours–1 day)
-- Phase 1: VADER (quick)
-- Phase 2: FinBERT (accurate)
-- Phase 3: LLM summarization (optional)
+- Use Traditional Chinese for reports; technical depth and focused questions are welcome.
+- Use the existing local checkout and environment; default to one agent.
+- Do not start trading, change approved risk limits, deploy or push without applicable authorization.
+- Update the outer workspace checkpoint and affected memory after significant work.
+- These relative links target the current local workspace. Update them when moving or integrating the checkout.

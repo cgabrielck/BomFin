@@ -1,6 +1,8 @@
-# Product
+# Legacy product record
 
 <!-- impeccable:product-schema 1 -->
+
+> LEGACY / SUPERSEDED — this record describes the previous implementation, not the new GabFin requirements. Follow the [confirmed design](../../docs/superpowers/specs/2026-11-25-gabfin-system-design.md) and [upgrade plan](../../docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md).
 
 Recorded from the accepted Desk handoff (Owner package, 2026-10-30) and ADR-003 / ADR-005. No separate interview was run in this pass.
 
