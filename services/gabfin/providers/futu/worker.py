@@ -21,7 +21,13 @@ def main():
                 SysConfig.enable_proto_encrypt(True)
                 SysConfig.set_init_rsa_file(config['rsa_file'])
             context=OpenQuoteContext(host=config['host'],port=config['port'],is_encrypt=config['encrypted'])
-            if config.get('operation')=='equity_smoke':
+            if config.get('operation')=='options_smoke':
+                from futu import SubType,Session,OptionType
+                from types import SimpleNamespace
+                from gabfin.providers.futu.options import inspect_options
+                sdk=SimpleNamespace(QUOTE=SubType.QUOTE,RTH=Session.RTH,ALL=OptionType.ALL)
+                result={'status':'ok','metadata':inspect_options(context,sdk,deadline=config['deadline_monotonic'])}
+            elif config.get('operation')=='equity_smoke':
                 from futu import Market,SecurityType,SubType,AuType,Session
                 from types import SimpleNamespace
                 from gabfin.providers.futu.equity import inspect_equity
