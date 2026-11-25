@@ -7,7 +7,7 @@ name = "gabfin"
 version = "0.1.0"
 description = "Versioned domain contracts for the new GabFin architecture"
 requires-python = ">=3.12"
-dependencies = ["pydantic==2.14.4"]
+dependencies = ["pydantic==2.14.4", "fastapi==0.165.0"]
 
 [tool.setuptools.packages.find]
 where = ["services"]
