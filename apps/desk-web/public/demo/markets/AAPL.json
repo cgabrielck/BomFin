@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "epoch": "44444444-4444-4444-8444-444444444444",
+  "cursor": 1,
+  "as_of": "2026-11-25T21:00:00Z",
+  "quotes": [
+    {
+      "schema_version": "1.0",
+      "event_id": "24be2d8c-c458-5657-aff9-3886aabcae1d",
+      "instrument_id": "11111111-1111-4111-8111-111111111111",
+      "event_at": "2026-11-25T20:59:58Z",
+      "received_at": "2026-11-25T21:00:00Z",
+      "available_at": "2026-11-25T21:00:00Z",
+      "source": "demo",
+      "source_seq": null,
+      "dedup_key": "demo:AAPL",
+      "payload": {
+        "schema_version": "1.0",
+        "instrument_id": "11111111-1111-4111-8111-111111111111",
+        "as_of": "2026-11-25T21:00:00Z",
+        "feed": "demo",
+        "session": "unknown",
+        "bid": null,
+        "ask": null,
+        "last": {
+          "price": "210.00",
+          "event_at": "2026-11-25T20:59:58Z",
+          "received_at": "2026-11-25T21:00:00Z",
+          "available_at": "2026-11-25T21:00:00Z",
+          "age_ms": 2000
+        },
+        "quality": [
+          "unknown",
+          "incomplete"
+        ],
+        "entitlements": {
+          "status": "unknown",
+          "checked_at": null,
+          "capability_snapshot_id": null
+        }
+      },
+      "kind": "quote"
+    }
+  ],
+  "bars": [],
+  "health": {
+    "schema_version": "1.0",
+    "source": "demo",
+    "connected": true,
+    "heartbeat_at": "2026-11-25T21:00:00Z",
+    "gap_pending": false,
+    "connection_started_at": null
+  },
+  "gap": null
+}

@@ -12,6 +12,8 @@ backend/data/strategy_backtest_*.json
 backend/data/fair_strategy_backtest*.json
 .streamlit/secrets.toml
 node_modules/
+test-results/
+playwright-report/
 web/dist/
 *.egg-info/
 *.egg-info/

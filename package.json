@@ -1,0 +1,19 @@
+{
+  "name": "gabfin-workspace",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": ["apps/desk-web"],
+  "scripts": {
+    "dev": "npm run dev --workspace @gabfin/desk-web --",
+    "contracts": "node scripts/generate-web-contracts.mjs",
+    "test:e2e": "playwright test",
+    "typecheck": "npm run contracts && npm run typecheck --workspace @gabfin/desk-web",
+    "build": "npm run contracts && npm run build --workspace @gabfin/desk-web"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/node": "26.6.11",
+    "json-schema-to-typescript": "16.0.0"
+  }
+}
