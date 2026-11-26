@@ -1,5 +1,5 @@
 """Stable service interfaces; implementations live in later sections."""
-from typing import Protocol,AsyncIterator
+from typing import Protocol,AsyncIterator,runtime_checkable
 from gabfin.contracts.events import MarketEvent
 from gabfin.contracts.subscriptions import FeedCapabilities,SubscriptionKey
 from gabfin.contracts.research import ResearchRequest,ResearchReport
@@ -7,12 +7,27 @@ from gabfin.contracts.intent import StrategyIntent
 from gabfin.contracts.order import OrderCommand
 from gabfin.contracts.policy import RiskDecision
 from gabfin.contracts.support import SubmitResult,OrderSnapshot,BrokerSnapshot,RiskContext,StrategyContext
+from gabfin.contracts.feed import FeedHealth,FeedCleanup
 
 class FeedAdapter(Protocol):
     async def capabilities(self)->FeedCapabilities:...
     async def subscribe(self,keys:list[SubscriptionKey])->None:...
     async def unsubscribe(self,keys:list[SubscriptionKey])->None:...
     def events(self)->AsyncIterator[MarketEvent]:...
+
+@runtime_checkable
+class ManagedFeedAdapter(FeedAdapter,Protocol):
+    """Unstarted factory product with explicit health and release ownership.
+
+    A factory owns partial construction cleanup if it raises. Once returned,
+    the supervisor closes the adapter and requires a typed release receipt.
+    """
+    @property
+    def health(self)->FeedHealth:...
+    @property
+    def cleanup(self)->FeedCleanup|None:...
+    async def close(self)->None:...
+
 class ResearchRunner(Protocol):
     async def run(self,request:ResearchRequest)->ResearchReport:...
 class BrokerAdapter(Protocol):

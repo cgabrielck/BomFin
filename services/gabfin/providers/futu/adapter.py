@@ -17,16 +17,18 @@ import time
 from typing import Literal
 from uuid import UUID, NAMESPACE_URL, uuid5
 
-from pydantic import Field, StrictBool, StrictInt, field_validator
+from pydantic import Field, StrictBool, StrictInt, TypeAdapter, field_validator
 
 from gabfin.contracts.common import ContractModel, NonNegativeDecimal, UtcTimestamp
 from gabfin.contracts.events import QuoteMarketEvent
+from gabfin.contracts.feed import FeedHealth, FeedCleanup
 from gabfin.contracts.market import NonNegativeCounter, QuotePoint, QuoteSnapshot, QuoteEntitlements
 from gabfin.contracts.subscriptions import FeedCapabilities, SubscriptionKey
 from gabfin.market.stream import QuoteStream
 from gabfin.providers.futu.quote_push import ERRORS
 from gabfin.providers.futu.symbols import InstrumentCatalog
 from gabfin.providers.futu.symbols_wire import us_equity_symbol
+from gabfin.providers.futu.runner import run_probe
 
 
 class _ClosedMessage(ContractModel):
@@ -56,9 +58,17 @@ class _QuoteWire(ContractModel):
         return value
 
 
+class _HeartbeatWire(ContractModel):
+    version: StrictInt = Field(ge=1, le=1)
+    kind: Literal['heartbeat']
+    checked_at: UtcTimestamp
+    quote_logged_in: StrictBool
+
+
 class FutuQuoteAdapter:
     def __init__(self, catalog: InstrumentCatalog, instrument_id: UUID, *, python: Path,
-                 port: int = 11111, lifetime: float = 110, _worker: Path | None = None):
+                 port: int = 11111, lifetime: float = 110, _worker: Path | None = None,
+                 _metadata_worker: Path | None = None):
         instrument = catalog.get(instrument_id)
         symbol = instrument.vendor_symbols.get('futu') if instrument else None
         if instrument is None or instrument.asset_class != 'equity' or not us_equity_symbol(symbol):
@@ -69,6 +79,7 @@ class FutuQuoteAdapter:
             raise ValueError('Lifetime must reserve cleanup within 90–120 seconds')
         self._python = Path(python).resolve(strict=True)
         self._worker = Path(_worker).resolve(strict=True) if _worker else Path(__file__).with_name('quote_worker.py')
+        self._metadata_worker = Path(_metadata_worker).resolve(strict=True) if _metadata_worker else None
         self._key = SubscriptionKey(instrument_id=instrument_id, channel='quote', timeframe=None)
         self._symbol = symbol
         self._port = port
@@ -83,12 +94,40 @@ class FutuQuoteAdapter:
         self._consuming = False
         self._result = None
         self.failure: str | None = None
+        self._health = FeedHealth(schema_version='1.0', source='futu', connected=False,
+                                  heartbeat_at=None, gap_pending=True)
+        self._capability_task = None
+        self._observed_metadata = None
+        self.capability_probe_status = None
 
     async def capabilities(self) -> FeedCapabilities:
+        if self._close_task is not None:
+            raise RuntimeError('Adapter is closed; use a new capability probe')
+        if self._capability_task is None or self._capability_task.done():
+            self._capability_task = asyncio.create_task(asyncio.to_thread(run_probe, self._python,
+                host='127.0.0.1', port=self._port, timeout=10, _worker=self._metadata_worker))
+        try:
+            result = await asyncio.shield(self._capability_task)
+        except asyncio.CancelledError:
+            await asyncio.shield(self._capability_task)
+            raise
+        self.capability_probe_status = result['status']
+        self._observed_metadata = deepcopy(result.get('metadata'))
+        metadata = self._observed_metadata
+        maximum = None
+        if metadata is not None and metadata['total_used_quota'] is not None and metadata['remaining_quota'] is not None:
+            try:
+                maximum = TypeAdapter(NonNegativeCounter).validate_python(metadata['total_used_quota'] + metadata['remaining_quota'])
+            except ValueError:
+                pass
         return FeedCapabilities(schema_version='1.0', source='futu', asset_classes=('equity',),
-                                sessions=(), latency_label='unknown', max_subscriptions=None,
-                                history_limits=(), checked_at=datetime.now(timezone.utc),
+                                sessions=(), latency_label='unknown', max_subscriptions=maximum,
+                                history_limits=(), checked_at=metadata['checked_at'] if metadata else datetime.now(timezone.utc),
                                 permission_errors=('live_manifest_unverified',))
+
+    @property
+    def observed_metadata(self):
+        return deepcopy(self._observed_metadata)
 
     def _validate_keys(self, keys):
         if any(key.identity != self._key.identity for key in keys):
@@ -104,6 +143,37 @@ class FutuQuoteAdapter:
 
     def snapshot(self):
         return self._stream.snapshot()
+
+    @property
+    def health(self):
+        return self._health.model_copy(deep=True)
+
+    @property
+    def cleanup(self) -> FeedCleanup | None:
+        metadata_closed = True
+        if self._capability_task is not None:
+            if not self._capability_task.done():
+                return None
+            try:
+                probe = self._capability_task.result()
+                metadata_closed = (probe['status'] in ('ok', 'sdk_unavailable', 'invalid_config')
+                    and 'context_close_failed' not in (probe.get('metadata') or {}).get('errors', ()))
+            except Exception:
+                metadata_closed = False
+        if self._result is None:
+            if self._started or self._close_task is None or not self._close_task.done():
+                return None
+            return FeedCleanup(schema_version='1.0', source='futu', context_closed=metadata_closed,
+                release_confirmed=True, requested_keys=(),
+                reason_codes=() if metadata_closed else ('metadata_cleanup_unverified',))
+        result = self._result
+        cleanup_errors = {'existing_subscription', 'unsubscribe_failed', 'cleanup_verify_failed',
+                          'close_failed', 'context_close_failed'}
+        released = result['cleanup'] in ('unsubscribed', 'not_subscribed') and not cleanup_errors.intersection(result['errors'])
+        return FeedCleanup(schema_version='1.0', source='futu',
+            context_closed=result['closed'] and metadata_closed and 'close_failed' not in result['errors'], release_confirmed=released,
+            requested_keys=(self._key,), reason_codes=tuple(result['errors']) +
+                (() if metadata_closed else ('metadata_cleanup_unverified',)))
 
     @property
     def stats(self):
@@ -168,6 +238,8 @@ class FutuQuoteAdapter:
             self._send_stop()
         if self._reader is not None:
             await self._reader
+        if self._capability_task is not None:
+            await asyncio.shield(self._capability_task)
 
     def _send_stop(self):
         try:
@@ -218,6 +290,8 @@ class FutuQuoteAdapter:
                 deadline = time.monotonic() + self._lifetime
                 async with asyncio.timeout(self._lifetime):
                     try:
+                        self._health = self._health.model_copy(update={
+                            'connection_started_at': datetime.now(timezone.utc)})
                         process = await asyncio.create_subprocess_exec(
                             str(self._python), '-I', str(self._worker),
                             stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE,
@@ -245,6 +319,13 @@ class FutuQuoteAdapter:
                                     self._ready.set_result(True)
                             elif message.get('kind') == 'quote' and seen_ready and self._result is None:
                                 self._apply_quote(message)
+                            elif message.get('kind') == 'heartbeat' and seen_ready and self._result is None:
+                                beat = _HeartbeatWire.model_validate(message)
+                                if (beat.checked_at > datetime.now(timezone.utc) or
+                                        (self._health.heartbeat_at is not None and beat.checked_at < self._health.heartbeat_at)):
+                                    raise ValueError('invalid_heartbeat_time')
+                                self._health = self._health.model_copy(update={
+                                    'connected': beat.quote_logged_in, 'heartbeat_at': beat.checked_at})
                             elif message.get('kind') == 'closed' and self._result is None:
                                 result = _ClosedMessage.model_validate(message)
                                 if any(error not in ERRORS for error in result.errors):
@@ -274,3 +355,4 @@ class FutuQuoteAdapter:
             if self._ready is not None and not self._ready.done():
                 self._ready.set_result(False)
             self._stream.close()
+            self._health = self._health.model_copy(update={'connected': False})

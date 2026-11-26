@@ -316,6 +316,55 @@
       "title": "BrokerSnapshot",
       "type": "object"
     },
+    "CalendarSnapshot": {
+      "additionalProperties": false,
+      "description": "Exchange-sourced, finite coverage; absence inside coverage means closed.\n\nIngestion supplies verified calendar identity/version. No weekday fallback.",
+      "properties": {
+        "calendar_id": {
+          "minLength": 1,
+          "title": "Calendar Id",
+          "type": "string"
+        },
+        "coverage_end": {
+          "format": "date-time",
+          "title": "Coverage End",
+          "type": "string"
+        },
+        "coverage_start": {
+          "format": "date-time",
+          "title": "Coverage Start",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        },
+        "windows": {
+          "items": {
+            "$ref": "#/$defs/SessionWindow"
+          },
+          "maxItems": 10000,
+          "title": "Windows",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "calendar_id",
+        "version",
+        "coverage_start",
+        "coverage_end",
+        "windows"
+      ],
+      "title": "CalendarSnapshot",
+      "type": "object"
+    },
     "CandidateObservation": {
       "additionalProperties": false,
       "properties": {
@@ -554,6 +603,38 @@
       ],
       "title": "EntitlementStatus",
       "type": "string"
+    },
+    "ErrorFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "unauthorized",
+            "invalid_request",
+            "snapshot_required",
+            "slow_consumer"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "kind": {
+          "const": "error",
+          "title": "Kind",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "code"
+      ],
+      "title": "ErrorFrame",
+      "type": "object"
     },
     "EventHorizon": {
       "additionalProperties": false,
@@ -916,6 +997,14 @@
           "title": "Schema Version",
           "type": "string"
         },
+        "sequence_rules": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SequenceRule"
+          },
+          "title": "Sequence Rules",
+          "type": "array"
+        },
         "sessions": {
           "items": {
             "$ref": "#/$defs/MarketSession"
@@ -941,6 +1030,240 @@
         "permission_errors"
       ],
       "title": "FeedCapabilities",
+      "type": "object"
+    },
+    "FeedCleanup": {
+      "additionalProperties": false,
+      "properties": {
+        "context_closed": {
+          "title": "Context Closed",
+          "type": "boolean"
+        },
+        "reason_codes": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "release_confirmed": {
+          "title": "Release Confirmed",
+          "type": "boolean"
+        },
+        "requested_keys": {
+          "items": {
+            "$ref": "#/$defs/SubscriptionKey"
+          },
+          "title": "Requested Keys",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "source",
+        "context_closed",
+        "release_confirmed",
+        "requested_keys",
+        "reason_codes"
+      ],
+      "title": "FeedCleanup",
+      "type": "object"
+    },
+    "FeedHealth": {
+      "additionalProperties": false,
+      "properties": {
+        "connected": {
+          "title": "Connected",
+          "type": "boolean"
+        },
+        "connection_started_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Connection Started At"
+        },
+        "gap_pending": {
+          "title": "Gap Pending",
+          "type": "boolean"
+        },
+        "heartbeat_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Heartbeat At"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "source",
+        "connected",
+        "heartbeat_at",
+        "gap_pending"
+      ],
+      "title": "FeedHealth",
+      "type": "object"
+    },
+    "FreshnessDecision": {
+      "additionalProperties": false,
+      "description": "Data prerequisites only. Risk, account, strategy and execution remain separate.",
+      "properties": {
+        "ages_ms": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "maximum": 9007199254740991,
+                "minimum": 0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "propertyNames": {
+            "enum": [
+              "bid",
+              "ask",
+              "last"
+            ]
+          },
+          "title": "Ages Ms",
+          "type": "object"
+        },
+        "eligible": {
+          "title": "Eligible",
+          "type": "boolean"
+        },
+        "evaluated_at": {
+          "format": "date-time",
+          "title": "Evaluated At",
+          "type": "string"
+        },
+        "policy_version": {
+          "minLength": 1,
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "reasons": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reasons",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "eligible",
+        "reasons",
+        "ages_ms",
+        "evaluated_at",
+        "policy_version"
+      ],
+      "title": "FreshnessDecision",
+      "type": "object"
+    },
+    "FreshnessPolicy": {
+      "additionalProperties": false,
+      "description": "Caller must supply a registry-verified policy; there are no defaults.",
+      "properties": {
+        "allowed_sessions": {
+          "items": {
+            "enum": [
+              "pre_market",
+              "regular",
+              "post_market"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Allowed Sessions",
+          "type": "array"
+        },
+        "approved": {
+          "title": "Approved",
+          "type": "boolean"
+        },
+        "max_entitlement_age_ms": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "title": "Max Entitlement Age Ms",
+          "type": "integer"
+        },
+        "max_heartbeat_age_ms": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "title": "Max Heartbeat Age Ms",
+          "type": "integer"
+        },
+        "max_quote_age_ms": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "title": "Max Quote Age Ms",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "version": {
+          "minLength": 1,
+          "title": "Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "version",
+        "approved",
+        "max_quote_age_ms",
+        "max_heartbeat_age_ms",
+        "max_entitlement_age_ms",
+        "allowed_sessions"
+      ],
+      "title": "FreshnessPolicy",
       "type": "object"
     },
     "HarnessProposal": {
@@ -1334,6 +1657,28 @@
       "type": "object"
     },
     "JsonValue": {},
+    "MarketCursor": {
+      "additionalProperties": false,
+      "properties": {
+        "epoch": {
+          "format": "uuid",
+          "title": "Epoch",
+          "type": "string"
+        },
+        "sequence": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "epoch",
+        "sequence"
+      ],
+      "title": "MarketCursor",
+      "type": "object"
+    },
     "MarketSession": {
       "enum": [
         "pre_market",
@@ -1345,6 +1690,150 @@
       ],
       "title": "MarketSession",
       "type": "string"
+    },
+    "MarketSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "bars": {
+          "items": {
+            "$ref": "#/$defs/BarMarketEvent"
+          },
+          "title": "Bars",
+          "type": "array"
+        },
+        "cursor": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Cursor",
+          "type": "integer"
+        },
+        "epoch": {
+          "format": "uuid",
+          "title": "Epoch",
+          "type": "string"
+        },
+        "gap": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecoveryGap"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "health": {
+          "$ref": "#/$defs/FeedHealth"
+        },
+        "quotes": {
+          "items": {
+            "$ref": "#/$defs/QuoteMarketEvent"
+          },
+          "title": "Quotes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "epoch",
+        "cursor",
+        "as_of",
+        "quotes",
+        "bars",
+        "health",
+        "gap"
+      ],
+      "title": "MarketSnapshot",
+      "type": "object"
+    },
+    "MarketUpdate": {
+      "additionalProperties": false,
+      "properties": {
+        "epoch": {
+          "format": "uuid",
+          "title": "Epoch",
+          "type": "string"
+        },
+        "event": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "bar": "#/$defs/BarMarketEvent",
+                  "quote": "#/$defs/QuoteMarketEvent",
+                  "trade": "#/$defs/TradeMarketEvent"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/QuoteMarketEvent"
+                },
+                {
+                  "$ref": "#/$defs/TradeMarketEvent"
+                },
+                {
+                  "$ref": "#/$defs/BarMarketEvent"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event"
+        },
+        "gap": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecoveryGap"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "health": {
+          "$ref": "#/$defs/FeedHealth"
+        },
+        "processed_at": {
+          "format": "date-time",
+          "title": "Processed At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sequence": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "epoch",
+        "sequence",
+        "processed_at",
+        "event",
+        "health",
+        "gap"
+      ],
+      "title": "MarketUpdate",
+      "type": "object"
     },
     "MissingData": {
       "additionalProperties": false,
@@ -2310,6 +2799,212 @@
       "title": "ReconciliationResult",
       "type": "object"
     },
+    "RecoveryBatch": {
+      "additionalProperties": false,
+      "properties": {
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "coverage": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/RecoveryCoverage"
+          },
+          "maxItems": 3000,
+          "title": "Coverage",
+          "type": "array"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        },
+        "events": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "bar": "#/$defs/BarMarketEvent",
+                "quote": "#/$defs/QuoteMarketEvent",
+                "trade": "#/$defs/TradeMarketEvent"
+              },
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/QuoteMarketEvent"
+              },
+              {
+                "$ref": "#/$defs/TradeMarketEvent"
+              },
+              {
+                "$ref": "#/$defs/BarMarketEvent"
+              }
+            ]
+          },
+          "maxItems": 10000,
+          "title": "Events",
+          "type": "array"
+        },
+        "evidence": {
+          "minLength": 1,
+          "title": "Evidence",
+          "type": "string"
+        },
+        "gap_id": {
+          "format": "uuid",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "mode": {
+          "default": "history",
+          "enum": [
+            "history",
+            "quote_snapshot"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "gap_id",
+        "source",
+        "start",
+        "end",
+        "complete",
+        "evidence",
+        "events"
+      ],
+      "title": "RecoveryBatch",
+      "type": "object"
+    },
+    "RecoveryCoverage": {
+      "additionalProperties": false,
+      "description": "Trusted history adapter's pagination/coverage receipt, per subscription.\n\nThis is evidence supplied by a verified adapter, not a claim accepted from\nconsumers. Empty history needs an explicit provider/calendar explanation.",
+      "properties": {
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "empty_reason": {
+          "anyOf": [
+            {
+              "enum": [
+                "provider_verified_empty",
+                "market_closed"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Empty Reason"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        },
+        "has_more": {
+          "title": "Has More",
+          "type": "boolean"
+        },
+        "key": {
+          "$ref": "#/$defs/SubscriptionKey"
+        },
+        "record_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Record Count",
+          "type": "integer"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "start",
+        "end",
+        "record_count",
+        "complete",
+        "has_more"
+      ],
+      "title": "RecoveryCoverage",
+      "type": "object"
+    },
+    "RecoveryGap": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        },
+        "gap_id": {
+          "format": "uuid",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "gap_id",
+        "source",
+        "start",
+        "reason"
+      ],
+      "title": "RecoveryGap",
+      "type": "object"
+    },
     "ResearchReport": {
       "additionalProperties": false,
       "properties": {
@@ -2781,6 +3476,40 @@
       "title": "ResourceKind",
       "type": "string"
     },
+    "ResumeFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Cursor",
+          "type": "integer"
+        },
+        "epoch": {
+          "format": "uuid",
+          "title": "Epoch",
+          "type": "string"
+        },
+        "kind": {
+          "const": "resumed",
+          "title": "Kind",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "epoch",
+        "cursor"
+      ],
+      "title": "ResumeFrame",
+      "type": "object"
+    },
     "RiskBounds": {
       "additionalProperties": false,
       "properties": {
@@ -3054,6 +3783,108 @@
       "title": "Role",
       "type": "string"
     },
+    "SequenceRule": {
+      "additionalProperties": false,
+      "description": "Omitted channels are opaque. Contiguous numbers must not reset mid-epoch.",
+      "properties": {
+        "channel": {
+          "enum": [
+            "quote",
+            "trade",
+            "bar"
+          ],
+          "title": "Channel",
+          "type": "string"
+        },
+        "semantics": {
+          "enum": [
+            "opaque",
+            "contiguous"
+          ],
+          "title": "Semantics",
+          "type": "string"
+        },
+        "timeframe": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Timeframe"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "channel",
+        "timeframe",
+        "semantics"
+      ],
+      "title": "SequenceRule",
+      "type": "object"
+    },
+    "SessionWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "session": {
+          "enum": [
+            "pre_market",
+            "regular",
+            "post_market"
+          ],
+          "title": "Session",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "session",
+        "start",
+        "end"
+      ],
+      "title": "SessionWindow",
+      "type": "object"
+    },
+    "SnapshotFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "snapshot",
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/MarketSnapshot"
+        },
+        "version": {
+          "const": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "payload"
+      ],
+      "title": "SnapshotFrame",
+      "type": "object"
+    },
     "StrategyContext": {
       "additionalProperties": false,
       "properties": {
@@ -3195,6 +4026,69 @@
         "producer_scope"
       ],
       "title": "StrategyIntent",
+      "type": "object"
+    },
+    "StreamHello": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cursor"
+        },
+        "epoch": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Epoch"
+        },
+        "instrument_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "maxItems": 1000,
+          "minItems": 1,
+          "title": "Instrument Ids",
+          "type": "array"
+        },
+        "token": {
+          "format": "password",
+          "maxLength": 256,
+          "minLength": 16,
+          "title": "Token",
+          "type": "string",
+          "writeOnly": true
+        },
+        "version": {
+          "maximum": 1,
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "token",
+        "instrument_ids"
+      ],
+      "title": "StreamHello",
       "type": "object"
     },
     "SubmitResult": {
@@ -3610,6 +4504,31 @@
       "title": "UnspecifiedHorizon",
       "type": "object"
     },
+    "UpdateFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "update",
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/MarketUpdate"
+        },
+        "version": {
+          "const": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "payload"
+      ],
+      "title": "UpdateFrame",
+      "type": "object"
+    },
     "VersionedContract": {
       "additionalProperties": false,
       "properties": {
@@ -3647,6 +4566,42 @@
       "$ref": "#/$defs/TradeMarketEvent"
     },
     {
+      "$ref": "#/$defs/CalendarSnapshot"
+    },
+    {
+      "$ref": "#/$defs/FeedCleanup"
+    },
+    {
+      "$ref": "#/$defs/FeedHealth"
+    },
+    {
+      "$ref": "#/$defs/FreshnessDecision"
+    },
+    {
+      "$ref": "#/$defs/FreshnessPolicy"
+    },
+    {
+      "$ref": "#/$defs/MarketCursor"
+    },
+    {
+      "$ref": "#/$defs/MarketSnapshot"
+    },
+    {
+      "$ref": "#/$defs/MarketUpdate"
+    },
+    {
+      "$ref": "#/$defs/RecoveryBatch"
+    },
+    {
+      "$ref": "#/$defs/RecoveryCoverage"
+    },
+    {
+      "$ref": "#/$defs/RecoveryGap"
+    },
+    {
+      "$ref": "#/$defs/SessionWindow"
+    },
+    {
       "$ref": "#/$defs/Capability"
     },
     {
@@ -3672,6 +4627,21 @@
     },
     {
       "$ref": "#/$defs/TradePlan"
+    },
+    {
+      "$ref": "#/$defs/ErrorFrame"
+    },
+    {
+      "$ref": "#/$defs/ResumeFrame"
+    },
+    {
+      "$ref": "#/$defs/SnapshotFrame"
+    },
+    {
+      "$ref": "#/$defs/StreamHello"
+    },
+    {
+      "$ref": "#/$defs/UpdateFrame"
     },
     {
       "$ref": "#/$defs/JobLease"
@@ -3789,6 +4759,9 @@
     },
     {
       "$ref": "#/$defs/HistoryLimit"
+    },
+    {
+      "$ref": "#/$defs/SequenceRule"
     },
     {
       "$ref": "#/$defs/SubscriptionKey"

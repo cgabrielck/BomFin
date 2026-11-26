@@ -227,3 +227,24 @@ def test_cancel_before_subscription_never_allocates_or_waits_minimum_hold(when):
     assert context.owned == 0 and not context.unsubscribed
     assert messages[-1]['cleanup'] == 'not_subscribed'
     assert messages[-1]['closed'] is True
+
+
+def test_provider_heartbeat_is_independent_of_market_events_and_sanitized():
+    clock = Clock()
+    stop = threading.Event()
+    class Quiet(Context):
+        def subscribe(self, *args, **kwargs):
+            self.owned = 1
+            return 0, None
+        def get_global_state(self):
+            stop.set()
+            return 0, {'qot_logined': True, 'private_account_field': 'never_export'}
+    messages = []
+    run_quote_context(Quiet(stop), SimpleNamespace(QUOTE='QUOTE', RTH='RTH'), HandlerBase,
+                      code='US.AAPL', emit=messages.append, stop=stop, deadline=110,
+                      clock=clock, sleep=clock.sleep,
+                      now=lambda: datetime(2026, 11, 25, 15, tzinfo=timezone.utc))
+    beats = [message for message in messages if message['kind'] == 'heartbeat']
+    assert beats == [dict(version=1, kind='heartbeat', checked_at='2026-11-25T15:00:00Z', quote_logged_in=True)]
+    assert not any(message['kind'] == 'quote' for message in messages)
+    assert 'private_account_field' not in str(messages)

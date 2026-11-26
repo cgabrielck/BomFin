@@ -72,6 +72,18 @@ def test_close_before_subscribe_is_terminal(tmp_path):
     asyncio.run(scenario())
 
 
+@pytest.mark.parametrize('error', ['unsubscribe_failed', 'cleanup_verify_failed', 'close_failed'])
+def test_contradictory_worker_cleanup_status_cannot_confirm_release(tmp_path, error):
+    worker = fake_worker(tmp_path, "ready()\nsys.stdin.readline()\nfinish(errors=[" + repr(error) + "])\n")
+    async def scenario():
+        adapter = FutuQuoteAdapter(InstrumentCatalog([equity()]), AAPL,
+                                   python=Path(sys.executable), _worker=worker)
+        await adapter.subscribe([SubscriptionKey(instrument_id=AAPL, channel='quote', timeframe=None)])
+        await adapter.close()
+        assert not adapter.cleanup.release_confirmed
+    asyncio.run(scenario())
+
+
 def test_cancel_waiting_consumer_waits_for_worker_cleanup(tmp_path):
     worker = fake_worker(tmp_path, """
 ready()
@@ -136,9 +148,14 @@ finish(cleanup='release_pending', errors=['unsubscribe_failed'], callbacks=0)
     SubscriptionKey(instrument_id=AAPL, channel='trade', timeframe=None),
     SubscriptionKey(instrument_id='22222222-2222-4222-8222-222222222222', channel='quote', timeframe=None),
 ])
-def test_foreign_instrument_and_non_quote_channel_never_start_worker(key):
+def test_foreign_instrument_and_non_quote_channel_never_start_worker(key, tmp_path):
+    metadata_worker = fake_worker(tmp_path, """
+from pathlib import Path
+Path(sys.argv[1]).write_text(json.dumps(dict(status='sdk_unavailable',metadata=None)),encoding='utf-8')
+""")
     async def scenario():
-        adapter = FutuQuoteAdapter(InstrumentCatalog([equity()]), AAPL, python=Path(sys.executable))
+        adapter = FutuQuoteAdapter(InstrumentCatalog([equity()]), AAPL, python=Path(sys.executable),
+                                   _metadata_worker=metadata_worker)
         with pytest.raises(ValueError):
             await adapter.subscribe([key])
         assert not adapter.running
@@ -437,4 +454,51 @@ raise SystemExit(1)
         await adapter.close()
         with pytest.raises(RuntimeError, match='quote_worker_failed'):
             await task
+    asyncio.run(scenario())
+
+
+def test_capabilities_use_observed_quota_without_upgrading_session_or_realtime(tmp_path):
+    worker = fake_worker(tmp_path, """
+from pathlib import Path
+Path(sys.argv[1]).write_text(json.dumps(dict(status='ok',metadata=dict(
+    checked_at='2020-11-25T15:00:00Z',status='metadata_available',quote_logged_in=True,
+    total_used_quota=2,remaining_quota=98,errors=[]))),encoding='utf-8')
+""")
+    async def scenario():
+        adapter = FutuQuoteAdapter(InstrumentCatalog([equity()]), AAPL,
+                                   python=Path(sys.executable), _metadata_worker=worker)
+        caps = await adapter.capabilities()
+        assert caps.max_subscriptions == 100
+        assert caps.latency_label == 'unknown' and caps.sessions == ()
+        assert caps.checked_at == datetime(2020, 11, 25, 15, tzinfo=timezone.utc)
+        assert 'live_manifest_unverified' in caps.permission_errors
+        assert adapter.observed_metadata['remaining_quota'] == 98
+        assert not adapter.running
+        await adapter.close()
+    asyncio.run(scenario())
+
+
+def test_close_waits_for_an_inflight_bounded_metadata_probe(tmp_path):
+    worker = fake_worker(tmp_path, """
+import time
+from pathlib import Path
+Path(__file__).with_suffix('.started').touch()
+while not Path(__file__).with_suffix('.gate').exists(): time.sleep(.01)
+Path(sys.argv[1]).write_text(json.dumps(dict(status='sdk_unavailable',metadata=None)),encoding='utf-8')
+""")
+    async def scenario():
+        adapter = FutuQuoteAdapter(InstrumentCatalog([equity()]), AAPL,
+                                   python=Path(sys.executable), _metadata_worker=worker)
+        probe = asyncio.create_task(adapter.capabilities())
+        async with asyncio.timeout(5):
+            while not worker.with_suffix('.started').exists():
+                await asyncio.sleep(.01)
+        closing = asyncio.create_task(adapter.close())
+        await asyncio.sleep(.03)
+        returned_early = closing.done()
+        worker.with_suffix('.gate').touch()
+        await asyncio.gather(probe, closing)
+        assert not returned_early
+        with pytest.raises(RuntimeError):
+            await adapter.capabilities()
     asyncio.run(scenario())

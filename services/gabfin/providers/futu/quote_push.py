@@ -151,10 +151,21 @@ def run_quote_context(context, sdk, handler_base, *, code, emit, stop, deadline,
             errors.append('subscribe_failed')
             return
         emit(dict(version=1, kind='ready'))
+        next_heartbeat = clock()
         while True:
             message = mailbox.take()
             if message is not None:
                 emit(message)
+            if not stop.is_set() and clock() >= next_heartbeat:
+                try:
+                    state = context.get_global_state()
+                    logged_in = (_ok(state) and isinstance(state[1], dict)
+                                 and state[1].get('qot_logined') is True)
+                except Exception:
+                    logged_in = False
+                emit(dict(version=1, kind='heartbeat', checked_at=now().isoformat().replace('+00:00', 'Z'),
+                          quote_logged_in=logged_in))
+                next_heartbeat = clock() + 10
             if stop.is_set() or clock() >= deadline - 10:
                 break
             sleep(.02)
