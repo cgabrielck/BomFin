@@ -35,11 +35,11 @@
 
 <!-- 每次交接更新這一行為主 -->
 
-stage: `backend-ready`
+stage: `ready-for-ui`
 
 ### Base
 
-- 後端 commit：`1cbee09e`（WU-3 FRED 宏觀）
+- 後端 commit：`5c49495a`（WU-7 provider routing + WU-9 analysis planes）
 - 分支：`codex/s01-source-baseline`
 - Checkout：`C:/Users/001/Downloads/GabFin-ai-trade/.worktrees/gabfin-s01`
 
@@ -47,13 +47,16 @@ stage: `backend-ready`
 
 本次交接新增或變更的合約。格式：`合約名稱` → 欄位變化 → 生成的 TS 型別位置。
 
-- `IndicatorSeries` / `IndicatorStatus` → 新增（WU-2 已有，本輪開始提供給前端）→ `generated.ts` 的 `IndicatorSeries`、`IndicatorStatus`
-- `MacroSnapshot` / `MacroPoint` → 新增（WU-3 已有）→ `generated.ts` 的 `MacroSnapshot`、`MacroPoint`
-- `FeedCapabilities` → 新增能力欄位（見下）→ `generated.ts` 的 `FeedCapabilities`
+- `IndicatorResponse` → 新增（回應包裝，含 `series` 與 `statuses`）→ `generated.ts` 的 `IndicatorResponse`
+- `MacroResponse` → 新增（回應包裝，含 `points`）→ `generated.ts` 的 `MacroResponse`
+- `CapabilitiesResponse` → 新增（回應包裝，含 `sources`）→ `generated.ts` 的 `CapabilitiesResponse`
+- `IndicatorStatus` → 新增（WU-2 已有，本輪開始提供給前端）→ `generated.ts` 的 `IndicatorStatus`
+- `MacroPoint` → 新增（WU-3 已有）→ `generated.ts` 的 `MacroPoint`
+- `FeedCapabilities` → 新增能力欄位：`venue_coverage`、`realtime`、`delay_minutes`、`tradable_for_entry`、`depth_levels`、`fee_class`、`unavailable_reason` → `generated.ts` 的 `FeedCapabilities`
 
 ### UI task
 
-- 目前無前端單位。下一個是 `ui-tasks/WU-9-ui.md`（指標疊圖與宏觀面板），待後端 WU-9 就緒。
+- `ui-tasks/WU-9-ui.md`：指標疊圖、宏觀面板、來源能力標示。Carbon 可開始。
 
 ### Forbidden edits
 
@@ -65,6 +68,10 @@ stage: `backend-ready`
 - **期權 OPRA 缺權限**：Futu 免費層無 OPRA 期權 LV1 權限，期權報價應顯示為「無即時期權權限」，不可顯示假價。
 - **indicative 報價**：Alpaca indicative 報價必須標示為不可作為進場依據。
 - **G2 仍未放行**：缺 channel／權益證據，維持拒絕新入場。前端不得顯示「可下單」。
+- **指標口徑不可混用**：`venue_coverage`（來源口徑）與 `source_coverage`（指標口徑）不同時，量能指標不可並列比較。
+- **本輪已知缺陷（既有，非本單位引入）**：`tests/api/test_desk_zone.py::test_zone_sanitize_fail_closed_and_color_only_edits`、
+  `tests/api/test_desk_zone_evidence.py` 兩個用例、`tests/trading/engine/test_worker_integration.py::test_shadow_mode_buy_signal_to_fill`
+  在本輪之前即失敗（Windows console 編碼與既有邏輯），已用 `git stash` 確認與本輪變更無關。
 
 ### Backlog
 
@@ -74,8 +81,8 @@ stage: `backend-ready`
 
 ### Next
 
-- 後端：實作 WU-9 合約擴充與 `/v1/indicators`、`/v1/macro` 端點，重建 schema 後 commit，然後寫 `ui-tasks/WU-9-ui.md`。
-- 前端（Carbon）：等待 `stage: ready-for-ui` 且 `ui-tasks/WU-9-ui.md` 存在後再開始。
+- 後端：等待 Carbon 完成 WU-9-ui，之後做 diff 審查、整合、跑 pytest 與 Playwright、commit。
+- 前端（Carbon）：`stage: ready-for-ui` 且 `ui-tasks/WU-9-ui.md` 存在，**可以開始**。
 
 ## UI 變更清單
 
