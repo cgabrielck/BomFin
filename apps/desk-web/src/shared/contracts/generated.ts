@@ -92,6 +92,11 @@ export type GabFinContracts =
   | RiskContext
   | StrategyContext
   | SubmitResult
+  | TapeManifest
+  | TapePartition
+  | TapeReadResult
+  | TapeSeries
+  | TapeWriteResult
   | MarketRequest
   | MarketStreamRequest;
 export type Amount = string;
@@ -636,6 +641,33 @@ export type ClientOrderId2 = string;
 export type Reason3 = string | null;
 export type SchemaVersion47 = '1.0';
 export type Status2 = 'ACKNOWLEDGED' | 'REJECTED' | 'UNKNOWN';
+export type Complete3 = boolean;
+export type MaxEventAt = string | null;
+export type MinEventAt = string | null;
+export type Path = string;
+export type Rows = number;
+export type Sha256 = string;
+export type Partitions = TapePartition[];
+export type PrecisionPolicy = string;
+export type SchemaVersion48 = '1.0';
+export type Adjustment = string;
+export type Complete4 = boolean;
+export type CoverageEnd1 = string | null;
+export type CoverageStart1 = string | null;
+export type Retention = 'full_history' | 'rolling_2y';
+export type RowCount = number;
+export type SchemaVersion49 = '1.0';
+export type SeriesId = string;
+export type Source10 = string;
+export type Symbol = string;
+export type VenueCoverage = string;
+export type WrittenAt = string;
+export type MaxEventAt1 = string | null;
+export type MinEventAt1 = string | null;
+export type Rows1 = number;
+export type RowsOutsideRetention = number;
+export type DroppedOutsideRetention = number;
+export type Partitions1 = TapePartition[];
 /**
  * @minItems 1
  * @maxItems 64
@@ -1349,6 +1381,67 @@ export interface SubmitResult {
   reason: Reason3;
   schema_version: SchemaVersion47;
   status: Status2;
+}
+/**
+ * Index of a tape series. `complete=false` means the series is not readable.
+ */
+export interface TapeManifest {
+  complete: Complete3;
+  partitions: Partitions;
+  precision_policy?: PrecisionPolicy;
+  schema_version: SchemaVersion48;
+  series: TapeSeries;
+  written_at: WrittenAt;
+}
+/**
+ * One stored file; the checksum binds a dataset to exact stored bytes.
+ */
+export interface TapePartition {
+  max_event_at: MaxEventAt;
+  min_event_at: MinEventAt;
+  path: Path;
+  rows: Rows;
+  sha256: Sha256;
+}
+/**
+ * Identity and retention of one stored series; not a data payload.
+ */
+export interface TapeSeries {
+  adjustment: Adjustment;
+  asset_class: AssetClass;
+  complete: Complete4;
+  coverage_end: CoverageEnd1;
+  coverage_start: CoverageStart1;
+  retention: Retention;
+  row_count: RowCount;
+  schema_version: SchemaVersion49;
+  series_id: SeriesId;
+  source: Source10;
+  symbol: Symbol;
+  timeframe: Timeframe;
+  venue_coverage: VenueCoverage;
+}
+/**
+ * Rows read back, plus what the reader must be told about their limits.
+ *
+ * `rows_outside_retention` counts stored rows that fall outside the
+ * retention window. It is reported rather than silently dropped, so a
+ * caller never mistakes a clipped read for complete history.
+ */
+export interface TapeReadResult {
+  max_event_at: MaxEventAt1;
+  min_event_at: MinEventAt1;
+  rows: Rows1;
+  rows_outside_retention?: RowsOutsideRetention;
+  series: TapeSeries;
+}
+/**
+ * What a write produced; the manifest is the durable record.
+ */
+export interface TapeWriteResult {
+  dropped_outside_retention: DroppedOutsideRetention;
+  partitions: Partitions1;
+  series: TapeSeries;
 }
 export interface MarketRequest {
   keys: Keys;

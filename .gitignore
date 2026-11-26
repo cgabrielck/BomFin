@@ -55,6 +55,9 @@ backend/data/agent_state_*.json
 config/mandate.json
 *.log
 
+# GabFin runtime state: tape files, manifests and operational databases.
+runtime/
+
 # impeccable-ignore-start
 # Ephemeral output, runtime state, and per-dev overrides.
 # Shared artifacts stay tracked: config.json, live/config.json,

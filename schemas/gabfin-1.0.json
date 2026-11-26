@@ -4329,6 +4329,290 @@
       "title": "SubscriptionRejection",
       "type": "object"
     },
+    "TapeManifest": {
+      "additionalProperties": false,
+      "description": "Index of a tape series. `complete=false` means the series is not readable.",
+      "properties": {
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "partitions": {
+          "items": {
+            "$ref": "#/$defs/TapePartition"
+          },
+          "title": "Partitions",
+          "type": "array"
+        },
+        "precision_policy": {
+          "default": "float64-storage-decimal-on-read",
+          "minLength": 1,
+          "title": "Precision Policy",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "series": {
+          "$ref": "#/$defs/TapeSeries"
+        },
+        "written_at": {
+          "format": "date-time",
+          "title": "Written At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "series",
+        "partitions",
+        "written_at",
+        "complete"
+      ],
+      "title": "TapeManifest",
+      "type": "object"
+    },
+    "TapePartition": {
+      "additionalProperties": false,
+      "description": "One stored file; the checksum binds a dataset to exact stored bytes.",
+      "properties": {
+        "max_event_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Event At"
+        },
+        "min_event_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Event At"
+        },
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "rows": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Rows",
+          "type": "integer"
+        },
+        "sha256": {
+          "minLength": 1,
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "rows",
+        "min_event_at",
+        "max_event_at",
+        "sha256"
+      ],
+      "title": "TapePartition",
+      "type": "object"
+    },
+    "TapeReadResult": {
+      "additionalProperties": false,
+      "description": "Rows read back, plus what the reader must be told about their limits.\n\n`rows_outside_retention` counts stored rows that fall outside the\nretention window. It is reported rather than silently dropped, so a\ncaller never mistakes a clipped read for complete history.",
+      "properties": {
+        "max_event_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Max Event At"
+        },
+        "min_event_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Min Event At"
+        },
+        "rows": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Rows",
+          "type": "integer"
+        },
+        "rows_outside_retention": {
+          "default": 0,
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Rows Outside Retention",
+          "type": "integer"
+        },
+        "series": {
+          "$ref": "#/$defs/TapeSeries"
+        }
+      },
+      "required": [
+        "series",
+        "rows",
+        "min_event_at",
+        "max_event_at"
+      ],
+      "title": "TapeReadResult",
+      "type": "object"
+    },
+    "TapeSeries": {
+      "additionalProperties": false,
+      "description": "Identity and retention of one stored series; not a data payload.",
+      "properties": {
+        "adjustment": {
+          "minLength": 1,
+          "title": "Adjustment",
+          "type": "string"
+        },
+        "asset_class": {
+          "$ref": "#/$defs/AssetClass"
+        },
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "coverage_end": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Coverage End"
+        },
+        "coverage_start": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Coverage Start"
+        },
+        "retention": {
+          "enum": [
+            "full_history",
+            "rolling_2y"
+          ],
+          "title": "Retention",
+          "type": "string"
+        },
+        "row_count": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "series_id": {
+          "format": "uuid",
+          "title": "Series Id",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "symbol": {
+          "minLength": 1,
+          "title": "Symbol",
+          "type": "string"
+        },
+        "timeframe": {
+          "$ref": "#/$defs/Timeframe"
+        },
+        "venue_coverage": {
+          "minLength": 1,
+          "title": "Venue Coverage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "series_id",
+        "asset_class",
+        "symbol",
+        "timeframe",
+        "source",
+        "venue_coverage",
+        "adjustment",
+        "retention",
+        "coverage_start",
+        "coverage_end",
+        "row_count",
+        "complete"
+      ],
+      "title": "TapeSeries",
+      "type": "object"
+    },
+    "TapeWriteResult": {
+      "additionalProperties": false,
+      "description": "What a write produced; the manifest is the durable record.",
+      "properties": {
+        "dropped_outside_retention": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Dropped Outside Retention",
+          "type": "integer"
+        },
+        "partitions": {
+          "items": {
+            "$ref": "#/$defs/TapePartition"
+          },
+          "title": "Partitions",
+          "type": "array"
+        },
+        "series": {
+          "$ref": "#/$defs/TapeSeries"
+        }
+      },
+      "required": [
+        "series",
+        "partitions",
+        "dropped_outside_retention"
+      ],
+      "title": "TapeWriteResult",
+      "type": "object"
+    },
     "TimeUnit": {
       "enum": [
         "second",
@@ -4898,6 +5182,21 @@
     },
     {
       "$ref": "#/$defs/SubmitResult"
+    },
+    {
+      "$ref": "#/$defs/TapeManifest"
+    },
+    {
+      "$ref": "#/$defs/TapePartition"
+    },
+    {
+      "$ref": "#/$defs/TapeReadResult"
+    },
+    {
+      "$ref": "#/$defs/TapeSeries"
+    },
+    {
+      "$ref": "#/$defs/TapeWriteResult"
     },
     {
       "$ref": "#/$defs/MarketRequest"
