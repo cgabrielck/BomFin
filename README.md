@@ -1,408 +1,113 @@
-# GabFin legacy source — ALPHA//DESK
+# GabFin
 
-[![Python](https://img.shields.io/badge/Python-3.12+-3776AB?logo=python&logoColor=white)](https://python.org)
-[![Tests](https://img.shields.io/badge/tests-191_passing-22d3c5)](#testing--測試)
-[![Last commit](https://img.shields.io/github/last-commit/cgabrielck/stock-analyzer)](https://github.com/cgabrielck/stock-analyzer/commits/main)
-[![Lab Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://stock-analyzergit-ijue4vuwb7kuvizn62fema.streamlit.app/)
+A personal stock research and market workspace, being rebuilt toward evidence-based research and controlled AI-assisted paper trading.
 
-> A risk-aware US equity research terminal combining fundamental quality, technical signals, active-session prices, market-regime controls, walk-forward backtesting, portfolio sizing, and optional LLM analysis. Designed for individual researchers who want institutional-grade tooling without a Bloomberg terminal bill.
->
-> 風險調整型美股研究終端，整合基本面、技術訊號、即時交易時段價格、市場狀態、walk-forward 回測、倉位管理與選用的 LLM 分析。專為個人研究者打造的機構級工具。
+English first · [繁體中文](#繁體中文)
 
-## Product surfaces / 產品介面
+## Current status
 
-**Legacy implementation name: Cgab.** The surfaces below describe existing source, not the target product. The new GabFin follows the [confirmed design](../../docs/superpowers/specs/2026-11-25-gabfin-system-design.md) and [upgrade plan](../../docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md). The frontend rewrite is planned, not implemented here.
+Completed through **S04/04d**: a responsive React workspace, secure read-only market integration, and incremental one-minute candlestick and volume charts. The interface currently uses Traditional Chinese.
 
-| Surface | What it is | How to run |
-|---------|------------|------------|
-| **Desk (product)** | FastAPI (`backend/api/app.py`) serving `web/static` | `uvicorn backend.api.app:app --host 127.0.0.1 --port 8000` → http://127.0.0.1:8000 |
-| **Streamlit (lab / legacy)** | `backend/app.py` — not the commercial UI | `streamlit run backend/app.py` → http://localhost:8501 |
+- Browse three sample stocks, search, open stock details, and maintain a temporary watchlist.
+- Inspect clearly labelled synthetic charts, exact OHLC values, missing data, source timestamps, and connection gaps.
+- Pair with a local HTTPS market host using secure sessions. Expiry and logout clear prices; reconnects start with a full snapshot.
+- Quotes and bars are independent: a quote-only provider does not produce invented candles or volume.
 
-Paper only on the Desk worker path. Do not treat the public Streamlit Cloud app as the product.
+**AI research, real opportunity discovery, account integration, automated paper trading, and live trading are not connected to this new workspace yet.** Market entitlement gate G2 remains open. No trading is started by the demo commands below. S04/04e integration acceptance and latency tracing are next.
 
-```bat
-cd C:\Users\001\cgabrielck-stock-analyzer
-.\.venv\Scripts\python.exe -m uvicorn backend.api.app:app --host 127.0.0.1 --port 8000
+## Run the demo
+
+From this repository root, using Node.js 24 and npm 11 (the versions tested locally):
+
+```powershell
+npm.cmd ci
+npm.cmd run dev -- --port 19045
 ```
 
-**Lab / legacy Streamlit (not the product):** [stock-analyzergit-ijue4vuwb7kuvizn62fema.streamlit.app](https://stock-analyzergit-ijue4vuwb7kuvizn62fema.streamlit.app/)
+Open **http://127.0.0.1:19045**. On macOS/Linux, use `npm` instead of `npm.cmd`; those platforms have not been verified. The demo needs no broker credentials or paid data subscription. AAPL/MSFT candles are synthetic; NVDA deliberately has no bars. Watchlists reset on reload.
 
-Current authority: the [new GabFin design and execution pointers](docs/ARCHITECTURE_DECISION.md). Old roadmaps and architecture labels are historical evidence only.
+For production build inspection:
 
-## What's New / 近期更新
-
-- **Desk trade journal (P0)** — FastAPI Desk `More → Trade journal` / `更多 → 交易日誌` shows orders, risk rejects (reason codes), and notes with audit/provenance links. Empty is not a live fill. Streamlit journal stays lab/legacy.
-- **Chart redesigned** — Clean simple/detail mode. Default view focuses on ~90 recent daily candles with natural scroll, pinch-zoom, and drag panning. No cluttered toolbar — just the price, volume, trend line, entry zone, stop, and target 1. Toggle detail mode for SMA/EMA, Bollinger Bands, RSI, MACD, Fibonacci, and Double Top/Bottom patterns with plain-language indicator explanations.
-- **Chart pattern overlays** — Double Top / Double Bottom detection with look-ahead bias prevention, Fibonacci retracement levels, and TradingView Pine Script v6 export for independent verification.
-- **Price alert monitoring** — Directional crossing state machine with confirmation bars, re-arm logic (0.5% away from level), stale quote rejection, and duplicate-safe events. Standalone background worker (default 60s interval) checks alerts when the browser is closed.
-- **Saved Plan versioning** — Immutable Deep Research versions with version history browsing, replacement with explicit invalidation of old alert rules, and on-demand outcome evaluation at 5/20/60 sessions.
-- **Full regression suite** — 191 passing tests covering backtesting, portfolio, alerts, patterns, charts, i18n, and database operations.
-
-## What It Does / 系統功能
-
-- Screens a curated universe of **74 liquid US-listed equities** across 14 sectors.
-- Separates the universe into **69 Core** and **5 Satellite** stocks.
-- Produces up to five recommendations with sector and speculative-stock limits.
-- Selects the correct Yahoo quote for pre-market, regular, after-hours, overnight, or closed sessions.
-- Blends fundamental, technical, and optional LLM analysis.
-- Applies a transparent risk penalty before ranking stocks.
-- Detects the global SPY/VIX market regime and adjusts entry thresholds and portfolio exposure.
-- Simulates monthly rebalancing with turnover, cash, transaction costs, and no-look-ahead score calibration.
-- Builds a portfolio with capped position weights, stop losses, P&L, correlation alerts, and a local trade journal.
-- Provides English, Simplified Chinese, and Traditional Chinese interfaces.
-
-## Current Decision Logic / 目前決策邏輯
-
-### 1. Investable Universe / 可投資股票池
-
-The built-in universe contains 74 stocks:
-
-| Constraint | Current rule |
-|---|---:|
-| Core stocks | 69 |
-| Satellite stocks | 5 |
-| Maximum recommendations | 5 |
-| Maximum per sector | 2 |
-| Maximum Satellite positions | 1 |
-| Minimum Satellite selection score | 65 |
-
-Core stocks emphasize liquidity, operating history, and diversified sector exposure. Satellite stocks currently include higher-risk EV and space names. User-added custom tickers are treated conservatively as Satellite stocks.
-
-內建股票池以大型、高流動性股票為核心，並保留少量高風險主題股票。自訂股票預設視為 Satellite，避免未知標的無限制進入投資組合。
-
-### 2. Fundamental Score / 基本面評分
-
-Available metrics are normalized to a 0–100 score. Missing metrics do not automatically become zero; the available weights are renormalized, while live recommendations require at least four usable metrics.
-
-| Metric | Relative weight |
-|---|---:|
-| Revenue growth | 25% |
-| EPS growth | 20% |
-| PEG ratio | 15% |
-| Profit margin | 10% |
-| ROE | 10% |
-| Debt-to-equity | 5% |
-
-Yahoo `debtToEquity` is normalized from percentage points to a ratio before scoring. For example, Yahoo `150` becomes `1.5x`.
-
-### 3. Technical Score / 技術評分
-
-Technical analysis uses approximately six months of adjusted OHLCV data:
-
-- RSI(14)
-- MACD and signal histogram
-- SMA20 / SMA50 trend
-- Bollinger Bands
-- ATR(14)
-- 10-day versus 50-day volume ratio
-
-When technical data is available:
-
-```text
-base_score = 70% fundamental_score + 30% technical_score
+```powershell
+npm.cmd run typecheck
+npm.cmd run build
+npm.cmd --prefix apps/desk-web run preview -- --port 19046
 ```
 
-### 4. Optional LLM Blend / 選用 LLM 混合評分
+HTTP preview is demo-only. Server market mode requires a trusted local HTTPS bootstrap and an existing S03 market listener; a persistent operator launcher and remote deployment are not included. See the [workspace guide](apps/desk-web/README.md) for integration details.
 
-The highest-ranked candidates can be analyzed by any OpenAI-compatible endpoint. The default influence is 20% and is adjustable in the sidebar.
+## Repository layout
 
-```text
-model_score = quant_score × (1 - llm_weight) + llm_score × llm_weight
+| Path | Purpose |
+| --- | --- |
+| `apps/desk-web/` | New React/Vite workspace |
+| `services/gabfin/` | Versioned contracts, sessions, market state, and read-only API bridge |
+| `schemas/` | Canonical contract schemas |
+| `tests/e2e/` | Browser integration and bar patch tests |
+| `tests/gabfin/` | New Python component tests |
+| `backend/`, `web/` | Preserved legacy application; separate from the new workspace |
+
+The planning/memory documents live in the outer development workspace. They are not included in this source-root branch. Older ADRs do not govern this redesign. The original README is preserved as [historical documentation](docs/README-legacy.md); its feature descriptions and test badges are not current acceptance evidence.
+
+## Verification and limits
+
+```powershell
+npx.cmd playwright test
 ```
 
-The LLM is an assistant, not the primary decision engine. The app remains fully usable without an API key.
+The S04/04d checkpoint passed **28 Playwright tests** (23 browser cases and 5 bar patch cases), TypeScript checks, and the production build on Windows with Microsoft Edge. HTTPS fixture tests additionally require the configured Python environment, `gabfin[web]`, `httpx2`, and Git OpenSSL; see the workspace guide. These are recorded checkpoint results, not a guarantee for every environment.
 
-### 5. Risk-Adjusted Selection / 風險調整選股
+The earlier full Python regression had one legacy holiday-dependent shadow-test failure and four optional PostgreSQL skips. It is not fully green. This checkpoint does not establish real-time data rights, real provider bars, iPhone hardware acceptance, or trading readiness.
 
-Risk is calculated from the latest 126 valid adjusted prices, with at least 60 return observations required.
+Charts use Lightweight Charts 5.3.0. Its attribution and license are retained under `apps/desk-web/public/third-party/` and displayed in the chart UI.
 
-| Risk tier | Trigger | Score penalty |
-|---|---|---:|
-| Low | Volatility <25% and drawdown <25% | 0 |
-| Medium | Volatility ≥25% or drawdown ≥25% | −5 |
-| High | Volatility ≥45% or drawdown ≥50% | −10 |
+---
 
-```text
-risk_adjusted_score = model_score - risk_penalty
+## 繁體中文
+
+GabFin 是逐步重建中的個人選股研究及行情工作台，目標包括具證據的研究，以及受控的 AI 輔助模擬交易。
+
+### 目前進度
+
+已完成至 **S04/04d**：響應式 React 工作台、安全只讀行情接入，以及 1 分鐘 K 線／成交量增量圖表。目前介面採用繁體中文。
+
+- 可搜尋三檔示範股票、查看詳情，並維護本頁暫存自選。
+- 圖表明示合成資料，提供精確 OHLC 數值、缺資料、來源時間及連線缺口。
+- 本機 HTTPS 主機使用安全 session 配對；到期／登出清除報價，重連先取得完整快照。
+- Quote 與 bar 獨立；只有報價的來源不會被拼成假 K 線或成交量。
+
+**新工作台尚未接入 AI 研究、真實機會池、帳戶、自動 paper trade 或真實交易。** G2 行情權益關卡仍未放行。以下示範指令不會啟動交易；下一步為 S04/04e 整合驗收及延遲追蹤。
+
+### 啟動示範
+
+在 repository 根目錄，以本機已驗證的 Node.js 24／npm 11 執行：
+
+```powershell
+npm.cmd ci
+npm.cmd run dev -- --port 19045
 ```
 
-Selection, backtest calibration, and calibrated Kelly sizing use `risk_adjusted_score`. The original model score remains visible for auditability. Missing risk data is neutral and clearly labeled instead of silently rejecting the stock.
+開啟 **http://127.0.0.1:19045**。macOS/Linux 可改用 `npm`，但尚未實測。示範不需要券商憑證或付費行情；AAPL／MSFT K 線為合成資料，NVDA 刻意缺 bar，自選重載後重設。
 
-Additional displayed risk metrics include:
+建置及檢查：
 
-- Historical VaR 95%
-- Annualized volatility and return
-- Maximum drawdown
-- Sharpe and Sortino ratios
-- Beta versus SPY
-
-### 6. Global Market Regime / 全局市場狀態
-
-The regime engine uses one year of SPY and VIX data. SPY trend is classified with SMA50 and SMA200; VIX ≥25 overrides the trend as high volatility.
-
-| Regime | Entry threshold | Fill threshold | Target portfolio exposure |
-|---|---:|---:|---:|
-| Bull | 60 | 50 | 90% |
-| Neutral | 65 | 55 | 70% |
-| Bear | 72 | 65 | 40% |
-| High volatility | 75 | 68 | 40% |
-
-The same regime rules are applied in live recommendations and historical backtests. Defensive regimes raise the quality threshold and retain more cash rather than forcing five positions.
-
-### 7. Active-Session Price Selection / 即時交易時段價格
-
-Price selection follows Yahoo's current `marketState` rather than blindly preferring any populated quote field:
-
-| Yahoo state | Preferred price |
-|---|---|
-| `PRE` / `PREPRE` | Fresh pre-market quote |
-| `REGULAR` | Regular-market quote |
-| `POST` / `POSTPOST` | Fresh after-hours quote |
-| `CLOSED` | Newest completed-session quote, labeled closed |
-
-If the expected session quote is unavailable or stale, the app requests an explicit one-minute, extended-hours bar. It finally falls back to the regular close and marks the result `STALE`. The UI displays the session, quote source, quote timestamp, and freshness status.
-
-### 8. Portfolio Construction / 投資組合建構
-
-- Maximum position weight: 25%
-- Maximum exposure: regime-dependent, between 40% and 90%
-- Default fallback: equal weight with retained cash
-- Calibrated Kelly: enabled only when a valid walk-forward model exists
-- Calibration expiry: 180 days
-- Default stop loss: 10%, adjusted by Beta and capped at 25%
-- Correlation warning: positive correlation `ρ ≥ 0.80`
-
-The system no longer treats `score / 100` as a win probability. If a valid calibration model is unavailable, it safely uses capped equal weights.
-
-## Walk-Forward Backtesting / Walk-Forward 回測
-
-The backtest uses only information available at each monthly rebalance date:
-
-- Six-month technical warm-up before the requested start date
-- Adjusted stock and SPY prices
-- Quarterly fundamentals with a conservative 60-day filing lag
-- Monthly rebalancing
-- Shared live/backtest selection rules
-- Historical SPY/VIX regime classification
-- Equal-weight or expanding calibrated-Kelly sizing
-- Drift-aware turnover and configurable transaction costs
-- Cash retained according to regime exposure
-- Months with missing selected-stock exit prices are excluded instead of silently reallocating weights
-- Coverage diagnostics for prices, technicals, fundamentals, and exits
-
-Calibration uses completed stock-month outcomes only:
-
-```text
-At rebalance T:
-1. Add outcomes completed before T
-2. Fit/update score probability bins
-3. Score and size positions at T
-4. Queue T outcomes for the next rebalance
+```powershell
+npm.cmd run typecheck
+npm.cmd run build
+npm.cmd --prefix apps/desk-web run preview -- --port 19046
+npx.cmd playwright test
 ```
 
-Calibration models are versioned and written atomically. A model is not allowed into live sizing when universe quality, technical coverage, sample size, or exit-price checks fail.
+HTTP preview 只供示範。伺服器行情模式需要可信本機 HTTPS bootstrap 及既有 S03 listener；未包含長駐操作 launcher 或遠端部署。整合設定見[工作台指引](apps/desk-web/README.md)。
 
-### Important Backtest Limitation / 重要限制
+### 程式位置及驗證界線
 
-If `data/historical_universe.json` is absent, historical tests use today's universe and therefore contain survivorship bias. The UI displays this warning, and such a backtest is not permitted to generate a live sizing model.
+`apps/desk-web/` 是新前端，`services/gabfin/` 是新契約、session、行情狀態與 API，`schemas/` 保存 canonical schema。`tests/e2e/` 與 `tests/gabfin/` 分別驗證瀏覽器及新 Python 元件；`backend/`、`web/` 保留舊程式。
 
-Yahoo generally exposes only limited quarterly history. Fundamental coverage may therefore be lower in early backtest periods. Coverage is displayed instead of being hidden.
+規劃／memory 文件留在外層開發工作目錄，未包含於這個以 source 為根的分支。舊 ADR 不約束新版；[原 README](docs/README-legacy.md) 僅供歷史參考，其功能描述及徽章不代表目前驗收。
 
-## Data Sources / 資料來源
+S04/04d 在 Windows／Microsoft Edge 通過 **28 項 Playwright 測試**（23 個瀏覽器案例及 5 個 bar patch 案例）、型別檢查與 build。HTTPS 測試另需 Python 環境、`gabfin[web]`、`httpx2` 及 Git OpenSSL，詳見工作台指引。
 
-| Source | Primary use |
-|---|---|
-| Yahoo Finance / `yfinance` | Session quotes, adjusted OHLCV, fundamentals, benchmark, VIX, options, news |
-| Yahoo chart and quote-summary APIs | HTTP fallback pricing and fundamentals |
-| Sina Finance | Cloud fallback quotes and news |
-| East Money / AKShare | China-accessible fundamental fallback |
-| SEC EDGAR | Latest 10-K/10-Q filing context |
-| Local seed data | Offline fallback for the original universe subset |
-| OpenAI-compatible API | Optional LLM scoring and narrative analysis |
+較早的 Python 全套回歸仍有一項依賴假期日期的舊 shadow 測試失敗，以及四項可選 PostgreSQL skip，不能宣稱全套通過。現有結果亦不代表即時權益、真實 provider bars、iPhone 真機或交易準備已驗收。
 
-Cached market information uses a five-minute TTL. Running analysis with force refresh bypasses application caches, but upstream providers may still be delayed.
-
-## Professional UI / 專業交易介面
-
-**Product UI is the FastAPI Desk** (`web/static`, served by `backend/api/app.py`): Scan, Deep, Auto, paper evidence, provenance, operator controls, and the **trade journal** (`More → Trade journal` / `更多 → 交易日誌`). That view lists recent orders, risk rejects, and notes with audit/provenance links from `GET /api/journal` — empty means nothing was recorded, not a live fill. Streamlit’s journal remains lab/legacy only. Dark institutional-terminal visual language (see `docs/ui/alphadesk-desk-demo.html`).
-
-The **Streamlit** app (`backend/app.py`) is **lab / legacy**. It still has a dark terminal layout (responsive, Core/Satellite labels, regime banner, recommendation cards, Plotly charts, journal, en / 简体中文 / 繁體中文) but it is not the surface we sell or extend first.
-
-New product features land on the Desk. Streamlit receives critical lab fixes only.
-
-## Architecture / 系統架構
-
-Legacy source layout: FastAPI serves the Desk shell; Streamlit is the lab interface. Existing Intent and Order paths are documented as implementation history in [MODULAR_ARCHITECTURE.md](docs/MODULAR_ARCHITECTURE.md), not as constraints on the new architecture.
-
-```text
-stock-analyzer/
-├── web/static/                        Desk product UI (served by FastAPI)
-├── backend/
-│   ├── api/app.py                     Desk FastAPI app (product)
-│   ├── app.py                         Streamlit lab / legacy UI
-│   ├── lab/advisory_debate.py         Lab memo only — not product M7, never OrderManager
-│   ├── run_agent.py                   CLI entry point
-│   ├── i18n.py                        en / zh_cn / zh_tw translations
-│   ├── agents/                        Scoring, regime, LLM assist, data fallbacks
-│   ├── trading/                       L2 worker, RiskEngine, mandate, kill, Alpaca
-│   ├── backtesting/                   Walk-forward + factor lab
-│   └── utils/                         Universe, selection, session quotes, cache
-├── docs/ARCHITECTURE_DECISION.md      Pointer to the new design
-├── docs/MODULAR_ARCHITECTURE.md       Intent v0, dual-clock, L1/L2
-├── tests/
-├── requirements.txt
-└── runtime.txt                        Streamlit Cloud Python version (lab host)
-```
-
-## Tech Stack / 技術棧
-
-- **Python 3.12**
-- **FastAPI + `web/static`** for the **product** Desk
-- **Streamlit** for the **lab / legacy** UI only
-- **Uvicorn** to serve the Desk
-- **Pandas** and **NumPy** for time-series and quantitative calculations
-- **yfinance** for Yahoo market and fundamental data
-- **AKShare**, **Requests**, and **BeautifulSoup4** for fallback data and parsing
-- **Plotly** and **Altair** for interactive visualization
-- **OpenAI Python SDK** for optional OpenAI-compatible LLM providers
-- **pytest** for regression testing
-- Thread pools for bounded parallel quote, technical, and backtest data retrieval
-- JSON-based local persistence for cache, portfolio state, trade journal, and calibration models
-
-## Quick Start / 快速開始
-
-Python 3.12 is recommended.
-
-```bash
-git clone https://github.com/cgabrielck/stock-analyzer.git
-cd stock-analyzer
-
-python3.12 -m venv .venv312
-source .venv312/bin/activate
-pip install -r requirements.txt
-
-# Product Desk
-python -m uvicorn backend.api.app:app --host 127.0.0.1 --port 8000
-```
-
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000).
-
-Lab / legacy Streamlit (optional):
-
-```bash
-streamlit run backend/app.py
-```
-
-Open [http://localhost:8501](http://localhost:8501). This is not the product surface.
-
-CLI mode:
-
-```bash
-PYTHONPATH=backend python backend/run_agent.py
-```
-
-## API Configuration / API 設定
-
-LLM analysis is optional. Configure an OpenAI-compatible provider in `.env` locally (Desk) or Streamlit Secrets (lab Cloud host only):
-
-```env
-LLM_API_KEY=your-api-key
-LLM_BASE_URL=https://zhi-api.com/v1
-LLM_MODEL=gpt-5.6-luna
-LLM_TIMEOUT_SECONDS=45
-TRADIER_API_TOKEN=your-production-token
-POLYGON_API_KEY=your-polygon-or-massive-key
-ALPHA_VANTAGE_API_KEY=your-alpha-vantage-key
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=your-server-side-service-role-key
-```
-
-`LLM_MODEL` handles all tasks by default. Set `LLM_REASONING_MODEL` only when the provider offers a separate reasoning model. The timeout defaults to 45 seconds and is capped at 120 seconds.
-
-Do not commit `.env` or API keys. The repository ignores `.env`, virtual environments, caches, portfolio state, and trade journals.
-
-Alpha Vantage is optional. When configured, it supplies company overview, income statements, balance sheets, cash flow, earnings, and adjusted daily-price fallback data. Fundamentals are cached for 24 hours to protect provider quotas. Yahoo remains responsible for session-aware pre-market, regular-market, and after-hours quotes. If Alpha Vantage is unavailable or rate-limited, the existing Yahoo/China/seed fallback chain continues automatically.
-
-## Testing / 測試
-
-```bash
-./.venv312/bin/pytest -q
-```
-
-Current verified result:
-
-```text
-191 passed
-```
-
-Additional checks:
-
-```bash
-./.venv312/bin/python -m compileall -q backend tests
-git diff --check
-```
-
-## Lab / legacy Streamlit Cloud / 實驗室雲端（非產品）
-
-The public Streamlit Cloud host is a **lab / legacy** deploy. Product traffic belongs on the FastAPI Desk. The steps below are kept so the lab app can still boot; they are not a product-launch checklist.
-
-1. Push the repository to GitHub.
-2. Connect it at [share.streamlit.io](https://share.streamlit.io).
-3. Set the entry point to `backend/app.py`.
-4. Open the app's **Settings → Secrets** and add root-level TOML values:
-
-```toml
-ALPHA_VANTAGE_API_KEY = "replace-with-a-new-key"
-LLM_API_KEY = "your-llm-key"
-LLM_BASE_URL = "https://zhi-api.com/v1"
-LLM_MODEL = "gpt-5.6-luna"
-LLM_TIMEOUT_SECONDS = "45"
-TRADIER_API_TOKEN = "your-production-token"
-POLYGON_API_KEY = "your-polygon-or-massive-key"
-SUPABASE_URL = "https://your-project.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY = "your-server-side-service-role-key"
-```
-
-Only `ALPHA_VANTAGE_API_KEY` is required for Alpha Vantage. The LLM and Supabase values remain optional. Do not add quotes around the variable name, do not paste `.env` syntax such as `KEY=value` into the TOML editor, and never commit `.streamlit/secrets.toml`.
-5. Save Secrets, reboot the app if Streamlit does not restart it automatically, and set app visibility as required.
-
-Every push to `main` triggers a Streamlit Cloud redeploy.
-
-## Privacy and Persistence / 隱私與持久化
-
-`data/portfolio_state.json` and `data/trade_journal.json` are local runtime files and are intentionally excluded from Git. On ephemeral cloud hosting, local file changes may be lost after a restart or redeploy. Use an external database before relying on the journal as a permanent multi-user ledger.
-
-### Optional Accounts and Favorites
-
-Guest analysis works without account configuration. To enable persistent username/PIN accounts, Favorites, and preferences:
-
-1. Create a Supabase project.
-2. Run `backend/persistence/migrations/001_accounts.sql` through `007_option_alert_lifecycle.sql` in numeric order in the Supabase SQL editor. Migration 006 retains email-prefixed database column/function names as an internal compatibility layer, but the worker delivers through Telegram only. Migration 007 enables option event types and requires manual confirmation of a simulated option entry before stop and target rules begin monitoring.
-3. Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to server-side secrets (Desk `.env` or lab Streamlit Secrets).
-4. Restart the app.
-
-The service-role key bypasses row-level security and must never be exposed in browser code or committed to Git. The account adapter is called only by server-side Python. Direct access through Supabase's public anon/authenticated roles remains denied because the migration enables RLS without public policies.
-
-The current product requirement stores PIN values as plaintext and allows any PIN format. A database operator or database leak can therefore reveal every PIN. Use unique PINs that are not reused for other services. One-way PIN hashing is strongly recommended before production use.
-
-Authenticated users can save deterministic Deep Research plans, compare a re-analysis with the active plan, explicitly replace it with an immutable new version, review version history, and confirm direction-aware price alert rules. Replacing a plan invalidates its prior alert rules and requires explicit reconfirmation against the new levels.
-
-### Price alert worker
-
-Price alert rules are monitored outside the UI process so checks continue after the browser closes. Deploy a long-running worker on Railway, Render, or another process host with `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, and `ALERT_OWNER_USER_ID`, then run:
-
-```bash
-python backend/alert_worker.py
-```
-
-The default interval is one minute. Set `ALERT_INTERVAL_SECONDS` to change it. `ALERT_OWNER_USER_ID` must be the UUID of the one Stock Analyzer account whose events belong in this Telegram chat; the worker filters rules and deliveries by that owner to prevent cross-user disclosure. The worker rejects stale Yahoo quotes, triggers only on directional crossings or entry-zone transitions, re-arms after price moves away from the level, stores duplicate-safe events in the signed-in user's in-app alert inbox, and sends claimed events to the configured Telegram chat with bounded retries. This is periodic/delayed monitoring, not exchange-grade real-time market data. Never commit the bot token, chat ID, owner UUID, or Supabase service-role key.
-
-Option-chain research uses Yahoo first, then configured Tradier and Polygon/Massive providers, then Cboe delayed data as a research-only fallback. Set `TRADIER_API_TOKEN` for Tradier production market data and/or `POLYGON_API_KEY` for Polygon/Massive. Provider response metadata controls safety: delayed/EOD data can display contracts and Greeks but cannot create actionable option alerts. Only fresh, regular-session Yahoo quotes, Tradier production quotes, or Polygon/Massive `REAL-TIME` quotes can drive the option alert worker.
-
-Deep Research also includes bounded SEC filing evidence with direct EDGAR citations. Saved-plan outcome journals can be evaluated on demand at 5, 20, and 60 completed trading sessions using raw daily OHLC and exact-date SPY comparison. Outcome observations are educational research records, not brokerage fills. The model portfolio reports cash-aware covariance volatility, historical VaR, coverage, and transparent -10%/-20% equity stress scenarios.
-
-## Disclaimer / 免責聲明
-
-This project is for educational and research purposes only. It does not provide financial advice, brokerage execution, or any guarantee of future performance. Market data can be delayed or incomplete. Always verify prices with your broker and perform independent due diligence before trading.
-
-本專案僅供教育與研究用途，不構成投資建議、交易執行服務或任何收益保證。市場資料可能延遲或不完整，下單前請以券商資料為準並自行研究風險。
+圖表使用 Lightweight Charts 5.3.0，署名與授權文件保留於 `apps/desk-web/public/third-party/`，畫面亦有署名。
