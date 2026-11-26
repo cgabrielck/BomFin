@@ -1947,6 +1947,246 @@
       "type": "object"
     },
     "JsonValue": {},
+    "MacroPoint": {
+      "additionalProperties": false,
+      "description": "One published observation of a macro series.",
+      "properties": {
+        "frequency": {
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "quarterly",
+            "annual"
+          ],
+          "title": "Frequency",
+          "type": "string"
+        },
+        "observation_date": {
+          "format": "date",
+          "title": "Observation Date",
+          "type": "string"
+        },
+        "release_date": {
+          "format": "date",
+          "title": "Release Date",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "series_id": {
+          "minLength": 1,
+          "title": "Series Id",
+          "type": "string"
+        },
+        "units": {
+          "minLength": 1,
+          "title": "Units",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "format": "decimal",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "vintage": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Vintage"
+        }
+      },
+      "required": [
+        "schema_version",
+        "series_id",
+        "observation_date",
+        "release_date",
+        "value",
+        "units",
+        "frequency"
+      ],
+      "title": "MacroPoint",
+      "type": "object"
+    },
+    "MacroRelease": {
+      "additionalProperties": false,
+      "description": "When a series was next published, and what it said.\n\nA macro dashboard that shows a number without its release date will\nshow a stale number with no indication of it, which is worse than\nshowing nothing.",
+      "properties": {
+        "fetched_at": {
+          "format": "date-time",
+          "title": "Fetched At",
+          "type": "string"
+        },
+        "frequency": {
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "quarterly",
+            "annual"
+          ],
+          "title": "Frequency",
+          "type": "string"
+        },
+        "period": {
+          "format": "date",
+          "title": "Period",
+          "type": "string"
+        },
+        "release_date": {
+          "format": "date",
+          "title": "Release Date",
+          "type": "string"
+        },
+        "series_id": {
+          "minLength": 1,
+          "title": "Series Id",
+          "type": "string"
+        },
+        "units": {
+          "minLength": 1,
+          "title": "Units",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "format": "decimal",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "series_id",
+        "release_date",
+        "period",
+        "value",
+        "units",
+        "frequency",
+        "fetched_at"
+      ],
+      "title": "MacroRelease",
+      "type": "object"
+    },
+    "MacroSeries": {
+      "additionalProperties": false,
+      "description": "The definition of a macro series, not its observations.",
+      "properties": {
+        "category": {
+          "enum": [
+            "rates",
+            "inflation",
+            "employment",
+            "risk",
+            "growth",
+            "other"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "frequency": {
+          "enum": [
+            "daily",
+            "weekly",
+            "monthly",
+            "quarterly",
+            "annual"
+          ],
+          "title": "Frequency",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "seasonal_adjustment": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seasonal Adjustment"
+        },
+        "series_id": {
+          "minLength": 1,
+          "title": "Series Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "units": {
+          "minLength": 1,
+          "title": "Units",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "series_id",
+        "title",
+        "category",
+        "frequency",
+        "units"
+      ],
+      "title": "MacroSeries",
+      "type": "object"
+    },
+    "MacroSnapshot": {
+      "additionalProperties": false,
+      "description": "The latest observation of several series at one instant.",
+      "properties": {
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/MacroPoint"
+          },
+          "maxItems": 1000,
+          "title": "Points",
+          "type": "array"
+        }
+      },
+      "required": [
+        "observed_at",
+        "points"
+      ],
+      "title": "MacroSnapshot",
+      "type": "object"
+    },
     "MarketCursor": {
       "additionalProperties": false,
       "properties": {
@@ -5313,6 +5553,18 @@
     },
     {
       "$ref": "#/$defs/ReservationStatus"
+    },
+    {
+      "$ref": "#/$defs/MacroPoint"
+    },
+    {
+      "$ref": "#/$defs/MacroRelease"
+    },
+    {
+      "$ref": "#/$defs/MacroSeries"
+    },
+    {
+      "$ref": "#/$defs/MacroSnapshot"
     },
     {
       "$ref": "#/$defs/AssetClass"
