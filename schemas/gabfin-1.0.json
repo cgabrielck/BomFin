@@ -1478,6 +1478,296 @@
       "title": "HistoryLimit",
       "type": "object"
     },
+    "IndicatorPoint": {
+      "additionalProperties": false,
+      "description": "One computed indicator value at one instant.",
+      "properties": {
+        "computed_at": {
+          "format": "date-time",
+          "title": "Computed At",
+          "type": "string"
+        },
+        "computed_by": {
+          "enum": [
+            "local",
+            "futu_api"
+          ],
+          "title": "Computed By",
+          "type": "string"
+        },
+        "event_at": {
+          "format": "date-time",
+          "title": "Event At",
+          "type": "string"
+        },
+        "indicator": {
+          "enum": [
+            "sma",
+            "ema",
+            "wma",
+            "macd",
+            "macd_signal",
+            "macd_histogram",
+            "rsi",
+            "stochastic_k",
+            "stochastic_d",
+            "stochastic_j",
+            "roc",
+            "momentum",
+            "atr",
+            "bollinger_upper",
+            "bollinger_middle",
+            "bollinger_lower",
+            "bollinger_percent_b",
+            "bollinger_bandwidth",
+            "donchian_upper",
+            "donchian_lower",
+            "historical_volatility",
+            "obv",
+            "volume_sma",
+            "mfi",
+            "vwap"
+          ],
+          "title": "Indicator",
+          "type": "string"
+        },
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Params",
+          "type": "object"
+        },
+        "realtime": {
+          "default": false,
+          "title": "Realtime",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_coverage": {
+          "enum": [
+            "iex",
+            "sip",
+            "futu_nasdaq_totalview",
+            "futu_arca",
+            "unknown"
+          ],
+          "title": "Source Coverage",
+          "type": "string"
+        },
+        "timeframe": {
+          "$ref": "#/$defs/Timeframe"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "format": "decimal",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "schema_version",
+        "instrument_id",
+        "indicator",
+        "params",
+        "timeframe",
+        "value",
+        "event_at",
+        "computed_at",
+        "source_coverage",
+        "computed_by"
+      ],
+      "title": "IndicatorPoint",
+      "type": "object"
+    },
+    "IndicatorSeries": {
+      "additionalProperties": false,
+      "description": "A run of indicator points for one indicator and one parameter set.",
+      "properties": {
+        "indicator": {
+          "enum": [
+            "sma",
+            "ema",
+            "wma",
+            "macd",
+            "macd_signal",
+            "macd_histogram",
+            "rsi",
+            "stochastic_k",
+            "stochastic_d",
+            "stochastic_j",
+            "roc",
+            "momentum",
+            "atr",
+            "bollinger_upper",
+            "bollinger_middle",
+            "bollinger_lower",
+            "bollinger_percent_b",
+            "bollinger_bandwidth",
+            "donchian_upper",
+            "donchian_lower",
+            "historical_volatility",
+            "obv",
+            "volume_sma",
+            "mfi",
+            "vwap"
+          ],
+          "title": "Indicator",
+          "type": "string"
+        },
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "params": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Params",
+          "type": "object"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/IndicatorPoint"
+          },
+          "maxItems": 100000,
+          "title": "Points",
+          "type": "array"
+        },
+        "source_coverage": {
+          "enum": [
+            "iex",
+            "sip",
+            "futu_nasdaq_totalview",
+            "futu_arca",
+            "unknown"
+          ],
+          "title": "Source Coverage",
+          "type": "string"
+        },
+        "timeframe": {
+          "$ref": "#/$defs/Timeframe"
+        }
+      },
+      "required": [
+        "instrument_id",
+        "indicator",
+        "params",
+        "timeframe",
+        "source_coverage",
+        "points"
+      ],
+      "title": "IndicatorSeries",
+      "type": "object"
+    },
+    "IndicatorStatus": {
+      "additionalProperties": false,
+      "description": "Why an indicator has no value, or that it has one.",
+      "properties": {
+        "indicator": {
+          "enum": [
+            "sma",
+            "ema",
+            "wma",
+            "macd",
+            "macd_signal",
+            "macd_histogram",
+            "rsi",
+            "stochastic_k",
+            "stochastic_d",
+            "stochastic_j",
+            "roc",
+            "momentum",
+            "atr",
+            "bollinger_upper",
+            "bollinger_middle",
+            "bollinger_lower",
+            "bollinger_percent_b",
+            "bollinger_bandwidth",
+            "donchian_upper",
+            "donchian_lower",
+            "historical_volatility",
+            "obv",
+            "volume_sma",
+            "mfi",
+            "vwap"
+          ],
+          "title": "Indicator",
+          "type": "string"
+        },
+        "observed_bars": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Bars"
+        },
+        "params": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Params",
+          "type": "object"
+        },
+        "ready": {
+          "title": "Ready",
+          "type": "boolean"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "required_bars": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Required Bars"
+        }
+      },
+      "required": [
+        "indicator",
+        "params",
+        "ready"
+      ],
+      "title": "IndicatorStatus",
+      "type": "object"
+    },
     "Inference": {
       "additionalProperties": false,
       "properties": {
@@ -4978,6 +5268,15 @@
     },
     {
       "$ref": "#/$defs/Role"
+    },
+    {
+      "$ref": "#/$defs/IndicatorPoint"
+    },
+    {
+      "$ref": "#/$defs/IndicatorSeries"
+    },
+    {
+      "$ref": "#/$defs/IndicatorStatus"
     },
     {
       "$ref": "#/$defs/PositionEffect"

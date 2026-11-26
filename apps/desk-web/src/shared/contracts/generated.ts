@@ -24,6 +24,9 @@ export type GabFinContracts =
   | Resource
   | ResourceKind
   | Role
+  | IndicatorPoint
+  | IndicatorSeries
+  | IndicatorStatus
   | PositionEffect
   | PositionSide
   | StrategyIntent
@@ -303,6 +306,102 @@ export type ResourceKind =
   | 'artifact';
 export type Owner = string;
 export type SchemaVersion18 = '1.0';
+export type ComputedAt = string;
+export type ComputedBy = 'local' | 'futu_api';
+export type EventAt5 = string;
+export type Indicator =
+  | 'sma'
+  | 'ema'
+  | 'wma'
+  | 'macd'
+  | 'macd_signal'
+  | 'macd_histogram'
+  | 'rsi'
+  | 'stochastic_k'
+  | 'stochastic_d'
+  | 'stochastic_j'
+  | 'roc'
+  | 'momentum'
+  | 'atr'
+  | 'bollinger_upper'
+  | 'bollinger_middle'
+  | 'bollinger_lower'
+  | 'bollinger_percent_b'
+  | 'bollinger_bandwidth'
+  | 'donchian_upper'
+  | 'donchian_lower'
+  | 'historical_volatility'
+  | 'obv'
+  | 'volume_sma'
+  | 'mfi'
+  | 'vwap';
+export type InstrumentId7 = string;
+export type Realtime = boolean;
+export type SchemaVersion19 = '1.0';
+export type SourceCoverage = 'iex' | 'sip' | 'futu_nasdaq_totalview' | 'futu_arca' | 'unknown';
+export type Value = string | null;
+export type Indicator1 =
+  | 'sma'
+  | 'ema'
+  | 'wma'
+  | 'macd'
+  | 'macd_signal'
+  | 'macd_histogram'
+  | 'rsi'
+  | 'stochastic_k'
+  | 'stochastic_d'
+  | 'stochastic_j'
+  | 'roc'
+  | 'momentum'
+  | 'atr'
+  | 'bollinger_upper'
+  | 'bollinger_middle'
+  | 'bollinger_lower'
+  | 'bollinger_percent_b'
+  | 'bollinger_bandwidth'
+  | 'donchian_upper'
+  | 'donchian_lower'
+  | 'historical_volatility'
+  | 'obv'
+  | 'volume_sma'
+  | 'mfi'
+  | 'vwap';
+export type InstrumentId8 = string;
+/**
+ * @maxItems 100000
+ */
+export type Points = IndicatorPoint[];
+export type SourceCoverage1 = 'iex' | 'sip' | 'futu_nasdaq_totalview' | 'futu_arca' | 'unknown';
+export type Indicator2 =
+  | 'sma'
+  | 'ema'
+  | 'wma'
+  | 'macd'
+  | 'macd_signal'
+  | 'macd_histogram'
+  | 'rsi'
+  | 'stochastic_k'
+  | 'stochastic_d'
+  | 'stochastic_j'
+  | 'roc'
+  | 'momentum'
+  | 'atr'
+  | 'bollinger_upper'
+  | 'bollinger_middle'
+  | 'bollinger_lower'
+  | 'bollinger_percent_b'
+  | 'bollinger_bandwidth'
+  | 'donchian_upper'
+  | 'donchian_lower'
+  | 'historical_volatility'
+  | 'obv'
+  | 'volume_sma'
+  | 'mfi'
+  | 'vwap';
+export type ObservedBars = number | null;
+export type Ready = boolean;
+export type Reason1 = string | null;
+export type RequiredBars = number | null;
 export type PositionEffect = 'open' | 'reduce' | 'close';
 /**
  * Position direction, independent of the broker's buy/sell order side.
@@ -315,7 +414,7 @@ export type Invalidation = string;
 export type Kind3 = 'strategy_intent';
 export type PolicyVersion1 = string;
 export type ProducerScope = 'strategy:emit';
-export type SchemaVersion19 = '1.0';
+export type SchemaVersion20 = '1.0';
 export type Setup = string;
 export type SnapshotId = string;
 export type StrategyVersion = string;
@@ -326,7 +425,7 @@ export type Evidence1 = string[];
 export type ExitScenarios = string[];
 export type Instrument1 = string;
 export type Kind4 = 'trade_plan';
-export type SchemaVersion20 = '1.0';
+export type SchemaVersion21 = '1.0';
 export type Code = 'unauthorized' | 'invalid_request' | 'snapshot_required' | 'slow_consumer';
 export type Kind5 = 'error';
 export type Version2 = 1;
@@ -352,7 +451,7 @@ export type Attempt = number;
 export type ExpiresAt1 = string;
 export type JobId = string;
 export type LeaseToken = string;
-export type SchemaVersion21 = '1.0';
+export type SchemaVersion22 = '1.0';
 export type WorkerId = string;
 export type ActualAmount = string | null;
 export type Amount1 = string;
@@ -361,19 +460,19 @@ export type CreatedAt = string;
 export type Currency1 = string;
 export type JobId1 = string;
 export type ReservationId = string;
-export type SchemaVersion22 = '1.0';
+export type SchemaVersion23 = '1.0';
 export type ReservationStatus = 'reserved' | 'settled' | 'released' | 'unknown';
 export type UpdatedAt = string;
 export type AssetClass = 'equity' | 'option';
 export type Currency2 = string;
-export type InstrumentId7 = string;
+export type InstrumentId9 = string;
 export type LotSize = string;
 export type Expiry = string;
 export type Multiplier = string;
 export type OptionRight = 'call' | 'put';
 export type Strike = string;
 export type UnderlyingId = string;
-export type SchemaVersion23 = '1.0';
+export type SchemaVersion24 = '1.0';
 export type TickSize = string;
 export type ClientOrderId = string;
 export type Instrument3 = string;
@@ -381,7 +480,7 @@ export type IntentId1 = string;
 export type LimitPrice = string | null;
 export type Qty = string;
 export type RiskDecisionId = string;
-export type SchemaVersion24 = '1.0';
+export type SchemaVersion25 = '1.0';
 export type Session1 = 'pre_market' | 'regular' | 'post_market';
 export type Side = 'buy' | 'sell';
 export type Tif = 'day' | 'gtc' | 'ioc' | 'fok';
@@ -391,13 +490,13 @@ export type BrokerId = string | null;
 export type ClientOrderId1 = string;
 export type CumFillQty = string;
 export type DedupKey3 = string;
-export type EventAt5 = string;
+export type EventAt6 = string;
 export type EventId3 = string;
 export type EvidenceId = string | null;
 export type FillEvidence = 'unavailable' | 'broker_reported';
 export type FillPrice = string | null;
 export type ReceivedAt5 = string;
-export type SchemaVersion25 = '1.0';
+export type SchemaVersion26 = '1.0';
 export type Status =
   | 'proposed'
   | 'approved'
@@ -418,7 +517,7 @@ export type GrossExposureLeverage = string | null;
 export type MissingDataPolicy = 'halt_entries' | null;
 export type PerTradeRisk = string | null;
 export type RuntimeDrawdown = string | null;
-export type SchemaVersion26 = '1.0';
+export type SchemaVersion27 = '1.0';
 export type Status1 = 'draft' | 'approved' | 'retired';
 export type Version7 = string;
 export type Code1 = string;
@@ -437,7 +536,7 @@ export type Quantity1 = string | null;
  * @minItems 1
  */
 export type ReasonCodes1 = [string, ...string[]];
-export type SchemaVersion27 = '1.0';
+export type SchemaVersion28 = '1.0';
 export type CitationId = string;
 export type EvidenceId1 = string;
 export type Locator = string;
@@ -456,7 +555,7 @@ export type LicenseTag = string;
 export type OriginalFirm = string | null;
 export type PublishedAt = string | null;
 export type Publisher = string;
-export type SchemaVersion28 = '1.0';
+export type SchemaVersion29 = '1.0';
 export type Url = string | null;
 /**
  * @minItems 1
@@ -481,14 +580,14 @@ export type Facts = Fact[];
 export type GeneratedAt = string;
 export type Horizon = DurationHorizon | EventHorizon | UnspecifiedHorizon;
 export type Kind11 = 'unspecified';
-export type Reason1 = string;
+export type Reason2 = string;
 export type Inferences = Inference[];
 export type MissingData1 = MissingData[];
 export type ModelVersion = string;
 export type PromptVersion = string;
 export type ReportId = string;
 export type RequestId = string;
-export type SchemaVersion29 = '1.0';
+export type SchemaVersion30 = '1.0';
 export type SnapshotId1 = string;
 export type Conditions = string[];
 export type Disposition = 'watch' | 'avoid' | 'no_edge' | 'insufficient_evidence';
@@ -512,13 +611,13 @@ export type Horizon1 = DurationHorizon | EventHorizon | UnspecifiedHorizon;
 export type Instruments = [string, ...string[]];
 export type Question = string;
 export type RequestId1 = string;
-export type SchemaVersion30 = '1.0';
+export type SchemaVersion31 = '1.0';
 export type SnapshotId2 = string;
 export type DemandId = string;
 export type ExpiresAt3 = string;
 export type Owner1 = string;
 export type Priority = 'holding' | 'chart' | 'strategy' | 'watchlist' | 'candidate';
-export type SchemaVersion31 = '1.0';
+export type SchemaVersion32 = '1.0';
 export type AssetClasses = AssetClass[];
 export type CheckedAt1 = string;
 export type Channel1 = 'quote' | 'trade' | 'bar';
@@ -527,7 +626,7 @@ export type HistoryLimits = HistoryLimit[];
 export type LatencyLabel = 'unknown' | 'realtime' | 'delayed' | 'indicative';
 export type MaxSubscriptions = number | null;
 export type PermissionErrors = string[];
-export type SchemaVersion32 = '1.0';
+export type SchemaVersion33 = '1.0';
 export type Channel2 = 'quote' | 'trade' | 'bar';
 export type Semantics = 'opaque' | 'contiguous';
 export type SequenceRules = SequenceRule[];
@@ -540,19 +639,19 @@ export type AsOf5 = string;
  */
 export type ReasonCodes2 = [string, ...string[]];
 export type Rejected = SubscriptionRejection[];
-export type SchemaVersion33 = '1.0';
+export type SchemaVersion34 = '1.0';
 export type Source9 = string;
 export type AsOf6 = string;
-export type SchemaVersion34 = '1.0';
+export type SchemaVersion35 = '1.0';
 export type SnapshotId3 = string;
 export type AsOf7 = string;
 export type Complete2 = boolean;
 export type OpenOrders = OrderCommand[];
-export type InstrumentId8 = string;
+export type InstrumentId10 = string;
 export type Quantity2 = string;
 export type Positions = Position[];
 export type RecentFills = OrderEvent[];
-export type SchemaVersion35 = '1.0';
+export type SchemaVersion36 = '1.0';
 export type SnapshotId4 = string;
 export type Action = 'include' | 'exclude';
 /**
@@ -564,19 +663,19 @@ export type Horizon2 = DurationHorizon | EventHorizon | UnspecifiedHorizon;
 export type Instrument4 = string;
 export type ObservationId = string;
 export type ObservedAt = string;
-export type Reason2 = string;
-export type SchemaVersion36 = '1.0';
+export type Reason3 = string;
+export type SchemaVersion37 = '1.0';
 export type Equity = Money[];
 export type Events1 = string[];
 export type ExperimentId = string;
 export type Fills = OrderEvent[];
-export type SchemaVersion37 = '1.0';
+export type SchemaVersion38 = '1.0';
 export type Warnings = string[];
 export type DatasetManifest = string;
 export type End5 = string;
 export type ExecutionAssumptions = string[];
 export type ExperimentId1 = string;
-export type SchemaVersion38 = '1.0';
+export type SchemaVersion39 = '1.0';
 export type SessionPolicy = string[];
 export type Start5 = string;
 export type StrategyVersion1 = string;
@@ -591,12 +690,12 @@ export type Diff = string;
 export type ExperimentIds = [string, ...string[]];
 export type ProposalId = string;
 export type RollbackVersion = string;
-export type SchemaVersion39 = '1.0';
+export type SchemaVersion40 = '1.0';
 export type Component = string;
 export type HeartbeatAt1 = string;
 export type LagMs = number | null;
 export type LastErrorCode = string | null;
-export type SchemaVersion40 = '1.0';
+export type SchemaVersion41 = '1.0';
 export type State = 'healthy' | 'degraded' | 'unavailable' | 'unknown';
 export type Content = string;
 export type Role1 = 'system' | 'user' | 'assistant';
@@ -609,37 +708,37 @@ export type Messages = [ModelMessage, ...ModelMessage[]];
 export type Model = string;
 export type JsonValue = unknown;
 export type RequestId2 = string;
-export type SchemaVersion41 = '1.0';
+export type SchemaVersion42 = '1.0';
 export type Error = string | null;
 export type Model1 = string;
 export type Output = {
   [k: string]: JsonValue;
 } | null;
 export type RequestId3 = string;
-export type SchemaVersion42 = '1.0';
-export type AsOf8 = string;
 export type SchemaVersion43 = '1.0';
+export type AsOf8 = string;
+export type SchemaVersion44 = '1.0';
 export type EntryAllowed = boolean;
 export type Matched = boolean;
 export type Mismatches = string[];
-export type SchemaVersion44 = '1.0';
+export type SchemaVersion45 = '1.0';
 export type BorrowAvailable = boolean | null;
 export type PendingOrders = OrderCommand[];
 export type PolicyVersion4 = string;
 export type Quotes1 = QuoteSnapshot[];
-export type SchemaVersion45 = '1.0';
+export type SchemaVersion46 = '1.0';
 export type Session2 = 'pre_market' | 'regular' | 'post_market';
 export type SnapshotId5 = string;
 export type AccountSnapshotId = string;
 export type AsOf9 = string;
 export type FinalizedBars = Bar[];
 export type PolicyVersion5 = string;
-export type SchemaVersion46 = '1.0';
+export type SchemaVersion47 = '1.0';
 export type StrategyVersion2 = string;
 export type BrokerId1 = string | null;
 export type ClientOrderId2 = string;
-export type Reason3 = string | null;
-export type SchemaVersion47 = '1.0';
+export type Reason4 = string | null;
+export type SchemaVersion48 = '1.0';
 export type Status2 = 'ACKNOWLEDGED' | 'REJECTED' | 'UNKNOWN';
 export type Complete3 = boolean;
 export type MaxEventAt = string | null;
@@ -649,14 +748,14 @@ export type Rows = number;
 export type Sha256 = string;
 export type Partitions = TapePartition[];
 export type PrecisionPolicy = string;
-export type SchemaVersion48 = '1.0';
+export type SchemaVersion49 = '1.0';
 export type Adjustment = string;
 export type Complete4 = boolean;
 export type CoverageEnd1 = string | null;
 export type CoverageStart1 = string | null;
 export type Retention = 'full_history' | 'rolling_2y';
 export type RowCount = number;
-export type SchemaVersion49 = '1.0';
+export type SchemaVersion50 = '1.0';
 export type SeriesId = string;
 export type Source10 = string;
 export type Symbol = string;
@@ -937,6 +1036,53 @@ export interface Resource {
   schema_version: SchemaVersion18;
 }
 /**
+ * One computed indicator value at one instant.
+ */
+export interface IndicatorPoint {
+  computed_at: ComputedAt;
+  computed_by: ComputedBy;
+  event_at: EventAt5;
+  indicator: Indicator;
+  instrument_id: InstrumentId7;
+  params: Params;
+  realtime?: Realtime;
+  schema_version: SchemaVersion19;
+  source_coverage: SourceCoverage;
+  timeframe: Timeframe;
+  value: Value;
+}
+export interface Params {
+  [k: string]: string;
+}
+/**
+ * A run of indicator points for one indicator and one parameter set.
+ */
+export interface IndicatorSeries {
+  indicator: Indicator1;
+  instrument_id: InstrumentId8;
+  params: Params1;
+  points: Points;
+  source_coverage: SourceCoverage1;
+  timeframe: Timeframe;
+}
+export interface Params1 {
+  [k: string]: string;
+}
+/**
+ * Why an indicator has no value, or that it has one.
+ */
+export interface IndicatorStatus {
+  indicator: Indicator2;
+  observed_bars?: ObservedBars;
+  params: Params2;
+  ready: Ready;
+  reason?: Reason1;
+  required_bars?: RequiredBars;
+}
+export interface Params2 {
+  [k: string]: string;
+}
+/**
  * Strategy output to risk evaluation; not a broker order or approval.
  */
 export interface StrategyIntent {
@@ -948,7 +1094,7 @@ export interface StrategyIntent {
   policy_version: PolicyVersion1;
   position_effect: PositionEffect;
   producer_scope: ProducerScope;
-  schema_version: SchemaVersion19;
+  schema_version: SchemaVersion20;
   setup: Setup;
   side: PositionSide;
   snapshot_id: SnapshotId;
@@ -965,7 +1111,7 @@ export interface TradePlan {
   exit_scenarios: ExitScenarios;
   instrument: Instrument1;
   kind: Kind4;
-  schema_version: SchemaVersion20;
+  schema_version: SchemaVersion21;
   side: PositionSide;
 }
 export interface ErrorFrame {
@@ -1002,7 +1148,7 @@ export interface JobLease {
   expires_at: ExpiresAt1;
   job_id: JobId;
   lease_token: LeaseToken;
-  schema_version: SchemaVersion21;
+  schema_version: SchemaVersion22;
   worker_id: WorkerId;
 }
 export interface Reservation {
@@ -1013,17 +1159,17 @@ export interface Reservation {
   currency: Currency1;
   job_id: JobId1;
   reservation_id: ReservationId;
-  schema_version: SchemaVersion22;
+  schema_version: SchemaVersion23;
   status: ReservationStatus;
   updated_at: UpdatedAt;
 }
 export interface Instrument2 {
   asset_class: AssetClass;
   currency: Currency2;
-  instrument_id: InstrumentId7;
+  instrument_id: InstrumentId9;
   lot_size: LotSize;
   option?: OptionTerms | null;
-  schema_version: SchemaVersion23;
+  schema_version: SchemaVersion24;
   tick_size: TickSize;
   vendor_symbols: VendorSymbols;
 }
@@ -1044,7 +1190,7 @@ export interface OrderCommand {
   limit_price: LimitPrice;
   qty: Qty;
   risk_decision_id: RiskDecisionId;
-  schema_version: SchemaVersion24;
+  schema_version: SchemaVersion25;
   session: Session1;
   side: Side;
   tif: Tif;
@@ -1056,13 +1202,13 @@ export interface OrderEvent {
   client_order_id: ClientOrderId1;
   cum_fill_qty: CumFillQty;
   dedup_key: DedupKey3;
-  event_at: EventAt5;
+  event_at: EventAt6;
   event_id: EventId3;
   evidence_id: EvidenceId;
   fill_evidence: FillEvidence;
   fill_price: FillPrice;
   received_at: ReceivedAt5;
-  schema_version: SchemaVersion25;
+  schema_version: SchemaVersion26;
   status: Status;
 }
 export interface PolicyVersion2 {
@@ -1072,7 +1218,7 @@ export interface PolicyVersion2 {
   approval_hash: ApprovalHash;
   approved_at: ApprovedAt;
   risk_bounds: RiskBounds;
-  schema_version: SchemaVersion26;
+  schema_version: SchemaVersion27;
   status: Status1;
   version: Version7;
 }
@@ -1097,7 +1243,7 @@ export interface RiskDecision {
   quantity: Quantity1;
   reason_codes: ReasonCodes1;
   risk_amount: Money | null;
-  schema_version: SchemaVersion27;
+  schema_version: SchemaVersion28;
 }
 export interface Citation {
   citation_id: CitationId;
@@ -1125,7 +1271,7 @@ export interface EvidenceItem {
   original_firm: OriginalFirm;
   published_at: PublishedAt;
   publisher: Publisher;
-  schema_version: SchemaVersion28;
+  schema_version: SchemaVersion29;
   url: Url;
 }
 export interface Fact {
@@ -1160,14 +1306,14 @@ export interface ResearchReport {
   prompt_version: PromptVersion;
   report_id: ReportId;
   request_id: RequestId;
-  schema_version: SchemaVersion29;
+  schema_version: SchemaVersion30;
   snapshot_id: SnapshotId1;
   summary: ResearchSummary;
   usage: ResearchUsage;
 }
 export interface UnspecifiedHorizon {
   kind: Kind11;
-  reason: Reason1;
+  reason: Reason2;
 }
 export interface ResearchSummary {
   conditions: Conditions;
@@ -1191,7 +1337,7 @@ export interface ResearchRequest {
   instruments: Instruments;
   question: Question;
   request_id: RequestId1;
-  schema_version: SchemaVersion30;
+  schema_version: SchemaVersion31;
   snapshot_id: SnapshotId2;
 }
 export interface Demand {
@@ -1200,7 +1346,7 @@ export interface Demand {
   key: SubscriptionKey;
   owner: Owner1;
   priority: Priority;
-  schema_version: SchemaVersion31;
+  schema_version: SchemaVersion32;
 }
 export interface FeedCapabilities {
   asset_classes: AssetClasses;
@@ -1209,7 +1355,7 @@ export interface FeedCapabilities {
   latency_label: LatencyLabel;
   max_subscriptions: MaxSubscriptions;
   permission_errors: PermissionErrors;
-  schema_version: SchemaVersion32;
+  schema_version: SchemaVersion33;
   sequence_rules?: SequenceRules;
   sessions: Sessions;
   source: Source8;
@@ -1231,7 +1377,7 @@ export interface SubscriptionPlan {
   accepted: Accepted;
   as_of: AsOf5;
   rejected: Rejected;
-  schema_version: SchemaVersion33;
+  schema_version: SchemaVersion34;
   source: Source9;
 }
 export interface SubscriptionRejection {
@@ -1242,7 +1388,7 @@ export interface AccountSnapshot {
   as_of: AsOf6;
   buying_power: Money;
   equity: Money;
-  schema_version: SchemaVersion34;
+  schema_version: SchemaVersion35;
   snapshot_id: SnapshotId3;
 }
 export interface BrokerSnapshot {
@@ -1252,11 +1398,11 @@ export interface BrokerSnapshot {
   open_orders: OpenOrders;
   positions: Positions;
   recent_fills: RecentFills;
-  schema_version: SchemaVersion35;
+  schema_version: SchemaVersion36;
   snapshot_id: SnapshotId4;
 }
 export interface Position {
-  instrument_id: InstrumentId8;
+  instrument_id: InstrumentId10;
   quantity: Quantity2;
 }
 export interface CandidateObservation {
@@ -1267,8 +1413,8 @@ export interface CandidateObservation {
   instrument: Instrument4;
   observation_id: ObservationId;
   observed_at: ObservedAt;
-  reason: Reason2;
-  schema_version: SchemaVersion36;
+  reason: Reason3;
+  schema_version: SchemaVersion37;
 }
 export interface ExperimentResult {
   equity: Equity;
@@ -1276,7 +1422,7 @@ export interface ExperimentResult {
   experiment_id: ExperimentId;
   fees: Money;
   fills: Fills;
-  schema_version: SchemaVersion37;
+  schema_version: SchemaVersion38;
   warnings: Warnings;
 }
 export interface ExperimentSpec {
@@ -1284,7 +1430,7 @@ export interface ExperimentSpec {
   end: End5;
   execution_assumptions: ExecutionAssumptions;
   experiment_id: ExperimentId1;
-  schema_version: SchemaVersion38;
+  schema_version: SchemaVersion39;
   session_policy: SessionPolicy;
   start: Start5;
   strategy_version: StrategyVersion1;
@@ -1299,7 +1445,7 @@ export interface HarnessProposal {
   metrics: Metrics;
   proposal_id: ProposalId;
   rollback_version: RollbackVersion;
-  schema_version: SchemaVersion39;
+  schema_version: SchemaVersion40;
 }
 export interface Metrics {
   [k: string]: string;
@@ -1310,7 +1456,7 @@ export interface HealthReport {
   heartbeat_at: HeartbeatAt1;
   lag_ms: LagMs;
   last_error_code: LastErrorCode;
-  schema_version: SchemaVersion40;
+  schema_version: SchemaVersion41;
   state: State;
 }
 export interface DependencyHealth {
@@ -1327,7 +1473,7 @@ export interface ModelRequest {
   model: Model;
   output_schema: OutputSchema;
   request_id: RequestId2;
-  schema_version: SchemaVersion41;
+  schema_version: SchemaVersion42;
 }
 export interface OutputSchema {
   [k: string]: JsonValue;
@@ -1337,20 +1483,20 @@ export interface ModelResult {
   model: Model1;
   output: Output;
   request_id: RequestId3;
-  schema_version: SchemaVersion42;
+  schema_version: SchemaVersion43;
   usage: ResearchUsage;
 }
 export interface OrderSnapshot {
   as_of: AsOf8;
   command: OrderCommand;
   latest_event: OrderEvent;
-  schema_version: SchemaVersion43;
+  schema_version: SchemaVersion44;
 }
 export interface ReconciliationResult {
   entry_allowed: EntryAllowed;
   matched: Matched;
   mismatches: Mismatches;
-  schema_version: SchemaVersion44;
+  schema_version: SchemaVersion45;
 }
 export interface RiskContext {
   account: AccountSnapshot;
@@ -1359,7 +1505,7 @@ export interface RiskContext {
   policy_version: PolicyVersion4;
   quotes: Quotes1;
   reserved_risk: Money;
-  schema_version: SchemaVersion45;
+  schema_version: SchemaVersion46;
   session: Session2;
   snapshot_id: SnapshotId5;
 }
@@ -1369,7 +1515,7 @@ export interface StrategyContext {
   features: Features;
   finalized_bars: FinalizedBars;
   policy_version: PolicyVersion5;
-  schema_version: SchemaVersion46;
+  schema_version: SchemaVersion47;
   strategy_version: StrategyVersion2;
 }
 export interface Features {
@@ -1378,8 +1524,8 @@ export interface Features {
 export interface SubmitResult {
   broker_id: BrokerId1;
   client_order_id: ClientOrderId2;
-  reason: Reason3;
-  schema_version: SchemaVersion47;
+  reason: Reason4;
+  schema_version: SchemaVersion48;
   status: Status2;
 }
 /**
@@ -1389,7 +1535,7 @@ export interface TapeManifest {
   complete: Complete3;
   partitions: Partitions;
   precision_policy?: PrecisionPolicy;
-  schema_version: SchemaVersion48;
+  schema_version: SchemaVersion49;
   series: TapeSeries;
   written_at: WrittenAt;
 }
@@ -1414,7 +1560,7 @@ export interface TapeSeries {
   coverage_start: CoverageStart1;
   retention: Retention;
   row_count: RowCount;
-  schema_version: SchemaVersion49;
+  schema_version: SchemaVersion50;
   series_id: SeriesId;
   source: Source10;
   symbol: Symbol;
