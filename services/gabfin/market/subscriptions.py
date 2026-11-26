@@ -1,6 +1,14 @@
-"""Deterministic Futu US subscription targets and advisory, context-owned deltas."""
+"""Deterministic subscription targets and advisory, context-owned deltas.
+
+The planner is source-agnostic. It asks a provider registry how the
+source under plan names instruments and which quota pool an asset class
+draws from, and it never decides for itself which vendor it is
+planning for. A source that is not registered is refused, rather than
+planned for on a guess.
+"""
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from types import MappingProxyType
 from zoneinfo import ZoneInfo
 
 from pydantic import TypeAdapter
@@ -8,7 +16,7 @@ from pydantic import TypeAdapter
 from gabfin.contracts.common import UtcTimestamp
 from gabfin.contracts.market import AssetClass, MarketSession, Timeframe, NonNegativeCounter
 from gabfin.contracts.subscriptions import Demand, FeedCapabilities, SubscriptionKey, SubscriptionPlan, SubscriptionRejection
-from gabfin.providers.futu.symbols import InstrumentCatalog, valid_us_symbol
+from gabfin.providers.registry import ProviderRegistry, SourceProfile, UnknownSource
 
 PRIORITY = {name: index for index, name in enumerate(('holding', 'chart', 'strategy', 'watchlist', 'candidate'))}
 
@@ -35,15 +43,24 @@ class ChannelSupport:
 
 @dataclass(frozen=True)
 class QuotaBudget:
-    """Net target capacities including our current keys, after external reservations."""
-    equity_slots: int | None
-    option_chain_slots: int | None
+    """Net target capacities per quota pool, including our current keys.
+
+    The pools are named by the source profile, not by asset class, so a
+    source that charges differently for equities and options can say so.
+    """
+    slots: MappingProxyType
     checked_at: datetime
 
     def __post_init__(self):
-        for name in ('equity_slots', 'option_chain_slots'):
-            TypeAdapter(NonNegativeCounter | None).validate_python(getattr(self, name))
+        for name, value in self.slots.items():
+            if not isinstance(name, str) or not name:
+                raise ValueError('Quota pools are named')
+            TypeAdapter(NonNegativeCounter | None).validate_python(value)
+        object.__setattr__(self, 'slots', MappingProxyType(dict(self.slots)))
         object.__setattr__(self, 'checked_at', TypeAdapter(UtcTimestamp).validate_python(self.checked_at))
+
+    def capacity(self, pool: str) -> int | None:
+        return self.slots.get(pool)
 
 
 @dataclass(frozen=True)
@@ -60,14 +77,24 @@ def _sort_key(key):
     return str(key.instrument_id), key.channel, '' if tf is None else tf.unit, 0 if tf is None else tf.count
 
 
-def plan_subscriptions(demands, caps: FeedCapabilities, catalog: InstrumentCatalog, *,
+def _expiry_market(profile: SourceProfile, now: datetime) -> ZoneInfo:
+    """The market whose calendar decides whether an option has expired."""
+    market = profile.markets[0]
+    if market != 'US':
+        raise ValueError('Only the US market calendar is implemented')
+    return ZoneInfo('America/New_York')
+
+
+def plan_subscriptions(demands, caps: FeedCapabilities, catalog, *, registry: ProviderRegistry,
                        as_of: datetime, session: MarketSession, max_snapshot_age: timedelta,
                        budget: QuotaBudget, supported, current=()) -> SubscriptionSchedule:
     """Plan only. Caller authenticates demands and supplies only its owned current keys."""
     now = TypeAdapter(UtcTimestamp).validate_python(as_of)
     caps = FeedCapabilities.model_validate(caps.model_dump(mode='python'))
-    if caps.source != 'futu':
-        raise ValueError('Quota grouping is implemented only for Futu')
+    try:
+        profile = registry.profile(caps.source)
+    except UnknownSource:
+        raise ValueError('The planned source is not registered') from None
     if not isinstance(max_snapshot_age, timedelta) or max_snapshot_age <= timedelta(0):
         raise ValueError('A positive explicit snapshot TTL is required')
     session = MarketSession(session)
@@ -78,7 +105,7 @@ def plan_subscriptions(demands, caps: FeedCapabilities, catalog: InstrumentCatal
     for value in current:
         key = SubscriptionKey.model_validate(value.model_dump(mode='python'))
         instrument = catalog.get(key.instrument_id)
-        if instrument is None or not valid_us_symbol(instrument.vendor_symbols.get('futu', '')):
+        if instrument is None or profile.validate(instrument) is not None:
             current_errors.append('current_identity_unverified')
         else:
             owned_instruments[key.identity] = instrument
@@ -107,20 +134,17 @@ def plan_subscriptions(demands, caps: FeedCapabilities, catalog: InstrumentCatal
         elif instrument is None:
             errors.append('unknown_instrument')
         else:
-            symbol = instrument.vendor_symbols.get('futu')
-            if symbol is None:
-                errors.append('vendor_symbol_missing')
-            elif not symbol.startswith('US.'):
-                errors.append('market_unsupported')
-            elif not valid_us_symbol(symbol):
-                errors.append('vendor_symbol_invalid')
+            reason = profile.validate(instrument)
+            if reason is not None:
+                errors.append(reason)
             if instrument.asset_class not in caps.asset_classes:
                 errors.append('asset_class_unverified')
             if (instrument.asset_class, session, key.channel_identity) not in support:
                 errors.append('channel_unverified')
-            if (instrument.option is not None and valid_us_symbol(symbol or '')
-                    and instrument.option.expiry < now.astimezone(ZoneInfo('America/New_York')).date()):
-                errors.append('instrument_expired')
+            if (instrument.option is not None and profile.validate(instrument) is None):
+                zone = _expiry_market(profile, now)
+                if instrument.option.expiry < now.astimezone(zone).date():
+                    errors.append('instrument_expired')
         if errors:
             reasons[identity] = tuple(errors)
         else:
@@ -137,15 +161,17 @@ def plan_subscriptions(demands, caps: FeedCapabilities, catalog: InstrumentCatal
     if session in (MarketSession.UNKNOWN, MarketSession.CLOSED) or session not in caps.sessions:
         global_errors.append('session_unverified')
     classes = {i.asset_class for i in (*eligible.values(), *owned_instruments.values())}
-    if AssetClass.EQUITY in classes:
-        if budget.equity_slots is None or caps.max_subscriptions is None:
-            global_errors.append('equity_quota_unknown')
-        elif budget.equity_slots > caps.max_subscriptions:
+    for asset_class in classes:
+        pool = profile.pool_of(asset_class)
+        capacity = budget.capacity(pool) if pool is not None else None
+        if pool is None or capacity is None:
+            global_errors.append(f'{asset_class.value}_quota_unknown')
+        elif pool in profile.maximum_pools and caps.max_subscriptions is None:
+            global_errors.append(f'{asset_class.value}_quota_unknown')
+        elif (pool in profile.maximum_pools and capacity > caps.max_subscriptions):
             global_errors.append('quota_snapshot_conflict')
-    if AssetClass.OPTION in classes and budget.option_chain_slots is None:
-        global_errors.append('option_quota_unknown')
     accepted = []
-    used = {'equity': set(), 'option': set()}
+    used: dict[str, set] = {}
     ordered = sorted(groups, key=lambda identity: (
         min((PRIORITY[d.priority] for d in active.get(identity, ())), default=len(PRIORITY)),
         _sort_key(groups[identity][0].key)))
@@ -157,12 +183,18 @@ def plan_subscriptions(demands, caps: FeedCapabilities, catalog: InstrumentCatal
             continue
         instrument = eligible[identity]
         terms = instrument.option
+        asset_class = instrument.asset_class
+        pool = profile.pool_of(asset_class)
         if terms is None:
-            pool, cost_key, capacity = 'equity', key.identity, budget.equity_slots
+            cost_key = key.identity
         else:
-            pool, cost_key, capacity = 'option', (terms.underlying_id, terms.expiry, key.channel_identity), budget.option_chain_slots
-        if cost_key not in used[pool] and len(used[pool]) >= capacity:
-            reasons[identity] = ('equity_quota_exhausted' if pool == 'equity' else 'option_quota_exhausted',)
+            cost_key = (terms.underlying_id, terms.expiry, key.channel_identity)
+        capacity = budget.capacity(pool) if pool is not None else None
+        if pool is None or capacity is None:
+            reasons[identity] = (f'{asset_class.value}_quota_unknown',)
+            continue
+        if cost_key not in used.setdefault(pool, set()) and len(used[pool]) >= capacity:
+            reasons[identity] = (f'{pool}_quota_exhausted',)
             continue
         used[pool].add(cost_key)
         accepted.append(key)

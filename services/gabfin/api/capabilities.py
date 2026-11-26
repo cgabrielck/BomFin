@@ -6,3 +6,12 @@ KINDS={C.READ_ACCOUNT:'account',C.RESOLVE_SYMBOLS:'instrument',C.START_RESEARCH:
 def authorize(principal:Principal,capability:C,resource:Resource)->None:
     if capability not in CEILINGS[principal.role] or capability not in principal.scope or resource.owner!=principal.actor_id or resource.kind.value!=KINDS[capability]:
         raise PermissionError('Forbidden')
+def require_scope(principal:Principal,capability:C)->None:
+    """Check the capability only, for reads that own no resource.
+
+    A macro series or a feed capability belongs to nobody, so there is
+    no resource whose ownership can be checked. The scope check still
+    applies.
+    """
+    if capability not in CEILINGS[principal.role] or capability not in principal.scope:
+        raise PermissionError('Forbidden')

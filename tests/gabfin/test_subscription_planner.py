@@ -5,6 +5,7 @@ import pytest
 
 from gabfin.contracts.market import MarketSession
 from gabfin.contracts.subscriptions import Demand, FeedCapabilities, SubscriptionKey
+from gabfin.providers.registry import default_registry
 from gabfin.providers.futu.symbols import InstrumentCatalog
 from test_symbols import AAPL, MSFT, CALL, PUT, equity, option
 
@@ -29,13 +30,16 @@ def caps(**changes):
 
 
 def plan(demands, *, instruments=None, current=(), capability=None, equity_slots=1, option_slots=1,
-         support=None, session=MarketSession.REGULAR, ttl=timedelta(minutes=3), budget_checked=NOW):
+         support=None, session=MarketSession.REGULAR, ttl=timedelta(minutes=3), budget_checked=NOW,
+         registry=None):
     from gabfin.market.subscriptions import plan_subscriptions, QuotaBudget, ChannelSupport
 
+    slots = {'equity': equity_slots, 'option': option_slots}
     return plan_subscriptions(
         demands, capability or caps(), InstrumentCatalog([equity(), equity(MSFT, 'US.MSFT')] if instruments is None else instruments),
+        registry=registry or default_registry(),
         as_of=NOW, session=session, max_snapshot_age=ttl,
-        budget=QuotaBudget(equity_slots, option_slots, budget_checked),
+        budget=QuotaBudget(slots, budget_checked),
         supported=[ChannelSupport('quote', asset_class=a, session='regular') for a in ('equity', 'option')] if support is None else support, current=current)
 
 
@@ -198,7 +202,7 @@ def test_repeated_demand_id_cannot_change_meaning():
 def test_invalid_quota_configuration_is_rejected(value):
     from gabfin.market.subscriptions import QuotaBudget
     with pytest.raises(ValueError):
-        QuotaBudget(value, 1, NOW)
+        QuotaBudget({'equity': value, 'option': 1}, NOW)
 
 
 @pytest.mark.parametrize('session', ['closed', 'unknown', 'pre_market'])

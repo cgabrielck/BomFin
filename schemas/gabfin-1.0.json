@@ -35,6 +35,35 @@
       "title": "AccountSnapshot",
       "type": "object"
     },
+    "AnalysisUnavailable": {
+      "additionalProperties": false,
+      "description": "Why an analysis plane cannot answer right now.",
+      "properties": {
+        "detail": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Detail"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "reason"
+      ],
+      "title": "AnalysisUnavailable",
+      "type": "object"
+    },
     "AssetClass": {
       "enum": [
         "equity",
@@ -450,6 +479,37 @@
         "action"
       ],
       "title": "CandidateObservation",
+      "type": "object"
+    },
+    "CapabilitiesResponse": {
+      "additionalProperties": false,
+      "description": "What each registered feed can do, as measured.",
+      "properties": {
+        "checked_at": {
+          "format": "date-time",
+          "title": "Checked At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/FeedCapabilities"
+          },
+          "maxItems": 32,
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "schema_version",
+        "checked_at",
+        "sources"
+      ],
+      "title": "CapabilitiesResponse",
       "type": "object"
     },
     "Capability": {
@@ -954,6 +1014,45 @@
           "title": "Checked At",
           "type": "string"
         },
+        "delay_minutes": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Delay Minutes"
+        },
+        "depth_levels": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Depth Levels"
+        },
+        "fee_class": {
+          "default": "none",
+          "enum": [
+            "none",
+            "exchange",
+            "per_quote",
+            "subscription"
+          ],
+          "title": "Fee Class",
+          "type": "string"
+        },
         "history_limits": {
           "items": {
             "$ref": "#/$defs/HistoryLimit"
@@ -992,6 +1091,11 @@
           "title": "Permission Errors",
           "type": "array"
         },
+        "realtime": {
+          "default": false,
+          "title": "Realtime",
+          "type": "boolean"
+        },
         "schema_version": {
           "const": "1.0",
           "title": "Schema Version",
@@ -1015,6 +1119,36 @@
         "source": {
           "minLength": 1,
           "title": "Source",
+          "type": "string"
+        },
+        "tradable_for_entry": {
+          "default": false,
+          "title": "Tradable For Entry",
+          "type": "boolean"
+        },
+        "unavailable_reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unavailable Reason"
+        },
+        "venue_coverage": {
+          "default": "unknown",
+          "enum": [
+            "iex",
+            "sip",
+            "futu_nasdaq_totalview",
+            "futu_arca",
+            "unknown"
+          ],
+          "title": "Venue Coverage",
           "type": "string"
         }
       },
@@ -1595,6 +1729,71 @@
       "title": "IndicatorPoint",
       "type": "object"
     },
+    "IndicatorResponse": {
+      "additionalProperties": false,
+      "description": "The indicator series of one instrument and timeframe.",
+      "properties": {
+        "computed_by": {
+          "enum": [
+            "local",
+            "futu_api"
+          ],
+          "title": "Computed By",
+          "type": "string"
+        },
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "series": {
+          "items": {
+            "$ref": "#/$defs/IndicatorSeries"
+          },
+          "maxItems": 64,
+          "title": "Series",
+          "type": "array"
+        },
+        "source_coverage": {
+          "enum": [
+            "iex",
+            "sip",
+            "futu_nasdaq_totalview",
+            "futu_arca",
+            "unknown"
+          ],
+          "title": "Source Coverage",
+          "type": "string"
+        },
+        "statuses": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/IndicatorStatus"
+          },
+          "maxItems": 64,
+          "title": "Statuses",
+          "type": "array"
+        },
+        "timeframe": {
+          "$ref": "#/$defs/Timeframe"
+        }
+      },
+      "required": [
+        "schema_version",
+        "instrument_id",
+        "timeframe",
+        "source_coverage",
+        "computed_by",
+        "series"
+      ],
+      "title": "IndicatorResponse",
+      "type": "object"
+    },
     "IndicatorSeries": {
       "additionalProperties": false,
       "description": "A run of indicator points for one indicator and one parameter set.",
@@ -2088,6 +2287,43 @@
         "fetched_at"
       ],
       "title": "MacroRelease",
+      "type": "object"
+    },
+    "MacroResponse": {
+      "additionalProperties": false,
+      "description": "The macro observations visible at one instant.\n\n`as_of` is the date the caller asked about. Only observations that\nhad been released by then are present, so a caller cannot read a\nnumber that did not exist yet.",
+      "properties": {
+        "as_of": {
+          "format": "date",
+          "title": "As Of",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/MacroPoint"
+          },
+          "maxItems": 1000,
+          "title": "Points",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "observed_at",
+        "as_of",
+        "points"
+      ],
+      "title": "MacroResponse",
       "type": "object"
     },
     "MacroSeries": {
@@ -5440,6 +5676,18 @@
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "anyOf": [
+    {
+      "$ref": "#/$defs/AnalysisUnavailable"
+    },
+    {
+      "$ref": "#/$defs/CapabilitiesResponse"
+    },
+    {
+      "$ref": "#/$defs/IndicatorResponse"
+    },
+    {
+      "$ref": "#/$defs/MacroResponse"
+    },
     {
       "$ref": "#/$defs/ContractModel"
     },
