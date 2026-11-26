@@ -11,6 +11,7 @@ dependencies = ["pydantic==2.14.4", "fastapi==0.165.0", "tzdata==2026.6; sys_pla
 
 [project.optional-dependencies]
 calendar = ["exchange-calendars==4.13.3"]
+web = ["uvicorn==0.54.0", "websockets==17.4"]
 
 [tool.setuptools.packages.find]
 where = ["services"]

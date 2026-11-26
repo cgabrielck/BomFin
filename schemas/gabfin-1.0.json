@@ -1679,6 +1679,32 @@
       "title": "MarketCursor",
       "type": "object"
     },
+    "MarketRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "keys": {
+          "items": {
+            "$ref": "#/$defs/SubscriptionKey"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "title": "Keys",
+          "type": "array"
+        },
+        "version": {
+          "maximum": 1,
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "keys"
+      ],
+      "title": "MarketRequest",
+      "type": "object"
+    },
     "MarketSession": {
       "enum": [
         "pre_market",
@@ -1754,6 +1780,59 @@
         "gap"
       ],
       "title": "MarketSnapshot",
+      "type": "object"
+    },
+    "MarketStreamRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "cursor": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cursor"
+        },
+        "epoch": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Epoch"
+        },
+        "keys": {
+          "items": {
+            "$ref": "#/$defs/SubscriptionKey"
+          },
+          "maxItems": 64,
+          "minItems": 1,
+          "title": "Keys",
+          "type": "array"
+        },
+        "version": {
+          "maximum": 1,
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "version",
+        "keys"
+      ],
+      "title": "MarketStreamRequest",
       "type": "object"
     },
     "MarketUpdate": {
@@ -4819,6 +4898,12 @@
     },
     {
       "$ref": "#/$defs/SubmitResult"
+    },
+    {
+      "$ref": "#/$defs/MarketRequest"
+    },
+    {
+      "$ref": "#/$defs/MarketStreamRequest"
     }
   ],
   "x-gabfin-schema-version": "1.0"

@@ -91,7 +91,9 @@ export type GabFinContracts =
   | ReconciliationResult
   | RiskContext
   | StrategyContext
-  | SubmitResult;
+  | SubmitResult
+  | MarketRequest
+  | MarketStreamRequest;
 export type Amount = string;
 export type Currency = string;
 export type SchemaVersion = '1.0';
@@ -634,6 +636,20 @@ export type ClientOrderId2 = string;
 export type Reason3 = string | null;
 export type SchemaVersion47 = '1.0';
 export type Status2 = 'ACKNOWLEDGED' | 'REJECTED' | 'UNKNOWN';
+/**
+ * @minItems 1
+ * @maxItems 64
+ */
+export type Keys = [SubscriptionKey, ...SubscriptionKey[]];
+export type Version8 = number;
+export type Cursor3 = number | null;
+export type Epoch5 = string | null;
+/**
+ * @minItems 1
+ * @maxItems 64
+ */
+export type Keys1 = [SubscriptionKey, ...SubscriptionKey[]];
+export type Version9 = number;
 
 /**
  * Reject unknown fields and accidental reassignment, not an auth boundary.
@@ -1333,4 +1349,14 @@ export interface SubmitResult {
   reason: Reason3;
   schema_version: SchemaVersion47;
   status: Status2;
+}
+export interface MarketRequest {
+  keys: Keys;
+  version: Version8;
+}
+export interface MarketStreamRequest {
+  cursor?: Cursor3;
+  epoch?: Epoch5;
+  keys: Keys1;
+  version: Version9;
 }

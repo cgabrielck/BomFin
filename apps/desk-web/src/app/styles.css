@@ -902,3 +902,22 @@ dialog p {
     font-size: 11px;
   }
 }
+.pairing-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+.pairing-form input {
+  min-width: 0;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
+.market-health {
+  padding: 10px 0;
+  line-height: 1.8;
+}

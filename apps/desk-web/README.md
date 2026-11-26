@@ -1,7 +1,8 @@
-# GabFin 示範工作台
+# GabFin 工作台
 
-這是 04b 的 React 前端殼；全部候選、價格與研究文字都是固定示例。
-沒有行情、AI、帳戶、登入或交易服務。K 線區保留空態，等待有來源的 bar。
+這是 S04 的 React 工作台。預設示範模式使用固定資料；04c 新增同源 HTTPS
+配對登入與只讀行情。候選清單及研究文字仍是設計示例；AI、帳戶及交易尚未接入。
+K 線區保留空態，等待 04d 的增量圖表及有來源的 bar。
 
 從 **source checkout root** 執行（Node 24／npm 11 已驗證）：
 
@@ -14,7 +15,7 @@ npm.cmd run dev -- --port 19045
 資料來自 `public/demo/` 本機靜態 JSON，開發／preview 都不連外部 provider。
 `public/demo/markets/*.json` 是由 canonical Python MarketSnapshot 驗證的 fixture；
 `demo-catalog.ts` 是畫面用的固定候選，不是完整市場 catalog。
-目前 `useMarketSubscription` 僅讀取單股 quote snapshot，沒有即時推送／輪詢。
+示範模式只讀單股 quote snapshot；伺服器模式取得快照後透過 WebSocket 增量更新。
 自選僅存本頁記憶體，重載會重設。情境選單是示意，不代表真實健康探測。
 
 ## 驗證
@@ -22,7 +23,7 @@ npm.cmd run dev -- --port 19045
 ```powershell
 npm.cmd run typecheck
 npm.cmd run build
-npx.cmd playwright test tests/e2e/market.spec.ts
+npx.cmd playwright test
 .venv/Scripts/python.exe scripts/check-demo-fixtures.py
 ```
 
@@ -32,6 +33,32 @@ Production bundle 可用 `npm.cmd --prefix apps/desk-web run preview -- --port 1
 
 TypeScript wire types 只從 `schemas/gabfin-1.0.json` 生成，勿手寫／修改 `generated.ts`。
 修改後端契約後先更新 schema，再跑 `npm.cmd run contracts`。
-同源 auth、完整 runtime wire 驗證及安全 bridge 由 04c 接入；示範 sanity checks 不取代它們。
+`market.schema.json` 同樣由 schema 生成，供伺服器模式的 runtime validation 使用；
+示範 sanity checks 不取代它。金額維持 decimal string，不轉成浮點數。
+
+## 伺服器模式
+
+HTTP Vite preview 只供示範。伺服器模式須由可信本機 bootstrap 組裝
+`create_market_app(store, allowed_origin=..., gateway=..., static_dir=Path(...))`，
+以 TLS server 提供已 build 的 `dist`。Origin 必須是完全相同的 `https://host:port`；
+綁定 loopback、關閉 proxy headers，設定憑證／私鑰並限制同時連線。
+正常使用須由瀏覽器信任該本機憑證，不能停用正式環境 TLS 驗證。
+
+Gateway 使用 `MarketGateway.from_store(...)`，接至既有 S03 listener 並共用該主機的
+SessionStore；只能由可信主機設定有限 `registered_keys` 及 source，不能接受 browser
+提供內部地址或憑證。每次連線發行 read_market service lease，關閉時撤銷。
+SDK 仍由 S03 程序持有，沒有為每個 browser 啟動 SDK。前端目前只有三個固定候選 ID，
+bootstrap 必須配置相符的 canonical ID；任意 symbol resolution 留待後續 Section。
+
+主機經私有本機操作建立短效單次配對碼，使用者在「資料模式 → 伺服器行情」輸入。
+此工作單位提供 factory 與完整測試入口，尚未交付長駐操作 launcher 或遠端部署。
+登入 cookie 是 Secure／HttpOnly／SameSite=Strict；可讀 CSRF nonce cookie 綁定同一 session。
+沒有把 auth／internal token 存入 URL、localStorage 或前端 bundle。斷線有界重試三次；
+每次重連先收完整 snapshot。失效或登出會清除報價；資料來源時間與缺口獨立顯示，
+連線正常不能當成價格新鮮或權益已核實。
+
+`secure-market.spec.ts` 每測試啟動臨時 TLS/API/S03 socket fixture，私有 stdio 提供配對碼。
+需要主機安裝 `gabfin[web]`、測試依賴 `httpx2` 及 Git 的 OpenSSL。測試的自簽憑證例外
+只限 Playwright context；所有價格是明示 `fixture` 來源的合成資料，未代表 OpenD 驗收。
 
 舊 `web/` 與其原 lockfile 保留。新 app 沒有沿用 legacy trading 或第三方產品程式碼。

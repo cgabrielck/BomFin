@@ -31,6 +31,9 @@ def create_app(store,*,allowed_origin):
         except PermissionError:raise HTTPException(401,'Unauthorized') from None
         from fastapi.responses import JSONResponse
         response=JSONResponse({'csrf':csrf});response.set_cookie('gabfin_session',token,httponly=True,secure=True,samesite='strict',max_age=store.session_seconds)
+        # Browser-readable anti-CSRF nonce, bound to the server's session record.
+        # The actual authentication token remains exclusively HttpOnly.
+        response.set_cookie('__Host-gabfin_csrf',csrf,httponly=False,secure=True,samesite='strict',path='/',max_age=store.session_seconds)
         return response
     @app.get('/session')
     def session(request:Request):return guard(request).model_dump(mode='json')
@@ -38,7 +41,7 @@ def create_app(store,*,allowed_origin):
     def logout(request:Request):
         guard(request,True);store.revoke(request.cookies['gabfin_session'])
         from fastapi.responses import JSONResponse
-        response=JSONResponse({'ok':True});response.delete_cookie('gabfin_session',httponly=True,secure=True,samesite='strict');return response
+        response=JSONResponse({'ok':True});response.delete_cookie('gabfin_session',httponly=True,secure=True,samesite='strict');response.delete_cookie('__Host-gabfin_csrf',secure=True,samesite='strict',path='/');return response
     @app.websocket('/ws')
     async def websocket(ws:WebSocket):
         try:validate_request(store,ws.cookies.get('gabfin_session'),origin=ws.headers.get('origin'),allowed_origin=allowed_origin,write=False,query=dict(ws.query_params),csrf=None)
