@@ -7,8 +7,11 @@ import type {
 } from '../../shared/contracts/generated';
 import { fetchSnapshot } from '../../shared/transport/market';
 import type { StreamStatus } from '../../shared/transport/live';
+import {snapshotTrace} from '../../shared/transport/market-trace';
+import type {MarketTrace} from '../../shared/transport/market-trace';
 
 export interface MarketViewState {
+  trace?:MarketTrace;
   selectedInstrumentId: string | undefined;
   snapshot: MarketSnapshot | undefined;
   loading: boolean;
@@ -27,6 +30,7 @@ export function useMarketSubscription(
   expire.current = session.expire;
   const signature = JSON.stringify(keys);
   const [live, setLive] = useState<{
+    trace?:MarketTrace;
     signature: string;
     snapshot?: MarketSnapshot;
     error: Error | null;
@@ -52,16 +56,19 @@ export function useMarketSubscription(
       scheduled = 0,
       snapshot: MarketSnapshot | undefined,
       resetId = '';
+    let trace:MarketTrace|undefined;
     setLive({ signature, error: null, status: 'connecting', resetId });
     const publish = () => {
       if (scheduled || controller.signal.aborted) return;
       scheduled = requestAnimationFrame(() => {
         scheduled = 0;
+        if(trace&&trace.stateMono===undefined)trace={...trace,stateMono:performance.now()};
         if (!controller.signal.aborted)
           setLive((value) => ({
             ...value,
             snapshot,
             resetId,
+            trace,
             ...(snapshot ? { error: null } : {}),
           }));
       });
@@ -75,13 +82,15 @@ export function useMarketSubscription(
     void import('../../shared/transport/live')
       .then(async (transport) => {
         snapshot = await transport.fetchSnapshot(selected, controller.signal);
+        trace=snapshotTrace(snapshot);
         resetId = `${snapshot.epoch}:${++resetCounter.current}`;
         if (controller.signal.aborted) return;
         publish();
         cancelStream = transport.subscribeMarket(
           selected,
-          (frame) => {
+          (frame,incomingTrace) => {
             if (controller.signal.aborted || frame.kind === 'error') return;
+            if(incomingTrace)trace=incomingTrace;
             if (frame.kind === 'snapshot') {
               snapshot = frame.payload;
               resetId = `${snapshot.epoch}:${++resetCounter.current}`;
@@ -167,6 +176,7 @@ export function useMarketSubscription(
       error: visible ? live.error : null,
       demo: false,
       resetId: visible ? live.resetId : '',
+      trace:visible?live.trace:undefined,
       streamStatus:
         session.status !== 'paired'
           ? 'needs_pair'

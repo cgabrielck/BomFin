@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
+import {commitQuoteTrace} from '../../shared/transport/market-trace';
 import type { SubscriptionKey } from '../../shared/contracts/generated';
 import { candidates, findCandidate } from './demo-catalog';
 import type { Scenario } from './demo-catalog';
@@ -35,6 +36,15 @@ export default function StockDetail({
     ? [{ instrument_id: candidate.id, channel: 'quote', timeframe: null }]
     : [];
   const market = useMarketSubscription(keys);
+  // The same quote reaches this reader over HTTP and again over the WebSocket.
+  // The event id plus the epoch is the market event identity, so one event
+  // yields one trace. A provider may reuse the id in a later epoch, so the
+  // epoch has to travel with it.
+  useLayoutEffect(()=>{
+    if(market.trace&&market.trace.instrumentId===candidate?.id
+      &&market.snapshot?.quotes.some(event=>event.event_id===market.trace!.eventId
+        &&market.snapshot!.epoch===market.trace!.epoch))return commitQuoteTrace(market.trace);
+  },[market.trace,candidate?.id]);
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), 1000);

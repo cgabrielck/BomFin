@@ -1,6 +1,8 @@
 import type { MarketSnapshot, SubscriptionKey } from '../contracts/generated';
 import { parseFrame, parseSnapshot } from '../contracts/validate-market';
 import type { BrowserMarketFrame } from '../contracts/validate-market';
+import {beginQuoteTrace,rememberSnapshot} from './market-trace';
+import type {MarketTrace} from './market-trace';
 
 export class SessionRequired extends Error {
   constructor(message: string) {
@@ -48,12 +50,13 @@ export async function fetchSnapshot(
   if (!response.ok) throw new Error('行情服務暫時不可用');
   const text = await response.text();
   if (text.length > 1048576) throw new Error('行情資料過大');
-  return parseSnapshot(JSON.parse(text), keys);
+  const mono=performance.now(),wall=Date.now();
+  const snapshot=parseSnapshot(JSON.parse(text),keys);rememberSnapshot(snapshot,mono,wall,keys);return snapshot;
 }
 
 export function subscribeMarket(
   keys: SubscriptionKey[],
-  onFrame: (frame: BrowserMarketFrame) => void,
+  onFrame: (frame: BrowserMarketFrame,trace?:MarketTrace) => void,
   signal: AbortSignal,
   onStatus: (state: StreamStatus) => void,
 ) {
@@ -70,6 +73,7 @@ export function subscribeMarket(
     );
     socket.onopen = () => socket?.send(JSON.stringify({ version: 1, keys }));
     socket.onmessage = (event) => {
+      const mono=performance.now(),wall=Date.now();
       try {
         if (typeof event.data !== 'string' || event.data.length > 1048576)
           throw new Error('行情訊息過大');
@@ -97,7 +101,7 @@ export function subscribeMarket(
           }
           position.cursor = frame.payload.sequence;
         }
-        onFrame(frame);
+        onFrame(frame,beginQuoteTrace(frame.payload,mono,wall,keys));
         onStatus('connected');
       } catch {
         onStatus('error');

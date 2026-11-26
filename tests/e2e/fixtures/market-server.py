@@ -1,10 +1,16 @@
 """Private-stdio test harness: real TLS/API/internal sockets, synthetic prices.
 
 Pairing codes travel only over the parent-owned pipe. No test-admin HTTP route.
+
+The quote identity is derived the way a real provider derives it: from the
+source facts, not from a random uuid. A provider that re-quotes the same
+price at the same source instant must produce the same event id, so the
+fixture has to behave that way for the deduplication paths to be exercised.
 """
 import argparse
 import asyncio
 from datetime import datetime, timedelta, timezone
+from hashlib import sha256
 import json
 from pathlib import Path
 import socket
@@ -12,7 +18,7 @@ import subprocess
 import sys
 import tempfile
 import threading
-from uuid import UUID, uuid4
+from uuid import UUID, uuid4, uuid5, NAMESPACE_URL
 
 import uvicorn
 
@@ -46,6 +52,7 @@ async def run(args, folder):
     market=new_market()
     bar_start=now().replace(second=0,microsecond=0)-timedelta(minutes=5)
     bar_events={}
+    quote_events={}
     def publish_bar(item):
         symbol=item.get('symbol','AAPL');index=item.get('index',2);stamp=now();start=bar_start+timedelta(minutes=index)
         event=BarMarketEvent(schema_version='1.0',kind='bar',event_id=uuid4(),instrument_id=IDS[symbol],
@@ -58,12 +65,19 @@ async def run(args, folder):
         bar_events[(symbol,index)]=event;market.apply(event)
     def publish(symbol, price):
         stamp=now(); event=stamp-timedelta(seconds=2)
-        market.apply(QuoteMarketEvent(schema_version='1.0', kind='quote',event_id=uuid4(),
+        # Same derivation as the real provider: code, source instant and price
+        # decide the identity, so an identical re-quote yields an identical
+        # event id and dedup_key.
+        digest=sha256(f'{symbol}|{event.isoformat()}|{price}'.encode()).hexdigest()
+        key='fixture:quote:'+digest
+        quote=QuoteMarketEvent(schema_version='1.0', kind='quote',event_id=uuid5(NAMESPACE_URL,key),
             instrument_id=IDS[symbol],event_at=event,received_at=stamp,available_at=stamp,
-            source='fixture',source_seq=None,dedup_key=str(uuid4()),payload=dict(schema_version='1.0',
+            source='fixture',source_seq=None,dedup_key=key,payload=dict(schema_version='1.0',
                 instrument_id=IDS[symbol],as_of=stamp,feed='fixture',session='unknown',bid=None,ask=None,
                 last=dict(price=price,event_at=event,received_at=stamp,available_at=stamp,age_ms=2000),
-                quality=['unknown','incomplete'],entitlements=dict(status='unknown',checked_at=None))))
+                quality=['unknown','incomplete'],entitlements=dict(status='unknown',checked_at=None)))
+        quote_events[(symbol,price)]=quote
+        market.apply(quote)
     def seed(count=3):
         market.heartbeat(now())
         for symbol,price in [('AAPL','210.00'),('MSFT','420.00'),('NVDA','140.00')]: publish(symbol,price)
@@ -102,6 +116,20 @@ async def run(args, folder):
                     await internal.close()
                     market=new_market();bar_events.clear();seed(item.get('count',1))
                     internal=InternalMarketServer(market,store,host=address[0],port=address[1]);await internal.start()
+                elif action=='new_epoch':
+                    # A fresh coordinator re-opens the epoch and drops the dedup
+                    # evidence, so the same source facts can legitimately be
+                    # published again under the same event id.
+                    address=internal.address
+                    await internal.close()
+                    market=new_market()
+                    internal=InternalMarketServer(market,store,host=address[0],port=address[1]);await internal.start()
+                elif action=='replay_quote':
+                    # Re-apply the stored event unchanged, so the event id
+                    # repeats on purpose.
+                    quote=quote_events.get((item.get('symbol','AAPL'),item.get('price','210.00')))
+                    if quote is None: raise ValueError('No stored quote to replay')
+                    market.apply(quote)
                 elif action=='expire': offset[0]+=301
                 elif action=='gap': market.disconnected('fixture_disconnect')
                 elif action=='heartbeat': market.heartbeat(now())

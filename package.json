@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npm run dev --workspace @gabfin/desk-web --",
     "contracts": "node scripts/generate-web-contracts.mjs",
-    "test:e2e": "playwright test",
+    "test:e2e": "npm run build && playwright test",
     "typecheck": "npm run contracts && npm run typecheck --workspace @gabfin/desk-web",
     "build": "npm run contracts && npm run build --workspace @gabfin/desk-web"
   },
