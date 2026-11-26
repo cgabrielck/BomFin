@@ -14,6 +14,7 @@ export interface MarketViewState {
   loading: boolean;
   error: Error | null;
   demo: boolean;
+  resetId: string;
   streamStatus: StreamStatus | 'demo' | 'needs_pair';
 }
 
@@ -22,6 +23,7 @@ export function useMarketSubscription(
 ): MarketViewState {
   const session = useServerSession();
   const expire = useRef(session.expire);
+  const resetCounter = useRef(0);
   expire.current = session.expire;
   const signature = JSON.stringify(keys);
   const [live, setLive] = useState<{
@@ -29,7 +31,8 @@ export function useMarketSubscription(
     snapshot?: MarketSnapshot;
     error: Error | null;
     status: StreamStatus;
-  }>({ signature: '', error: null, status: 'connecting' });
+    resetId: string;
+  }>({ signature: '', error: null, status: 'connecting', resetId: '' });
   const identity = keys.map((key) => [
     key.instrument_id,
     key.channel,
@@ -47,8 +50,9 @@ export function useMarketSubscription(
     const controller = new AbortController();
     let cancelStream: (() => void) | undefined,
       scheduled = 0,
-      snapshot: MarketSnapshot | undefined;
-    setLive({ signature, error: null, status: 'connecting' });
+      snapshot: MarketSnapshot | undefined,
+      resetId = '';
+    setLive({ signature, error: null, status: 'connecting', resetId });
     const publish = () => {
       if (scheduled || controller.signal.aborted) return;
       scheduled = requestAnimationFrame(() => {
@@ -57,6 +61,7 @@ export function useMarketSubscription(
           setLive((value) => ({
             ...value,
             snapshot,
+            resetId,
             ...(snapshot ? { error: null } : {}),
           }));
       });
@@ -64,20 +69,23 @@ export function useMarketSubscription(
     const fail = (error: Error) => {
       if (controller.signal.aborted) return;
       snapshot = undefined;
-      setLive({ signature, error, status: 'error' });
+      setLive({ signature, error, status: 'error', resetId: '' });
       if (error.name === 'SessionRequired') expire.current();
     };
     void import('../../shared/transport/live')
       .then(async (transport) => {
         snapshot = await transport.fetchSnapshot(selected, controller.signal);
+        resetId = `${snapshot.epoch}:${++resetCounter.current}`;
         if (controller.signal.aborted) return;
         publish();
         cancelStream = transport.subscribeMarket(
           selected,
           (frame) => {
             if (controller.signal.aborted || frame.kind === 'error') return;
-            if (frame.kind === 'snapshot') snapshot = frame.payload;
-            else if (snapshot) {
+            if (frame.kind === 'snapshot') {
+              snapshot = frame.payload;
+              resetId = `${snapshot.epoch}:${++resetCounter.current}`;
+            } else if (snapshot) {
               const update = frame.payload,
                 event = update.event;
               let quotes = snapshot.quotes,
@@ -158,6 +166,7 @@ export function useMarketSubscription(
         (!visible || (!live.snapshot && !live.error)),
       error: visible ? live.error : null,
       demo: false,
+      resetId: visible ? live.resetId : '',
       streamStatus:
         session.status !== 'paired'
           ? 'needs_pair'
@@ -173,6 +182,7 @@ export function useMarketSubscription(
     loading: query.isPending,
     error: query.error,
     demo: true,
+    resetId: `${query.data?.epoch ?? 'empty'}:${query.dataUpdatedAt}`,
     streamStatus: 'demo',
   };
 }

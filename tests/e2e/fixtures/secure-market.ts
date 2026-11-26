@@ -11,8 +11,9 @@ interface Server {
   ) => Promise<Record<string, unknown>>;
 }
 
-export const test = base.extend<{ market: Server }>({
-  market: async ({}, use) => {
+export const test = base.extend<{ market: Server; barsEnabled: boolean }>({
+  barsEnabled: [false, { option: true }],
+  market: async ({ barsEnabled }, use) => {
     const env: NodeJS.ProcessEnv = {};
     for (const key of [
       'SystemRoot',
@@ -34,6 +35,7 @@ export const test = base.extend<{ market: Server }>({
         resolve('apps/desk-web/dist'),
         '--openssl',
         'C:/Program Files/Git/usr/bin/openssl.exe',
+        ...(barsEnabled ? ['--bars'] : []),
       ],
       { env, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true },
     );

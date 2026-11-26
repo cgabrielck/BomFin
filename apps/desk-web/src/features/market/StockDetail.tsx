@@ -3,6 +3,7 @@ import type { SubscriptionKey } from '../../shared/contracts/generated';
 import { candidates, findCandidate } from './demo-catalog';
 import type { Scenario } from './demo-catalog';
 import { useMarketSubscription } from './useMarketSubscription';
+import ChartPanel from '../chart/ChartPanel';
 
 interface Props {
   symbol: string;
@@ -121,7 +122,9 @@ export default function StockDetail({
           {!hiddenData && point && (
             <p className="tiny" data-testid="market-source">
               來源：
-              {market.demo ? '本機人工樣本' : market.snapshot?.health.source} ·{' '}
+              {market.demo
+                ? '本機人工樣本'
+                : market.snapshot?.health.source} ·{' '}
               {ageLabel(point.event_at, now)}
               <br />
               來源時間：{point.event_at ?? '未知'} ·
@@ -167,16 +170,11 @@ export default function StockDetail({
               · 連線正常不代表價格新鮮。
             </div>
           )}
-          <div className="empty chart-placeholder">
-            <strong>尚無可靠 K 線資料</strong>
-            <p>
-              目前只顯示 quote。後續提供有來源的 bar 才顯示圖表，不用 quote
-              拼成交量。
-            </p>
-          </div>
-          <p className="chart-label">
-            成交量：未提供 · 增量圖表續接下一功能切片
-          </p>
+          <ChartPanel
+            instrumentId={candidate.id}
+            hidden={hiddenData}
+            stale={market.demo && scenario === 'offline'}
+          />
           <div className="tabs">
             <span className="tab active">觀察概況</span>
           </div>

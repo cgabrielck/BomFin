@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "epoch": "755ec163-1b83-53ea-afcc-fcf81ac01277",
+  "cursor": 30,
+  "as_of": "2026-11-25T21:00:00Z",
+  "quotes": [],
+  "bars": [],
+  "health": {
+    "schema_version": "1.0",
+    "source": "demo",
+    "connected": false,
+    "heartbeat_at": null,
+    "gap_pending": false,
+    "connection_started_at": null
+  },
+  "gap": null
+}

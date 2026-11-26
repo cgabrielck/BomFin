@@ -19,7 +19,7 @@ import uvicorn
 from gabfin.api.app import create_market_app
 from gabfin.api.market_gateway import MarketGateway
 from gabfin.api.sessions import SessionStore
-from gabfin.contracts.events import QuoteMarketEvent
+from gabfin.contracts.events import QuoteMarketEvent, BarMarketEvent
 from gabfin.contracts.subscriptions import SubscriptionKey
 from gabfin.market.coordinator import MarketCoordinator
 from gabfin.market.internal_stream import InternalMarketServer
@@ -39,7 +39,23 @@ async def run(args, folder):
     now = lambda: datetime.now(timezone.utc) + timedelta(seconds=offset[0])
     store = SessionStore(folder/'sessions.sqlite', owner_id=uuid4(), session_seconds=300,
         pairing_seconds=60, max_failures=10, clock=now)
-    market = MarketCoordinator(IDS.values(), source='fixture', replay_capacity=100, max_bars=50, clock=now)
+    keys=[SubscriptionKey(instrument_id=value,channel='quote',timeframe=None) for value in IDS.values()]
+    if args.bars: keys += [SubscriptionKey(instrument_id=value,channel='bar',timeframe=dict(count=1,unit='minute')) for value in IDS.values()]
+    def new_market():
+        return MarketCoordinator(IDS.values(), source='fixture', replay_capacity=100, max_bars=50, clock=now,required_keys=keys)
+    market=new_market()
+    bar_start=now().replace(second=0,microsecond=0)-timedelta(minutes=5)
+    bar_events={}
+    def publish_bar(item):
+        symbol=item.get('symbol','AAPL');index=item.get('index',2);stamp=now();start=bar_start+timedelta(minutes=index)
+        event=BarMarketEvent(schema_version='1.0',kind='bar',event_id=uuid4(),instrument_id=IDS[symbol],
+            event_at=stamp,received_at=stamp,available_at=stamp,source='fixture',source_seq=None,
+            dedup_key=str(uuid4()),payload=dict(schema_version='1.0',instrument_id=IDS[symbol],source='fixture',
+                timeframe=dict(count=1,unit='minute'),session='regular',start=start,end=start+timedelta(minutes=1),
+                open='100',high='110',low='95',close=item.get('close','103'),volume=item.get('volume','100'),
+                status=item.get('status','forming'),revision=item.get('revision',0),corporate_action_policy='unadjusted-fixture',
+                event_at=stamp,received_at=stamp,available_at=stamp))
+        bar_events[(symbol,index)]=event;market.apply(event)
     def publish(symbol, price):
         stamp=now(); event=stamp-timedelta(seconds=2)
         market.apply(QuoteMarketEvent(schema_version='1.0', kind='quote',event_id=uuid4(),
@@ -48,11 +64,15 @@ async def run(args, folder):
                 instrument_id=IDS[symbol],as_of=stamp,feed='fixture',session='unknown',bid=None,ask=None,
                 last=dict(price=price,event_at=event,received_at=stamp,available_at=stamp,age_ms=2000),
                 quality=['unknown','incomplete'],entitlements=dict(status='unknown',checked_at=None))))
-    market.heartbeat(now())
-    for symbol,price in [('AAPL','210.00'),('MSFT','420.00'),('NVDA','140.00')]: publish(symbol,price)
-    market.recover_latest_quotes()
+    def seed(count=3):
+        market.heartbeat(now())
+        for symbol,price in [('AAPL','210.00'),('MSFT','420.00'),('NVDA','140.00')]: publish(symbol,price)
+        if args.bars:
+            for symbol in ('AAPL','MSFT'):
+                for index in range(count):publish_bar(dict(symbol=symbol,index=index,status='final' if index<count-1 else 'forming'))
+        else: market.recover_latest_quotes()
+    seed()
     internal = InternalMarketServer(market,store); await internal.start()
-    keys=[SubscriptionKey(instrument_id=value,channel='quote',timeframe=None) for value in IDS.values()]
     gateway=MarketGateway.from_store(host=internal.address[0],port=internal.address[1],store=store,
         registered_keys=keys,source='fixture')
     listener=socket.socket();listener.bind(('127.0.0.1',0))
@@ -68,12 +88,20 @@ async def run(args, folder):
                 if serving.done(): await serving; raise RuntimeError('TLS fixture failed')
                 await asyncio.sleep(.01)
         loop=asyncio.get_running_loop()
-        def command(line):
+        async def command(line):
+            nonlocal market,internal
             item=None
             try:
                 item=json.loads(line); action=item['action']; result={}
                 if action=='pair': result={'code':store.create_pairing()}
                 elif action=='price': publish(item['symbol'],item['price'])
+                elif action=='bar': publish_bar(item)
+                elif action=='repeat_bar': market.apply(bar_events[(item.get('symbol','AAPL'),item.get('index',2))])
+                elif action=='reset_bars':
+                    address=internal.address
+                    await internal.close()
+                    market=new_market();bar_events.clear();seed(item.get('count',1))
+                    internal=InternalMarketServer(market,store,host=address[0],port=address[1]);await internal.start()
                 elif action=='expire': offset[0]+=301
                 elif action=='gap': market.disconnected('fixture_disconnect')
                 elif action=='heartbeat': market.heartbeat(now())
@@ -84,7 +112,7 @@ async def run(args, folder):
                 emit({'id':item.get('id') if isinstance(item,dict) else None,'ok':False})
         def controls():
             for line in sys.stdin:
-                loop.call_soon_threadsafe(command,line)
+                asyncio.run_coroutine_threadsafe(command(line),loop)
             loop.call_soon_threadsafe(setattr,server,'should_exit',True)
         threading.Thread(target=controls,daemon=True).start()
         emit({'kind':'ready','origin':origin})
@@ -98,7 +126,7 @@ async def run(args, folder):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--dist',type=Path,required=True)
-    parser.add_argument('--openssl',type=Path,required=True);args=parser.parse_args()
+    parser.add_argument('--openssl',type=Path,required=True);parser.add_argument('--bars',action='store_true');args=parser.parse_args()
     with tempfile.TemporaryDirectory(prefix='gabfin-tls-fixture-') as temp:
         folder=Path(temp)
         subprocess.run([str(args.openssl),'req','-x509','-newkey','rsa:2048','-nodes','-days','1',

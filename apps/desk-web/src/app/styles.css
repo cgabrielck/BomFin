@@ -921,3 +921,56 @@ dialog p {
   padding: 10px 0;
   line-height: 1.8;
 }
+.chart-content,
+.candle-workspace {
+  min-width: 0;
+}
+.candle-canvas {
+  width: 100%;
+  height: 360px;
+}
+.chart-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.chart-toolbar button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.chart-values {
+  font-size: 12px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.chart-attribution a {
+  color: var(--green);
+}
+.chart-data {
+  padding: 12px 0;
+  font-size: 12px;
+}
+.chart-data summary {
+  cursor: pointer;
+  min-height: 32px;
+}
+.chart-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.chart-data table {
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.chart-data td,
+.chart-data th {
+  padding: 7px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+}

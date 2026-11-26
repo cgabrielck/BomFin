@@ -107,6 +107,22 @@ test('quiet expired session clears prices and reconnects with a new pairing', as
   await expect(page.getByTestId('market-health')).toContainText('連線：已連線');
 });
 
+test('expired session still clears prices when the close code is a generic transport error', async ({
+  page,
+  market,
+}) => {
+  await page.routeWebSocket('**/market/stream', (route) => {
+    const server = route.connectToServer();
+    server.onClose(() => route.close({ code: 1011 }));
+  });
+  await paired(page, market);
+  await market.command('expire');
+  await expect(
+    page.getByRole('heading', { name: '登入行情工作台' }),
+  ).toBeVisible();
+  await expect(page.getByTestId('last-price')).toHaveText('—');
+});
+
 test('reload restores same-origin session without storing tokens and logout revokes it', async ({
   page,
   market,
@@ -178,6 +194,10 @@ test('canonical validation refuses a foreign instrument in an HTTP snapshot', as
   await page.route('**/market/snapshot', async (route) => {
     const response = await route.fetch();
     const body = await response.json();
+    if (!body.quotes?.length) {
+      await route.fulfill({ response });
+      return;
+    }
     body.quotes[0].instrument_id = '11111111-1111-4111-8111-111111111111';
     await route.fulfill({ response, json: body });
   });

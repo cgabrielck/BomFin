@@ -104,13 +104,30 @@ export function subscribeMarket(
         socket?.close();
       }
     };
-    socket.onclose = (event) => {
+    socket.onclose = async (event) => {
       if (stopped || signal.aborted) return;
       if (event.code === 1008) {
         onStatus('unauthorized');
         return;
       }
       onStatus('disconnected');
+      // Proxies and a racing upstream expiry can hide the policy close code.
+      // The session authority decides expiry, not the transport's error number.
+      try {
+        const response = await fetch('/session', {
+          credentials: 'same-origin',
+          cache: 'no-store',
+          signal: AbortSignal.any([signal, AbortSignal.timeout(2000)]),
+        });
+        if (stopped || signal.aborted) return;
+        if (response.status === 401) {
+          stopped = true;
+          onStatus('unauthorized');
+          return;
+        }
+      } catch {
+        if (stopped || signal.aborted) return;
+      }
       if (attempts < 3) {
         timer = setTimeout(open, 250 * 2 ** attempts);
         attempts++;

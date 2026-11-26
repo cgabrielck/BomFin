@@ -6,13 +6,33 @@ export async function fetchSnapshot(
   keys: SubscriptionKey[],
   signal?: AbortSignal,
 ): Promise<MarketSnapshot> {
-  if (keys.length !== 1 || keys[0].channel !== 'quote' || keys[0].timeframe !== null)
-    throw new Error('此示範僅支援單股 quote');
-  const candidate = candidates.find((item) => item.id === keys[0].instrument_id);
+  const isBar =
+    keys.length === 1 &&
+    keys[0].channel === 'bar' &&
+    keys[0].timeframe?.count === 1 &&
+    keys[0].timeframe.unit === 'minute';
+  if (
+    keys.length !== 1 ||
+    (!isBar && (keys[0].channel !== 'quote' || keys[0].timeframe !== null))
+  )
+    throw new Error('此示範僅支援單股 quote 或 1 分鐘 K 線');
+  const candidate = candidates.find(
+    (item) => item.id === keys[0].instrument_id,
+  );
   if (!candidate) throw new Error('示範股票不存在');
-  const response = await fetch(`/demo/markets/${candidate.symbol}.json`, { signal });
+  const response = await fetch(
+    `/demo/${isBar ? 'bars' : 'markets'}/${candidate.symbol}.json`,
+    { signal },
+  );
   if (!response.ok) throw new Error('示範資料暫時無法讀取');
   const data = (await response.json()) as MarketSnapshot;
+  if (isBar) {
+    if (data.health?.source !== 'demo') throw new Error('示範 K 線來源不一致');
+    return (await import('../contracts/validate-market')).parseSnapshot(
+      data,
+      keys,
+    );
+  }
   // Boundary sanity checks, not a replacement for 04c's authenticated live API.
   if (
     data?.schema_version !== '1.0' ||
@@ -30,11 +50,18 @@ export async function fetchSnapshot(
   return data;
 }
 
-export async function fetchDemoAccount(signal?: AbortSignal): Promise<{ status: 'unavailable' }> {
+export async function fetchDemoAccount(
+  signal?: AbortSignal,
+): Promise<{ status: 'unavailable' }> {
   const response = await fetch('/demo/account.json', { signal });
   if (!response.ok) throw new Error('帳戶資料未接入');
   const data: unknown = await response.json();
-  if (!data || typeof data !== 'object' || !('status' in data) || data.status !== 'unavailable')
+  if (
+    !data ||
+    typeof data !== 'object' ||
+    !('status' in data) ||
+    data.status !== 'unavailable'
+  )
     throw new Error('示範帳戶格式不符');
   return { status: 'unavailable' };
 }
