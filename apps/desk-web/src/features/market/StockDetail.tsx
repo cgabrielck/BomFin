@@ -5,6 +5,8 @@ import { candidates, findCandidate } from './demo-catalog';
 import type { Scenario } from './demo-catalog';
 import { useMarketSubscription } from './useMarketSubscription';
 import ChartPanel from '../chart/ChartPanel';
+import MacroPanel from '../macro/MacroPanel';
+import FeedCapabilityBadges from '../feed/FeedCapabilityBadges';
 
 interface Props {
   symbol: string;
@@ -194,6 +196,8 @@ export default function StockDetail({
               ? '所有價格及觀點都是固定設計樣本，沒有即時市場結論。'
               : '報價來自已登入的行情來源；研究觀點仍為固定設計樣本。'}
           </p>
+          <MacroPanel demo={market.demo} />
+          <FeedCapabilityBadges demo={market.demo} />
         </div>
         <aside className="research-card">
           <p className="eyebrow">RESEARCH NOTE / SAMPLE</p>

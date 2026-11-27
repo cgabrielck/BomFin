@@ -974,3 +974,143 @@ dialog p {
   border-bottom: 1px solid var(--line);
   text-align: right;
 }
+
+/* Indicator overlay */
+.chart-indicators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin: 8px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+.chart-indicators span {
+  white-space: nowrap;
+}
+.chart-indicators sub {
+  font-size: 9px;
+  vertical-align: baseline;
+}
+.indicator-overlay {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.indicator-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.indicator-controls .text-button {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 4px 9px;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface);
+}
+.indicator-controls .text-button.active {
+  border-color: var(--green);
+  color: var(--green);
+  background: var(--soft);
+  font-weight: 650;
+}
+.indicator-statuses {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+.indicator-statuses li {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--amber);
+}
+
+/* Macro panel */
+.macro-panel,
+.feed-capabilities {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.macro-panel h3,
+.feed-capabilities h3 {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  margin: 0 0 10px;
+}
+.macro-asof {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.macro-asof label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.macro-asof input {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+.macro-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.macro-table {
+  border-collapse: collapse;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+.macro-table td,
+.macro-table th {
+  padding: 7px 10px 7px 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+/* Feed capability badges */
+.capability-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.capability-item {
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 11px 13px;
+  background: var(--surface);
+}
+.capability-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+.capability-head strong {
+  font-size: 12px;
+}
+.capability-warning {
+  margin: 9px 0 0;
+  font-size: 11px;
+  line-height: 1.8;
+  color: #8b4c35;
+  font-weight: 600;
+}
+.capability-unavailable {
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--red);
+}

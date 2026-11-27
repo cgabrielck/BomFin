@@ -3,18 +3,22 @@ import type { Bar } from '../../shared/contracts/generated';
 import { createChartPort } from './chart-port';
 import type { ChartPort } from './chart-port';
 import type { ChartScope } from './bar-series';
+import type { IndicatorLine } from './indicator-lines';
 
 export default function ChartCanvas({
   bars,
   scope,
+  indicators = [],
 }: {
   bars: Bar[];
   scope: ChartScope;
+  indicators?: IndicatorLine[];
 }) {
   const container = useRef<HTMLDivElement>(null),
     port = useRef<ChartPort | null>(null);
   const [view, setView] = useState<Bar[]>([]),
     [error, setError] = useState(''),
+    [indicatorError, setIndicatorError] = useState(''),
     [hover, setHover] = useState<number | null>(null);
   useEffect(() => {
     const node = container.current;
@@ -48,6 +52,18 @@ export default function ChartCanvas({
       port.current = null;
     }
   }, [bars]);
+  useEffect(() => {
+    try {
+      if (port.current) port.current.applyIndicators(indicators);
+      setIndicatorError('');
+    } catch (failure) {
+      // A chart that cannot draw the indicator still shows the candles.
+      // The indicator values remain readable in the legend below it.
+      setIndicatorError(
+        failure instanceof Error ? failure.message : '指標疊圖無法顯示',
+      );
+    }
+  }, [indicators]);
   if (error)
     return (
       <p role="status" className="state-banner">
@@ -96,6 +112,11 @@ export default function ChartCanvas({
         </p>
       )}
       <div className="candle-canvas" ref={container} />
+      {indicatorError && (
+        <p role="status" className="tiny" data-testid="indicator-draw-error">
+          {indicatorError}；K 線不受影響。
+        </p>
+      )}
       {selected && (
         <p className="tiny">
           游標 {selected.start} · O {selected.open} H {selected.high} L{' '}

@@ -1,6 +1,8 @@
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
 import { useMarketSubscription } from '../market/useMarketSubscription';
 import type { SubscriptionKey } from '../../shared/contracts/generated';
+import IndicatorOverlay from './IndicatorOverlay';
+import type { IndicatorLine } from './indicator-lines';
 const ChartCanvas = lazy(() => import('./ChartCanvas'));
 const TIMEFRAME = { count: 1, unit: 'minute' as const };
 
@@ -17,6 +19,9 @@ export default function ChartPanel({
     ? []
     : [{ instrument_id: instrumentId, channel: 'bar', timeframe: TIMEFRAME }];
   const market = useMarketSubscription(keys);
+  // The indicator lines live here because the chart does. The overlay
+  // fetches them and hands them up; the canvas draws them.
+  const [indicators, setIndicators] = useState<IndicatorLine[]>([]);
   const snapshot = hidden ? undefined : market.snapshot;
   const bars = useMemo(
     () => snapshot?.bars.map((event) => event.payload) ?? [],
@@ -51,6 +56,7 @@ export default function ChartPanel({
           <ChartCanvas
             key={`${instrumentId}:${market.resetId}:${snapshot?.health.source}`}
             bars={bars}
+            indicators={indicators}
             scope={{
               instrumentId,
               source: snapshot!.health.source,
@@ -70,6 +76,12 @@ export default function ChartPanel({
           {market.loading && !hidden && <p role="status">等待 K 線資料…</p>}
         </div>
       )}
+      <IndicatorOverlay
+        instrumentId={instrumentId}
+        demo={market.demo}
+        candleCoverage={snapshot?.health.source}
+        onLines={setIndicators}
+      />
       {bars.length > 0 && (
         <p className="chart-attribution tiny">
           圖表：
