@@ -39,11 +39,11 @@ stage: `ready-for-ui`
 
 ### Base
 
-- 後端 commit：`5c49495a`（WU-7 provider routing + WU-9 analysis planes）
+- 後端 commit：`cd59fca1`（分析平面的生產接線 + e2e 覆蓋）
+- 前一階段：`5c49495a`（WU-7 provider routing + WU-9 analysis planes）、
+  `9e7d109b`（交接卡）
 - 分支：`codex/s01-source-baseline`
 - Checkout：`C:/Users/001/Downloads/GabFin-ai-trade/.worktrees/gabfin-s01`
-- 後端補充（本階段，commit 尚未建立）：分析平面的**生產接線**（tape → 指標平面）
-  與 `tests/e2e/analysis.spec.ts`（三個端點 6 項斷言，全過）。
 
 ### Contract delta
 

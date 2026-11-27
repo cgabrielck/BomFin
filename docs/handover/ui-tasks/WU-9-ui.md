@@ -8,11 +8,10 @@
 
 ## Base
 
-- 後端 commit：`5c49495a`（WU-7 provider routing + WU-9 analysis planes）
+- 後端 commit：`cd59fca1`（分析平面的生產接線 + e2e 覆蓋）
 - 分支：`codex/s01-source-baseline`
 - Checkout：`C:/Users/001/Downloads/GabFin-ai-trade/.worktrees/gabfin-s01`
-- 後端補充（同一階段，尚未 commit）：分析平面的**生產接線**與 e2e 覆蓋。
-  Carbon 若在 `stage` 顯示 `ready-for-ui` 時看到工作樹有未提交變更，那是這一輪補充。
+- 前一階段：`5c49495a`（WU-7 + WU-9）、`9e7d109b`（交接卡）
 
 ## 後端已就緒、Carbon 可直接對接的事實
 
