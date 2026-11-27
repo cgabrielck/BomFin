@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.402" timestamp="2026-11-26T03:39:10.266745+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_internal_market_stream" name="test_listener_close_waits_for_an_inflight_auth_database_read" time="2.433"><failure message="assert False">tests\gabfin\test_internal_market_stream.py:196: in test_listener_close_waits_for_an_inflight_auth_database_read
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_internal_market_stream.py:195: in scenario
+    assert completed
+E   assert False</failure></testcase></testsuite></testsuites>

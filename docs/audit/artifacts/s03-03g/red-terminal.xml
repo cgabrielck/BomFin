@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="10" time="3.274" timestamp="2026-11-25T22:51:48.565187+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_adapter_delivers_callback_while_worker_is_still_running_then_closes" time="1.416" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_close_before_subscribe_is_terminal" time="0.180"><failure message="AssertionError: Regex pattern did not match.&#10;  Expected regex: 'single-use'&#10;  Actual message: 'Quote worker could not subscribe'">tests\gabfin\test_futu_quote_adapter.py:53: in test_close_before_subscribe_is_terminal
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:50: in scenario
+    with pytest.raises(RuntimeError, match='single-use'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: Regex pattern did not match.
+E     Expected regex: 'single-use'
+E     Actual message: 'Quote worker could not subscribe'</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_cancel_waiting_consumer_waits_for_worker_cleanup" time="0.128" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_bad_or_failed_worker_is_reaped_and_reports_only_fixed_error[print('raw private SDK failure',flush=True)]" time="0.122" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_bad_or_failed_worker_is_reaped_and_reports_only_fixed_error[print(json.dumps(dict(version=2,kind='ready')),flush=True)]" time="0.125" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_bad_or_failed_worker_is_reaped_and_reports_only_fixed_error[print('x'*5000,flush=True)]" time="0.142" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_bad_or_failed_worker_is_reaped_and_reports_only_fixed_error[raise RuntimeError('private SDK error')]" time="0.152" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_incomplete_cleanup_stays_visible_and_cannot_claim_success" time="0.125" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_foreign_instrument_and_non_quote_channel_never_start_worker[key0]" time="0.007" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_foreign_instrument_and_non_quote_channel_never_start_worker[key1]" time="0.007" /></testsuite></testsuites>

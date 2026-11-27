@@ -1,0 +1,9 @@
+{
+  "version": "exchange-calendars:4.13.3",
+  "calendar_id": "XNYS",
+  "sessions": 251,
+  "holiday_verified": true,
+  "early_close_verified": true,
+  "dst_examples_verified": true,
+  "reference": "https://www.nyse.com/trade/hours-calendars"
+}

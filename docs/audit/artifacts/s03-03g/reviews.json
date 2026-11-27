@@ -1,0 +1,28 @@
+{
+  "base": "a8d23d575baab94420595ca5cddf12255fb40ebc",
+  "index_tree": "454c42aaab392434b14d59532ff15163c3139d75",
+  "diff_command": "git diff --cached a8d23d575baab94420595ca5cddf12255fb40ebc",
+  "commits_at_review": [],
+  "scope": "9 source/test files; initial index empty; original lockfile never staged",
+  "standards": {
+    "agent": "/root/stream_standards",
+    "fresh_context": true,
+    "initial_hard": 2,
+    "initial_heuristics": 3,
+    "additional_findings": ["strict worker ingress config", "duplicate independent transport fixtures"],
+    "final_unresolved": 0,
+    "final_heuristics": 0,
+    "final_scope_verified_against_tree": true
+  },
+  "spec": {
+    "agent": "/root/stream_spec",
+    "fresh_context": true,
+    "initial_findings": 5,
+    "additional_findings": ["terminal re-subscribe", "clean pre-subscription cancellation classification", "worker ingress config", "late terminal failure visibility"],
+    "final_unresolved": 0,
+    "independent_unit_tests": 62,
+    "final_adapter_tests": 40,
+    "final_full_xml_verified": {"passed": 2021, "skipped": 4, "failed": 0}
+  },
+  "reviewer_limits": "Read-only, no OpenD/network, no full suite executed by reviewers. Spec read final full XML/log; primary ran full suite and live smoke."
+}

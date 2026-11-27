@@ -1,0 +1,16 @@
+{
+  "sdk_present": false,
+  "listener_reachable": false,
+  "gates": [
+    "sdk_unavailable",
+    "opend_unreachable"
+  ],
+  "features": {
+    "equity_quote": "unverified",
+    "bar": "unverified",
+    "option_chain": "unverified",
+    "option_quote": "unverified",
+    "pre_market": "unverified",
+    "post_market": "unverified"
+  }
+}

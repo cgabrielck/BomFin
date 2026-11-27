@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="2.141" timestamp="2026-11-26T03:56:10.450882+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_feed_supervisor" name="test_transient_factory_failure_before_acquisition_can_retry" time="1.373"><failure message="ValueError: temporary constructor failure">tests\gabfin\test_feed_supervisor.py:127: in test_transient_factory_failure_before_acquisition_can_retry
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_supervisor.py:125: in scenario
+    await supervisor.run(asyncio.Event(), max_attempts=2)
+services\gabfin\market\supervisor.py:101: in run
+    feed = self._factory()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_supervisor.py:120: in factory
+    if len(attempts) == 1: raise ValueError('temporary constructor failure')
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: temporary constructor failure</failure></testcase><testcase classname="tests.gabfin.test_feed_supervisor" name="test_plain_adapter_is_rejected_before_resource_acquisition_with_clear_contract" time="0.006"><failure message="RuntimeError: Feed cleanup failed">tests\gabfin\test_feed_supervisor.py:143: in test_plain_adapter_is_rejected_before_resource_acquisition_with_clear_contract
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_supervisor.py:142: in scenario
+    await supervisor.run(asyncio.Event(), max_attempts=1)
+services\gabfin\market\supervisor.py:131: in run
+    raise RuntimeError('Feed cleanup failed') from None
+E   RuntimeError: Feed cleanup failed</failure></testcase></testsuite></testsuites>

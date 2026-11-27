@@ -1,0 +1,11 @@
+{
+  "sdk_worker_count": 0,
+  "opend_listeners": [
+    {
+      "LocalAddress": "127.0.0.1",
+      "LocalPort": 11111,
+      "OwningProcess": 29100
+    }
+  ],
+  "checked_at_utc": "2026-11-26T01:03:35.2556950Z"
+}

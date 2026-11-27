@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.656" timestamp="2026-11-26T12:45:50.243432+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_market_api" name="test_websocket_starts_with_full_snapshot_and_cleans_up_on_disconnect" time="1.356"><failure message="starlette.websockets.WebSocketDisconnect">tests\gabfin\test_market_api.py:86: in test_websocket_starts_with_full_snapshot_and_cleans_up_on_disconnect
+    with client.websocket_connect('wss://desk.test/market/stream', headers={'Origin':ORIGIN}) as ws:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:116: in __enter__
+    self._raise_on_close(message)
+.venv\Lib\site-packages\starlette\testclient.py:143: in _raise_on_close
+    raise WebSocketDisconnect(code=message.get("code", 1000), reason=message.get("reason", ""))
+E   starlette.websockets.WebSocketDisconnect</failure></testcase></testsuite></testsuites>

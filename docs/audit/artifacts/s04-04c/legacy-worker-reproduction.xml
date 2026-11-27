@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="5.354" timestamp="2026-11-26T14:07:55.482100+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.trading.engine.test_worker_integration.TestWorkerIntegration" name="test_shadow_mode_buy_signal_to_fill" time="2.313"><failure message="PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\001\\AppData\\Local\\Temp\\tmp1du0fj_n\\orders.sqlite3'">tests\trading\engine\test_worker_integration.py:180: in test_shadow_mode_buy_signal_to_fill
+    self.assertEqual(order.status, OrderStatus.FILLED, "Shadow engine should have filled the order")
+E   AssertionError: &lt;OrderStatus.CANCELLED: 'cancelled'&gt; != &lt;OrderStatus.FILLED: 'filled'&gt; : Shadow engine should have filled the order
+
+During handling of the above exception, another exception occurred:
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\shutil.py:633: in _rmtree_unsafe
+    os.unlink(fullname)
+E   PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\001\\AppData\\Local\\Temp\\tmp1du0fj_n\\orders.sqlite3'
+
+During handling of the above exception, another exception occurred:
+tests\trading\engine\test_worker_integration.py:75: in test_shadow_mode_buy_signal_to_fill
+    with tempfile.TemporaryDirectory() as tmpdir:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\tempfile.py:1029: in __exit__
+    self.cleanup()
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\tempfile.py:1033: in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\tempfile.py:1013: in _rmtree
+    _shutil.rmtree(name, onexc=onexc, dir_fd=dir_fd, _onexc_kwargs=True)
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\shutil.py:788: in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\shutil.py:635: in _rmtree_unsafe
+    onexc(os.unlink, fullname, err)
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\tempfile.py:980: in onexc
+    _os.unlink(base, dir_fd=dir_fd)
+E   PermissionError: [WinError 32] 另一个程序正在使用此文件，进程无法访问。: 'C:\\Users\\001\\AppData\\Local\\Temp\\tmp1du0fj_n\\orders.sqlite3'</failure></testcase><testcase classname="tests.trading.engine.test_worker_integration.TestWorkerIntegration" name="test_shadow_mode_no_broker_calls" time="0.128" /></testsuite></testsuites>

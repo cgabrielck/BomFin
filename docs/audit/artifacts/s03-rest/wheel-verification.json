@@ -1,0 +1,10 @@
+{
+  "installed_root": "C:\\Users\\001\\Desktop\\GabFin-ai-trade\\.tools\\s03-rest-wheel-check\\Lib\\site-packages\\gabfin",
+  "python_modules_checked": 51,
+  "modules_imported": 50,
+  "schema_matches": true,
+  "sdk_present": false,
+  "pandas_present": false,
+  "calendar_extra_present": false,
+  "wheel_sha256": "11e6e81e0657b6e8d97fb4995861ebfa4980626c8a6d4069c7fe56f0be384e2a"
+}

@@ -1,0 +1,27 @@
+{
+  "commit": "f361264903be5bb648f5eab294ebe409ae8b5ae2",
+  "reviewed_tree": "8a9f825027d1f7ca57ed50f07b480584849f28aa",
+  "base": "a434de2134550f6dc6ff32b593327192d309ffda",
+  "committed_files": 24,
+  "playwright_passed": 28,
+  "browser_cases": 23,
+  "bar_patch_cases": 5,
+  "production_capture_passed": 1,
+  "chart_package_version": "5.3.0",
+  "canonical_synthetic_bars": 60,
+  "production_known_vulnerabilities": 0,
+  "original_lock_preserved": true,
+  "local_markdown_links_checked": 84,
+  "markdown_anchors_checked": false,
+  "python_product_unchanged": true,
+  "python_full_suite_run_this_unit": false,
+  "live_opend_run_this_unit": false,
+  "g2_approved": false,
+  "trading_started": false,
+  "pushed": false,
+  "deployed": false,
+  "screenshot_sha256": {
+    "chart-desktop.png": "7e0af199ddd7181bfa8504299e8ff70eb7b8a93963b1c59d9aac46b31013a458",
+    "chart-mobile.png": "47d01d9b644435d9ace5e91f7da5081602519827f9258fce851fcabe84c889f4"
+  }
+}

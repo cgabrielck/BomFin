@@ -1,0 +1,43 @@
+{
+  "status": "ok",
+  "metadata": {
+    "kind": "history_smoke",
+    "code": "US.AAPL",
+    "checked_at": "2026-11-25T13:22:05.821833Z",
+    "requested_date": "2026-11-24",
+    "source_timezone": "America/New_York",
+    "adjustment": "NONE",
+    "interval": "K_1M",
+    "live_rights": "unverified",
+    "market_state": "PRE_MARKET_BEGIN",
+    "quota_before": {
+      "used": 5,
+      "remaining": 295
+    },
+    "quota_after": {
+      "used": 5,
+      "remaining": 295
+    },
+    "requests": [
+      {
+        "session": "RTH",
+        "status": "empty",
+        "bars": [],
+        "has_more": false
+      },
+      {
+        "session": "ETH",
+        "status": "empty",
+        "bars": [],
+        "has_more": false
+      }
+    ],
+    "historical_evidence": {
+      "PRE": "not_sampled",
+      "RTH": "not_sampled",
+      "POST": "not_sampled"
+    },
+    "cleanup": "closed",
+    "errors": []
+  }
+}

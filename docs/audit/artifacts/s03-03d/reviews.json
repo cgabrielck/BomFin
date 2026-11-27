@@ -1,0 +1,23 @@
+{
+  "base": "2607a81a073a5fac2286b0fc0aa5742a5f6fabba",
+  "mode": "pre-commit staged diff under GabFin workflow",
+  "command": "git diff --cached 2607a81a073a5fac2286b0fc0aa5742a5f6fabba",
+  "commits_at_review": [],
+  "files": ["pyproject.toml", "services/gabfin/providers/futu/options.py", "services/gabfin/providers/futu/runner.py", "services/gabfin/providers/futu/worker.py", "tests/gabfin/test_options_smoke.py"],
+  "standards": {
+    "agent": "/root/options_standards",
+    "initial_context": "fork_turns=none",
+    "reviewed": ["default timeout", "independent option quota", "allowlist phase consistency", "Windows timezone dependency", "complete quote source time"],
+    "final_unresolved": 0,
+    "final_p3_recheck": "completed after an earlier temporary usage-limit failure; both added process-boundary tests independently passed"
+  },
+  "spec": {
+    "agent": "/root/options_spec",
+    "initial_context": "fork_turns=none",
+    "reviewed": ["default and remaining timeout budget", "partial window", "cleanup on provider errors", "allowlist phase consistency", "Windows dependency", "complete quote source time"],
+    "final_blocking": 0,
+    "final_unresolved": 0,
+    "final_p3_recheck": "2 passed, 62 deselected; staged diff --check passed"
+  },
+  "limitations": ["Reviews do not establish live freshness, realtime latency, option trading authority or guaranteed cleanup under arbitrary provider hangs."]
+}

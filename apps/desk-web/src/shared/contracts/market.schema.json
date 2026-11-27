@@ -1,0 +1,1014 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "ErrorFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "unauthorized",
+            "invalid_request",
+            "snapshot_required",
+            "slow_consumer"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "kind": {
+          "const": "error",
+          "title": "Kind",
+          "type": "string"
+        },
+        "version": {
+          "const": 1,
+          "title": "Version",
+          "type": "integer",
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "code"
+      ],
+      "title": "ErrorFrame",
+      "type": "object"
+    },
+    "UpdateFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "update",
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/MarketUpdate"
+        },
+        "version": {
+          "const": 1,
+          "title": "Version",
+          "type": "integer",
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "payload"
+      ],
+      "title": "UpdateFrame",
+      "type": "object"
+    },
+    "MarketUpdate": {
+      "additionalProperties": false,
+      "properties": {
+        "epoch": {
+          "format": "uuid",
+          "title": "Epoch",
+          "type": "string"
+        },
+        "event": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "bar": "#/$defs/BarMarketEvent",
+                  "quote": "#/$defs/QuoteMarketEvent",
+                  "trade": "#/$defs/TradeMarketEvent"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/QuoteMarketEvent"
+                },
+                {
+                  "$ref": "#/$defs/TradeMarketEvent"
+                },
+                {
+                  "$ref": "#/$defs/BarMarketEvent"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event"
+        },
+        "gap": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecoveryGap"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "health": {
+          "$ref": "#/$defs/FeedHealth"
+        },
+        "processed_at": {
+          "format": "date-time",
+          "title": "Processed At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "sequence": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "schema_version",
+        "epoch",
+        "sequence",
+        "processed_at",
+        "event",
+        "health",
+        "gap"
+      ],
+      "title": "MarketUpdate",
+      "type": "object"
+    },
+    "FeedHealth": {
+      "additionalProperties": false,
+      "properties": {
+        "connected": {
+          "title": "Connected",
+          "type": "boolean"
+        },
+        "connection_started_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Connection Started At"
+        },
+        "gap_pending": {
+          "title": "Gap Pending",
+          "type": "boolean"
+        },
+        "heartbeat_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Heartbeat At"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "source",
+        "connected",
+        "heartbeat_at",
+        "gap_pending"
+      ],
+      "title": "FeedHealth",
+      "type": "object"
+    },
+    "RecoveryGap": {
+      "additionalProperties": false,
+      "properties": {
+        "end": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        },
+        "gap_id": {
+          "format": "uuid",
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "gap_id",
+        "source",
+        "start",
+        "reason"
+      ],
+      "title": "RecoveryGap",
+      "type": "object"
+    },
+    "BarMarketEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "dedup_key": {
+          "minLength": 1,
+          "title": "Dedup Key",
+          "type": "string"
+        },
+        "event_at": {
+          "format": "date-time",
+          "title": "Event At",
+          "type": "string"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "bar",
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/Bar"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "source_seq": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Seq"
+        }
+      },
+      "required": [
+        "schema_version",
+        "event_id",
+        "instrument_id",
+        "event_at",
+        "received_at",
+        "available_at",
+        "source",
+        "source_seq",
+        "dedup_key",
+        "payload",
+        "kind"
+      ],
+      "title": "BarMarketEvent",
+      "type": "object"
+    },
+    "Bar": {
+      "additionalProperties": false,
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "close": {
+          "format": "decimal",
+          "title": "Close",
+          "type": "string",
+          "x-exclusiveMinimum": "0"
+        },
+        "corporate_action_policy": {
+          "minLength": 1,
+          "title": "Corporate Action Policy",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        },
+        "event_at": {
+          "format": "date-time",
+          "title": "Event At",
+          "type": "string"
+        },
+        "high": {
+          "format": "decimal",
+          "title": "High",
+          "type": "string",
+          "x-exclusiveMinimum": "0"
+        },
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "low": {
+          "format": "decimal",
+          "title": "Low",
+          "type": "string",
+          "x-exclusiveMinimum": "0"
+        },
+        "open": {
+          "format": "decimal",
+          "title": "Open",
+          "type": "string",
+          "x-exclusiveMinimum": "0"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        },
+        "revision": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "session": {
+          "$ref": "#/$defs/MarketSession"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/BarStatus"
+        },
+        "timeframe": {
+          "$ref": "#/$defs/Timeframe"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "format": "decimal",
+              "type": "string",
+              "x-minimum": "0"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Volume"
+        }
+      },
+      "required": [
+        "schema_version",
+        "instrument_id",
+        "source",
+        "timeframe",
+        "session",
+        "start",
+        "end",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "status",
+        "revision",
+        "corporate_action_policy",
+        "event_at",
+        "received_at",
+        "available_at"
+      ],
+      "title": "Bar",
+      "type": "object"
+    },
+    "Timeframe": {
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "title": "Count",
+          "type": "integer"
+        },
+        "unit": {
+          "$ref": "#/$defs/TimeUnit"
+        }
+      },
+      "required": [
+        "count",
+        "unit"
+      ],
+      "title": "Timeframe",
+      "type": "object"
+    },
+    "TimeUnit": {
+      "enum": [
+        "second",
+        "minute",
+        "hour",
+        "trading_day",
+        "week",
+        "month",
+        "year"
+      ],
+      "title": "TimeUnit",
+      "type": "string"
+    },
+    "BarStatus": {
+      "enum": [
+        "forming",
+        "final",
+        "corrected"
+      ],
+      "title": "BarStatus",
+      "type": "string"
+    },
+    "MarketSession": {
+      "enum": [
+        "pre_market",
+        "regular",
+        "post_market",
+        "overnight",
+        "closed",
+        "unknown"
+      ],
+      "title": "MarketSession",
+      "type": "string"
+    },
+    "TradeMarketEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "dedup_key": {
+          "minLength": 1,
+          "title": "Dedup Key",
+          "type": "string"
+        },
+        "event_at": {
+          "format": "date-time",
+          "title": "Event At",
+          "type": "string"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "trade",
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/TradeTick"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "source_seq": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Seq"
+        }
+      },
+      "required": [
+        "schema_version",
+        "event_id",
+        "instrument_id",
+        "event_at",
+        "received_at",
+        "available_at",
+        "source",
+        "source_seq",
+        "dedup_key",
+        "payload",
+        "kind"
+      ],
+      "title": "TradeMarketEvent",
+      "type": "object"
+    },
+    "TradeTick": {
+      "additionalProperties": false,
+      "description": "A market print, not an account fill or an instruction to trade.",
+      "properties": {
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "price": {
+          "format": "decimal",
+          "title": "Price",
+          "type": "string",
+          "x-exclusiveMinimum": "0"
+        },
+        "quantity": {
+          "format": "decimal",
+          "title": "Quantity",
+          "type": "string",
+          "x-exclusiveMinimum": "0"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "trade_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Trade Id"
+        }
+      },
+      "required": [
+        "schema_version",
+        "instrument_id",
+        "price",
+        "quantity",
+        "trade_id"
+      ],
+      "title": "TradeTick",
+      "type": "object"
+    },
+    "QuoteMarketEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "dedup_key": {
+          "minLength": 1,
+          "title": "Dedup Key",
+          "type": "string"
+        },
+        "event_at": {
+          "format": "date-time",
+          "title": "Event At",
+          "type": "string"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "kind": {
+          "const": "quote",
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/QuoteSnapshot"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "source_seq": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Seq"
+        }
+      },
+      "required": [
+        "schema_version",
+        "event_id",
+        "instrument_id",
+        "event_at",
+        "received_at",
+        "available_at",
+        "source",
+        "source_seq",
+        "dedup_key",
+        "payload",
+        "kind"
+      ],
+      "title": "QuoteMarketEvent",
+      "type": "object"
+    },
+    "QuoteSnapshot": {
+      "additionalProperties": false,
+      "description": "Per-price ages are relative to as_of, never a live wall clock.",
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "ask": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuotePoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "bid": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuotePoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "entitlements": {
+          "$ref": "#/$defs/QuoteEntitlements"
+        },
+        "feed": {
+          "minLength": 1,
+          "title": "Feed",
+          "type": "string"
+        },
+        "instrument_id": {
+          "format": "uuid",
+          "title": "Instrument Id",
+          "type": "string"
+        },
+        "last": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuotePoint"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quality": {
+          "items": {
+            "$ref": "#/$defs/QuoteQuality"
+          },
+          "title": "Quality",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "session": {
+          "$ref": "#/$defs/MarketSession"
+        }
+      },
+      "required": [
+        "schema_version",
+        "instrument_id",
+        "as_of",
+        "feed",
+        "session",
+        "bid",
+        "ask",
+        "last",
+        "quality",
+        "entitlements"
+      ],
+      "title": "QuoteSnapshot",
+      "type": "object"
+    },
+    "QuoteQuality": {
+      "enum": [
+        "unknown",
+        "delayed",
+        "indicative",
+        "stale",
+        "incomplete",
+        "clock_skew",
+        "crossed",
+        "permission_denied",
+        "unavailable"
+      ],
+      "title": "QuoteQuality",
+      "type": "string"
+    },
+    "QuotePoint": {
+      "additionalProperties": false,
+      "properties": {
+        "age_ms": {
+          "anyOf": [
+            {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Age Ms"
+        },
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "event_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Event At"
+        },
+        "price": {
+          "format": "decimal",
+          "title": "Price",
+          "type": "string",
+          "x-minimum": "0"
+        },
+        "received_at": {
+          "format": "date-time",
+          "title": "Received At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "price",
+        "event_at",
+        "received_at",
+        "available_at",
+        "age_ms"
+      ],
+      "title": "QuotePoint",
+      "type": "object"
+    },
+    "QuoteEntitlements": {
+      "additionalProperties": false,
+      "description": "Reported metadata; actual capability verification is a service duty.",
+      "properties": {
+        "capability_snapshot_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capability Snapshot Id"
+        },
+        "checked_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Checked At"
+        },
+        "status": {
+          "$ref": "#/$defs/EntitlementStatus"
+        }
+      },
+      "required": [
+        "status",
+        "checked_at"
+      ],
+      "title": "QuoteEntitlements",
+      "type": "object"
+    },
+    "EntitlementStatus": {
+      "enum": [
+        "unknown",
+        "realtime",
+        "delayed",
+        "indicative",
+        "denied"
+      ],
+      "title": "EntitlementStatus",
+      "type": "string"
+    },
+    "SnapshotFrame": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "const": "snapshot",
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/MarketSnapshot"
+        },
+        "version": {
+          "const": 1,
+          "title": "Version",
+          "type": "integer",
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "version",
+        "kind",
+        "payload"
+      ],
+      "title": "SnapshotFrame",
+      "type": "object"
+    },
+    "MarketSnapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "bars": {
+          "items": {
+            "$ref": "#/$defs/BarMarketEvent"
+          },
+          "title": "Bars",
+          "type": "array"
+        },
+        "cursor": {
+          "maximum": 9007199254740991,
+          "minimum": 0,
+          "title": "Cursor",
+          "type": "integer"
+        },
+        "epoch": {
+          "format": "uuid",
+          "title": "Epoch",
+          "type": "string"
+        },
+        "gap": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RecoveryGap"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "health": {
+          "$ref": "#/$defs/FeedHealth"
+        },
+        "quotes": {
+          "items": {
+            "$ref": "#/$defs/QuoteMarketEvent"
+          },
+          "title": "Quotes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_version",
+        "epoch",
+        "cursor",
+        "as_of",
+        "quotes",
+        "bars",
+        "health",
+        "gap"
+      ],
+      "title": "MarketSnapshot",
+      "type": "object"
+    }
+  }
+}

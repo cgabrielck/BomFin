@@ -1,0 +1,78 @@
+{
+  "base": "1802198648ce465db5f3dba79a342756a7f9ccc5",
+  "tree": "e28f6d8c6dedd33c62b6717af12b6bd552130785",
+  "e2e": {
+    "startTime": "2026-11-26T04:12:51.899Z",
+    "duration": 12536.473,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "production_capture": {
+    "productionBuild": true,
+    "errors": [],
+    "external": [],
+    "mobileOverflow": false,
+    "screenshots": 4
+  },
+  "preservation": {
+    "baseline_files": 563,
+    "unexpected_changes": [],
+    "original_lock_sha256": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6",
+    "original_lock_preserved": true,
+    "allowed_baseline_change": ".gitignore: add test-results/playwright-report ignores"
+  },
+  "production_audit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "fixture_validation": "3 canonical MarketSnapshot passed",
+  "typecheck_exit": 0,
+  "build_exit": 0,
+  "review": "author self-review; demo UI, no auth/trade/backend behavior changes",
+  "original_lock_staged": false,
+  "dist_files": {
+    "index.html": {
+      "bytes": 401,
+      "sha256": "4e6ce3141cb8a5918e37053c4a2c430ad0d5c644a1684b531344f643df8ebe70"
+    },
+    "assets/index-BJayrxvD.css": {
+      "bytes": 11454,
+      "sha256": "2b7f7e660e24a15bfc1c5dabc98c875c693f805eabd253bdbdfd6f372d31a05f"
+    },
+    "assets/index-ChsdVu-T.js": {
+      "bytes": 267010,
+      "sha256": "06c2402c7adc5b17b8b63eba277672974e392097311231d7e95270b231cbf5ae"
+    },
+    "assets/StockDetail-C-C-TUqx.js": {
+      "bytes": 5203,
+      "sha256": "96767eb20b9bb3c47b862be8a35b0d70ff78c5cdcb1d373ae5c3e4db06e2abe9"
+    },
+    "demo/account.json": {
+      "bytes": 54,
+      "sha256": "fc133e00eda4e9ae66d289b8ce58577357b0e17f9e2e07dcd6fd2a821cc77725"
+    },
+    "demo/markets/AAPL.json": {
+      "bytes": 1537,
+      "sha256": "5a13c516df114b2397e3c9f86401570d7984a3cfa474a1a81e4e83317ac71c6d"
+    },
+    "demo/markets/MSFT.json": {
+      "bytes": 1537,
+      "sha256": "93f7c72e0b3451b75cef0a2b2f94682fe448906e1f78ea2fe388b889b4b544bf"
+    },
+    "demo/markets/NVDA.json": {
+      "bytes": 1537,
+      "sha256": "057c1e1fdbc8f54a3586ca7549583fc2f6706435b29413b44f8c618a53270973"
+    }
+  },
+  "commit": "898cc04b7850451ae7fde96f5ff422e78250b1a5",
+  "final_status": [
+    "?? web/package-lock.json"
+  ],
+  "original_lock_after_commit": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6"
+}

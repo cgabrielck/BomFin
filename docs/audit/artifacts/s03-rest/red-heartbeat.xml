@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.995" timestamp="2026-11-26T03:04:11.939199+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_provider_heartbeat_is_independent_of_market_events_and_sanitized" time="1.562"><failure message="AssertionError: assert [] == [{'version': ...ed_in': True}]&#10;  &#10;  Right contains one more item: {'version': 1, 'kind': 'heartbeat', 'checked_at': '2026-11-25T15:00:00Z', 'quote_logged_in': True}&#10;  Use -v to get more diff">tests\gabfin\test_futu_quote_callback.py:248: in test_provider_heartbeat_is_independent_of_market_events_and_sanitized
+    assert beats == [dict(version=1, kind='heartbeat', checked_at='2026-11-25T15:00:00Z', quote_logged_in=True)]
+E   AssertionError: assert [] == [{'version': ...ed_in': True}]
+E     
+E     Right contains one more item: {'version': 1, 'kind': 'heartbeat', 'checked_at': '2026-11-25T15:00:00Z', 'quote_logged_in': True}
+E     Use -v to get more diff</failure></testcase></testsuite></testsuites>

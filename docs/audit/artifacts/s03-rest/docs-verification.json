@@ -1,0 +1,25 @@
+{
+  "modified": [
+    "docs/audit/feed-entitlements.md",
+    "docs/memory/architecture.md",
+    "docs/memory/execution.md",
+    "docs/memory/progress.md",
+    "docs/memory/tasks.md",
+    "docs/memory/tooling.md",
+    "docs/superpowers/plans/2026-11-25-gabfin-plus-sections.md",
+    "docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md",
+    "docs/tickets/s03-stream/issues/02-market-state-recovery.md"
+  ],
+  "new": [
+    "docs/audit/s03-completion-2026-11-26.md",
+    "docs/tickets/s03-stream/issues/03-feed-evidence-g2.md"
+  ],
+  "broken_links": [],
+  "memory_line_counts": {
+    "docs/memory/architecture.md": 75,
+    "docs/memory/execution.md": 22,
+    "docs/memory/progress.md": 61,
+    "docs/memory/tasks.md": 18,
+    "docs/memory/tooling.md": 48
+  }
+}

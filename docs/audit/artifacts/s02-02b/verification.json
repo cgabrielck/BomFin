@@ -1,0 +1,113 @@
+{
+  "base_head": "24ae093b7b8cbf7a4263faaf1a9e0a616f8d5c35",
+  "current_head": "5891b2ed1ef8d604535c2ce564eaba7f6f7949bc",
+  "source_paths": [
+    "services/gabfin/contracts/common.py",
+    "services/gabfin/contracts/events.py",
+    "services/gabfin/contracts/market.py",
+    "tests/gabfin/conftest.py",
+    "tests/gabfin/test_market_contracts.py",
+    "tests/gabfin/test_market_events.py"
+  ],
+  "unchanged_original_files": 482,
+  "old_common_declarations_preserved": 13,
+  "lockfile_preserved": true,
+  "baseline_evidence_preserved": true,
+  "new_cases": 118,
+  "contract_cases": 204,
+  "results": {
+    "market-red-final": {
+      "tests": 77,
+      "failures": 77,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 0,
+      "seconds": 2.755
+    },
+    "market-green": {
+      "tests": 77,
+      "failures": 1,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 76,
+      "seconds": 2.173
+    },
+    "market-final": {
+      "tests": 77,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 77,
+      "seconds": 1.824
+    },
+    "events-red": {
+      "tests": 33,
+      "failures": 33,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 0,
+      "seconds": 2.209
+    },
+    "events-source-red": {
+      "tests": 2,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 0,
+      "seconds": 1.781
+    },
+    "events-green": {
+      "tests": 35,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 35,
+      "seconds": 1.743
+    },
+    "contracts-green": {
+      "tests": 198,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 198,
+      "seconds": 2.151
+    },
+    "contracts-final": {
+      "tests": 204,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 204,
+      "seconds": 2.265
+    },
+    "full-regression": {
+      "tests": 1410,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "passed": 1406,
+      "seconds": 65.919
+    },
+    "full-final": {
+      "tests": 1416,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 4,
+      "passed": 1412,
+      "seconds": 65.425
+    }
+  },
+  "final_console_seconds": 65.59,
+  "wheel_sha256": "09da946f38ec4c5aac9ad8366534ea525740219bcea3c2e6005d150d9044a0e9",
+  "wheel_matches_source": true,
+  "schema_smoke": {
+    "isolated_import": "C:\\Users\\001\\Desktop\\GabFin-ai-trade\\.worktrees\\gabfin-s01\\services\\gabfin\\__init__.py",
+    "schemas_checked": 4,
+    "market_event_roundtrip": true,
+    "backend_imported": false
+  },
+  "legacy_journal_archived": true,
+  "worker_pid_present": false,
+  "known_skips": "4 optional Postgres cases, missing psycopg",
+  "known_warning": "Pandas4Warning: backend/research/comps.py:26"
+}

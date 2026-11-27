@@ -1,0 +1,42 @@
+{
+  "baseline_head": "898cc04b7850451ae7fde96f5ff422e78250b1a5",
+  "tracked_baseline_files": 591,
+  "owned_files": [
+    "apps/desk-web/README.md",
+    "apps/desk-web/package.json",
+    "apps/desk-web/src/app/App.tsx",
+    "apps/desk-web/src/app/ServerSession.tsx",
+    "apps/desk-web/src/app/providers.tsx",
+    "apps/desk-web/src/app/styles.css",
+    "apps/desk-web/src/features/market/AccountSummary.tsx",
+    "apps/desk-web/src/features/market/StockDetail.tsx",
+    "apps/desk-web/src/features/market/useMarketSubscription.ts",
+    "apps/desk-web/src/shared/contracts/generated.ts",
+    "apps/desk-web/src/shared/contracts/market.schema.json",
+    "apps/desk-web/src/shared/contracts/validate-market.ts",
+    "apps/desk-web/src/shared/transport/live.ts",
+    "apps/desk-web/tsconfig.json",
+    "package-lock.json",
+    "playwright.config.ts",
+    "pyproject.toml",
+    "schemas/gabfin-1.0.json",
+    "scripts/generate-web-contracts.mjs",
+    "services/gabfin/api/app.py",
+    "services/gabfin/api/auth.py",
+    "services/gabfin/api/market.py",
+    "services/gabfin/api/market_gateway.py",
+    "services/gabfin/contracts/web_market.py",
+    "tests/e2e/fixtures/market-server.py",
+    "tests/e2e/fixtures/secure-market.ts",
+    "tests/e2e/secure-market.spec.ts",
+    "tests/gabfin/test_market_api.py"
+  ],
+  "unexpected_baseline_changes": [],
+  "unstaged_tracked": [],
+  "untracked": [
+    "web/package-lock.json"
+  ],
+  "original_lock_sha256": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6",
+  "original_lock_preserved": true,
+  "index_tree": "24c9183fef8aa8c93f364bf4986408c3f70e1876"
+}

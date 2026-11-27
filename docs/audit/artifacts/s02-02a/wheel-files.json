@@ -1,0 +1,10 @@
+[
+  "gabfin/__init__.py",
+  "gabfin/contracts/__init__.py",
+  "gabfin/contracts/common.py",
+  "gabfin/contracts/intent.py",
+  "gabfin-0.1.0.dist-info/METADATA",
+  "gabfin-0.1.0.dist-info/WHEEL",
+  "gabfin-0.1.0.dist-info/top_level.txt",
+  "gabfin-0.1.0.dist-info/RECORD"
+]

@@ -1,0 +1,23 @@
+{
+  "base": "6c28d9dd79d496a74153a5242f891893fc618b71",
+  "previous_files_preserved_except": [
+    "services/gabfin/providers/futu/runner.py",
+    "services/gabfin/providers/futu/worker.py"
+  ],
+  "lock_preserved": true,
+  "wheel_matches_source": true,
+  "wheel_sha256": "596457044a6c39a1b38503f55e750ebe3457f6b53d956c09cf252d46017c7cc0",
+  "head": "2607a81a073a5fac2286b0fc0aa5742a5f6fabba",
+  "full": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "4",
+    "tests": "1778",
+    "time": "73.476",
+    "timestamp": "2026-11-25T15:48:07.819949+08:00",
+    "hostname": "DESKTOP-BTBR5SC"
+  },
+  "documents_checked": 7,
+  "local_links_checked": 49
+}

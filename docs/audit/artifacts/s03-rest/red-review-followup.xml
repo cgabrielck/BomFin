@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="2.381" timestamp="2026-11-26T08:55:15.778055+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_market_coordinator" name="test_history_duplicate_rows_do_not_count_as_complete_missing_prints" time="1.469"><failure message="ValueError: History event outside recovery window">tests\gabfin\test_market_coordinator.py:271: in test_history_duplicate_rows_do_not_count_as_complete_missing_prints
+    assert not market.recover(batch)
+               ^^^^^^^^^^^^^^^^^^^^^
+services\gabfin\market\coordinator.py:241: in recover
+    raise ValueError('History event outside recovery window')
+E   ValueError: History event outside recovery window</failure></testcase><testcase classname="tests.gabfin.test_market_coordinator" name="test_contiguous_sequence_cannot_reset_or_relabel_a_prior_number" time="0.030"><failure message="Failed: DID NOT RAISE ValueError">tests\gabfin\test_market_coordinator.py:283: in test_contiguous_sequence_cannot_reset_or_relabel_a_prior_number
+    with pytest.raises(ValueError, match='sequence'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError</failure></testcase><testcase classname="tests.gabfin.test_market_coordinator" name="test_skewed_quote_cannot_fill_a_contiguous_hole_through_history" time="0.016"><failure message="AssertionError: assert not True&#10; +  where True = recover(RecoveryBatch(schema_version='1.0', gap_id=UUID('be99ec25-8280-4abc-817e-4b3c4b1c18dd'), source='test-feed', start=dat... 11, 25, 15, 0, 10, tzinfo=datetime.timezone.utc), record_count=1, complete=True, has_more=False, empty_reason=None),)))&#10; +    where recover = &lt;gabfin.market.coordinator.MarketCoordinator object at 0x0000022962CC3CB0&gt;.recover">tests\gabfin\test_market_coordinator.py:303: in test_skewed_quote_cannot_fill_a_contiguous_hole_through_history
+    assert not market.recover(batch)
+E   AssertionError: assert not True
+E    +  where True = recover(RecoveryBatch(schema_version='1.0', gap_id=UUID('be99ec25-8280-4abc-817e-4b3c4b1c18dd'), source='test-feed', start=dat... 11, 25, 15, 0, 10, tzinfo=datetime.timezone.utc), record_count=1, complete=True, has_more=False, empty_reason=None),)))
+E    +    where recover = &lt;gabfin.market.coordinator.MarketCoordinator object at 0x0000022962CC3CB0&gt;.recover</failure></testcase></testsuite></testsuites>

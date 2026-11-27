@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="1.929" timestamp="2026-11-25T14:55:05.962510+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_session_auth" name="test_role_ceiling_and_ownership" time="1.323"><failure message="ModuleNotFoundError: No module named 'gabfin.api'">tests\gabfin\test_session_auth.py:7: in test_role_ceiling_and_ownership
+    from gabfin.api.capabilities import authorize
+E   ModuleNotFoundError: No module named 'gabfin.api'</failure></testcase><testcase classname="tests.gabfin.test_session_auth" name="test_pairing_single_use_expiry_and_restart" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.api'">tests\gabfin\test_session_auth.py:14: in test_pairing_single_use_expiry_and_restart
+    from gabfin.api.sessions import SessionStore
+E   ModuleNotFoundError: No module named 'gabfin.api'</failure></testcase><testcase classname="tests.gabfin.test_session_auth" name="test_auth_boundary" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.api'">tests\gabfin\test_session_auth.py:22: in test_auth_boundary
+    from gabfin.api.sessions import SessionStore
+E   ModuleNotFoundError: No module named 'gabfin.api'</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="3" time="2.150" timestamp="2026-11-26T03:53:51.067710+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_freshness" name="test_read_time_market_close_cannot_borrow_capture_session" time="1.427"><failure message="TypeError: entry_eligible() got an unexpected keyword argument 'calendar'">tests\gabfin\test_freshness.py:108: in test_read_time_market_close_cannot_borrow_capture_session
+    result = entry_eligible(value, policy(), now, health=health(heartbeat_at=now), calendar=calendar())
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: entry_eligible() got an unexpected keyword argument 'calendar'</failure></testcase><testcase classname="tests.gabfin.test_freshness" name="test_source_time_ahead_of_its_receipt_is_rejected_even_when_now_is_later" time="0.003"><failure message="TypeError: entry_eligible() got an unexpected keyword argument 'calendar'">tests\gabfin\test_freshness.py:116: in test_source_time_ahead_of_its_receipt_is_rejected_even_when_now_is_later
+    result = entry_eligible(QuoteSnapshot.model_validate(data), policy(), NOW,
+E   TypeError: entry_eligible() got an unexpected keyword argument 'calendar'</failure></testcase><testcase classname="tests.gabfin.test_freshness" name="test_original_three_argument_interface_fails_closed_without_context" time="0.004"><failure message="TypeError: entry_eligible() takes 2 positional arguments but 3 were given">tests\gabfin\test_freshness.py:122: in test_original_three_argument_interface_fails_closed_without_context
+    result = entry_eligible(quote(), policy(), NOW)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: entry_eligible() takes 2 positional arguments but 3 were given</failure></testcase></testsuite></testsuites>

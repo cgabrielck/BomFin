@@ -1,0 +1,69 @@
+{
+  "base": "3073cf3b41ac2724979442960b314a0c92598ca0",
+  "source_commit": "1802198648ce465db5f3dba79a342756a7f9ccc5",
+  "final_tree": "63f71a854aefff3de147404f82e6fd9fda7b315a",
+  "diff_command": "git diff --cached 3073cf3b41ac2724979442960b314a0c92598ca0 (before commit)",
+  "committed_diff": "git diff 3073cf3b41ac2724979442960b314a0c92598ca0...1802198648ce465db5f3dba79a342756a7f9ccc5",
+  "reviewers": [
+    {
+      "agent": "/root/s03_rest_standards",
+      "fresh_context": true,
+      "read_only": true,
+      "final_result": "no remaining blocker in checked scope",
+      "independent_focused_tests": 7,
+      "original_findings_closed": [
+        "ManagedFeedAdapter explicit contract",
+        "three-positional freshness API",
+        "shared quote-resync validation",
+        "numeric sequence parsing",
+        "MarketCursor value object",
+        "provider-owned cleanup mapping",
+        "unused wire error removal"
+      ],
+      "followup_findings_closed": [
+        "rejected quote cannot fill sequence hole",
+        "exact requested-key release receipt",
+        "named sequence state",
+        "single-pass history grouping",
+        "contradictory provider cleanup errors"
+      ]
+    },
+    {
+      "agent": "/root/s03_rest_spec",
+      "fresh_context": true,
+      "read_only": true,
+      "final_result": "no remaining code blocker in checked scope",
+      "independent_focused_tests": 8,
+      "original_findings_closed": [
+        "current-session and source-clock checks",
+        "post-cutover accepted quote proof",
+        "history scope receipts",
+        "declared contiguous sequence gaps",
+        "retained dual trade identity",
+        "heartbeat-failure restart"
+      ],
+      "followup_findings_closed": [
+        "unique history records",
+        "sequence reset faults",
+        "view-bound and slow-reader resume",
+        "finite diagnostic failure propagation"
+      ]
+    }
+  ],
+  "unverified_external": [
+    "realtime/BBO/PRE/POST rights and channels",
+    "actual trade/bar history recovery",
+    "UI render tracing deferred to S04"
+  ],
+  "reviewers_did_not": [
+    "write files",
+    "run full suite",
+    "connect live provider"
+  ],
+  "documentation_review": {
+    "scope": "docs-verification.json and docs-close.diff; nine modified files plus two new files",
+    "spec": "Composite callback/history checkbox split; external history integration remains unchecked G2; correction confirmed",
+    "standards": "Spec links/blocker, pending order-delivery evidence and historical architecture status corrected and confirmed",
+    "result": "No remaining finding in reviewed documentation scope"
+  }
+}

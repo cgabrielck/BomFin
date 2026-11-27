@@ -1,0 +1,68 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+.venv312/
+.venv-local/
+env/
+*.egg-info/
+build/
+dist/
+
+# Node
+node_modules/
+test-results/
+playwright-report/
+web/dist/
+apps/desk-web/dist/
+
+# Secrets — never commit real keys
+.env
+*.pem
+*.key
+
+# Tooling and local checkouts — reproducible from the records in docs/audit
+.tools/
+.worktrees/
+output/
+.playwright-cli/
+
+# Runtime state
+runtime/
+data/
+config/mandate.json
+*.log
+*.sqlite3
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# impeccable-ignore-start
+# Ephemeral output, runtime state, and per-dev overrides.
+# Shared artifacts stay tracked: config.json, live/config.json,
+# design.json, surfaces/*.md, critique/*.md.
+**/.impeccable/config.local.json
+**/.impeccable/hook.cache.json
+**/.impeccable/hook.pending.json
+**/.impeccable/*.png
+**/.impeccable/review/
+**/.impeccable/questions/
+**/.impeccable/live/server.json
+**/.impeccable/live/sessions/
+**/.impeccable/live/previews/
+**/.impeccable/live/annotations/
+**/.impeccable/live/cache/
+**/.impeccable/live/manual-edit-apply-transaction.json
+**/.impeccable/live/manual-edit-events.jsonl
+**/.impeccable/live/manual-edit-evidence/
+**/.impeccable/live/pending-manual-edits.json
+**/.impeccable/live/deferred-svelte-component-accepts.json
+**/.impeccable/live/*.png
+# Platform engine binary. The launcher downloads it on first run.
+.cursor/skills/impeccable/scripts/bin/
+# impeccable-ignore-end

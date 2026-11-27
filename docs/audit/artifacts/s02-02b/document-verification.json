@@ -1,0 +1,12 @@
+{
+  "documents": 9,
+  "local_links": 49,
+  "progress_entries": 10,
+  "fences_passed": true,
+  "whitespace_passed": true,
+  "memory_max_lines": 73,
+  "source_head": "5891b2ed1ef8d604535c2ce564eaba7f6f7949bc",
+  "tracked_worktree_clean": true,
+  "staged_changes": false,
+  "retained_untracked": "web/package-lock.json"
+}

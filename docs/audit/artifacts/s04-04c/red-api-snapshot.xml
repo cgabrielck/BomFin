@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.818" timestamp="2026-11-26T12:43:30.236678+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_market_api" name="test_authorized_snapshot_preserves_decimal_and_closes_read_only_connection" time="1.527"><failure message="assert 503 == 200&#10; +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code">tests\gabfin\test_market_api.py:75: in test_authorized_snapshot_preserves_decimal_and_closes_read_only_connection
+    assert response.status_code == 200
+E   assert 503 == 200
+E    +  where 503 = &lt;Response [503 Service Unavailable]&gt;.status_code</failure></testcase></testsuite></testsuites>

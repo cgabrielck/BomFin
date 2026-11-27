@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="11" time="6.023" timestamp="2026-11-26T02:33:08.505222+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch0]" time="1.971"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat0/external_sdk_stub.opened').exists&#10; +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat0/external_sdk_stub.opened') = with_suffix('.opened')&#10;[+1 more line; full report in element text]">tests\gabfin\test_futu_quote_adapter.py:291: in test_worker_rejects_bad_private_config_before_opening_sdk_context
+    assert not worker.with_suffix('.opened').exists()
+E   AssertionError: assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat0/external_sdk_stub.opened').exists
+E    +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat0/external_sdk_stub.opened') = with_suffix('.opened')
+E    +        where with_suffix = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat0/external_sdk_stub.py').with_suffix</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch1]" time="0.326"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat1/external_sdk_stub.opened').exists&#10; +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat1/external_sdk_stub.opened') = with_suffix('.opened')&#10;[+1 more line; full report in element text]">tests\gabfin\test_futu_quote_adapter.py:291: in test_worker_rejects_bad_private_config_before_opening_sdk_context
+    assert not worker.with_suffix('.opened').exists()
+E   AssertionError: assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat1/external_sdk_stub.opened').exists
+E    +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat1/external_sdk_stub.opened') = with_suffix('.opened')
+E    +        where with_suffix = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat1/external_sdk_stub.py').with_suffix</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch2]" time="0.337" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch3]" time="0.299"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat3/external_sdk_stub.opened').exists&#10; +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat3/external_sdk_stub.opened') = with_suffix('.opened')&#10;[+1 more line; full report in element text]">tests\gabfin\test_futu_quote_adapter.py:291: in test_worker_rejects_bad_private_config_before_opening_sdk_context
+    assert not worker.with_suffix('.opened').exists()
+E   AssertionError: assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat3/external_sdk_stub.opened').exists
+E    +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat3/external_sdk_stub.opened') = with_suffix('.opened')
+E    +        where with_suffix = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat3/external_sdk_stub.py').with_suffix</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch4]" time="0.286"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat4/external_sdk_stub.opened').exists&#10; +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat4/external_sdk_stub.opened') = with_suffix('.opened')&#10;[+1 more line; full report in element text]">tests\gabfin\test_futu_quote_adapter.py:291: in test_worker_rejects_bad_private_config_before_opening_sdk_context
+    assert not worker.with_suffix('.opened').exists()
+E   AssertionError: assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat4/external_sdk_stub.opened').exists
+E    +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat4/external_sdk_stub.opened') = with_suffix('.opened')
+E    +        where with_suffix = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat4/external_sdk_stub.py').with_suffix</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch5]" time="0.280"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat5/external_sdk_stub.opened').exists&#10; +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat5/external_sdk_stub.opened') = with_suffix('.opened')&#10;[+1 more line; full report in element text]">tests\gabfin\test_futu_quote_adapter.py:291: in test_worker_rejects_bad_private_config_before_opening_sdk_context
+    assert not worker.with_suffix('.opened').exists()
+E   AssertionError: assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat5/external_sdk_stub.opened').exists
+E    +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat5/external_sdk_stub.opened') = with_suffix('.opened')
+E    +        where with_suffix = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat5/external_sdk_stub.py').with_suffix</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch6]" time="0.292" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch7]" time="0.309"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat7/external_sdk_stub.opened').exists&#10; +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat7/external_sdk_stub.opened') = with_suffix('.opened')&#10;[+1 more line; full report in element text]">tests\gabfin\test_futu_quote_adapter.py:291: in test_worker_rejects_bad_private_config_before_opening_sdk_context
+    assert not worker.with_suffix('.opened').exists()
+E   AssertionError: assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat7/external_sdk_stub.opened').exists
+E    +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat7/external_sdk_stub.opened') = with_suffix('.opened')
+E    +        where with_suffix = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat7/external_sdk_stub.py').with_suffix</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_worker_rejects_bad_private_config_before_opening_sdk_context[patch8]" time="0.288"><failure message="AssertionError: assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat8/external_sdk_stub.opened').exists&#10; +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat8/external_sdk_stub.opened') = with_suffix('.opened')&#10;[+1 more line; full report in element text]">tests\gabfin\test_futu_quote_adapter.py:291: in test_worker_rejects_bad_private_config_before_opening_sdk_context
+    assert not worker.with_suffix('.opened').exists()
+E   AssertionError: assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat8/external_sdk_stub.opened').exists
+E    +      where WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat8/external_sdk_stub.opened') = with_suffix('.opened')
+E    +        where with_suffix = WindowsPath('C:/Users/001/AppData/Local/Temp/pytest-of-001/pytest-152/test_worker_rejects_bad_privat8/external_sdk_stub.py').with_suffix</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_terminal_worker_cannot_reuse_old_successful_subscription_ack" time="0.166"><failure message="Failed: DID NOT RAISE RuntimeError">tests\gabfin\test_futu_quote_adapter.py:318: in test_terminal_worker_cannot_reuse_old_successful_subscription_ack
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:313: in scenario
+    with pytest.raises(RuntimeError, match='single-use'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE RuntimeError</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_clean_cancel_before_any_subscription_is_not_a_cleanup_failure" time="0.145"><failure message="AssertionError: assert 'quote_cleanup_incomplete' is None&#10; +  where 'quote_cleanup_incomplete' = &lt;gabfin.providers.futu.adapter.FutuQuoteAdapter object at 0x000002AF86A128D0&gt;.failure">tests\gabfin\test_futu_quote_adapter.py:339: in test_clean_cancel_before_any_subscription_is_not_a_cleanup_failure
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:338: in scenario
+    assert adapter.failure is None
+E   AssertionError: assert 'quote_cleanup_incomplete' is None
+E    +  where 'quote_cleanup_incomplete' = &lt;gabfin.providers.futu.adapter.FutuQuoteAdapter object at 0x000002AF86A128D0&gt;.failure</failure></testcase></testsuite></testsuites>

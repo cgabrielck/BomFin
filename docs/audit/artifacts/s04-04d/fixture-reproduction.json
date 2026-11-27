@@ -1,0 +1,8 @@
+{
+  "reproducible": true,
+  "sha256": {
+    "AAPL.json": "0e34be4e898a9b72135dc1d0f7f169d93d81eeb5e0c9c360cfabddc0bb3011a4",
+    "MSFT.json": "8e30a2cd7b5ae007d1446eb11bfadcc9306cb7080acdb076fd6e2c312c0e282d",
+    "NVDA.json": "c1fd9ff1e7942ab803efff45b5c8afb9a4c013094ef9704caf91331483cbedb2"
+  }
+}

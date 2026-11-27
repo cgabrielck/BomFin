@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="5.166" timestamp="2026-11-26T02:26:56.918563+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_real_worker_can_end_without_parent_stop_and_without_buffered_stdin_crash[existing]" time="2.768"><failure message="AssertionError: assert 'quote_worker_failed' == 'quote_cleanup_incomplete'&#10;  &#10;  - quote_cleanup_incomplete&#10;  + quote_worker_failed">tests\gabfin\test_futu_quote_adapter.py:257: in test_real_worker_can_end_without_parent_stop_and_without_buffered_stdin_crash
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:256: in scenario
+    assert adapter.failure == ('quote_cleanup_incomplete' if mode == 'existing' else None)
+E   AssertionError: assert 'quote_worker_failed' == 'quote_cleanup_incomplete'
+E     
+E     - quote_cleanup_incomplete
+E     + quote_worker_failed</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_real_worker_can_end_without_parent_stop_and_without_buffered_stdin_crash[natural]" time="1.313"><failure message="AssertionError: assert 'quote_worker_failed' == None&#10; +  where 'quote_worker_failed' = &lt;gabfin.providers.futu.adapter.FutuQuoteAdapter object at 0x00000251D468A6F0&gt;.failure">tests\gabfin\test_futu_quote_adapter.py:257: in test_real_worker_can_end_without_parent_stop_and_without_buffered_stdin_crash
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:256: in scenario
+    assert adapter.failure == ('quote_cleanup_incomplete' if mode == 'existing' else None)
+E   AssertionError: assert 'quote_worker_failed' == None
+E    +  where 'quote_worker_failed' = &lt;gabfin.providers.futu.adapter.FutuQuoteAdapter object at 0x00000251D468A6F0&gt;.failure</failure></testcase></testsuite></testsuites>

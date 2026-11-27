@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="1.753" timestamp="2026-11-25T14:54:03.126651+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_migrations" name="test_migrations_reentrant_and_unknown" time="1.372"><failure message="ModuleNotFoundError: No module named 'gabfin.storage'">tests\gabfin\test_migrations.py:5: in test_migrations_reentrant_and_unknown
+    from gabfin.storage.database import open_database
+E   ModuleNotFoundError: No module named 'gabfin.storage'</failure></testcase><testcase classname="tests.gabfin.test_migrations" name="test_migration_crash_atomic" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.storage'">tests\gabfin\test_migrations.py:16: in test_migration_crash_atomic
+    from gabfin.storage import migrations as m
+E   ModuleNotFoundError: No module named 'gabfin.storage'</failure></testcase></testsuite></testsuites>

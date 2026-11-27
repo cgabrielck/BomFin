@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="5.854" timestamp="2026-11-26T12:42:25.659958+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_market_api" name="test_snapshot_requires_session_before_opening_market_connection" time="4.453"><failure message="ModuleNotFoundError: No module named 'gabfin.api.app'">tests\gabfin\test_market_api.py:57: in test_snapshot_requires_session_before_opening_market_connection
+    app, _, _, connections = setup(tmp_path)
+                             ^^^^^^^^^^^^^^^
+tests\gabfin\test_market_api.py:38: in setup
+    from gabfin.api.app import create_market_app
+E   ModuleNotFoundError: No module named 'gabfin.api.app'</failure></testcase></testsuite></testsuites>

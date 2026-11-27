@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.795" timestamp="2026-11-25T09:14:18.840879+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.api.test_mobile_desk_ro" name="test_serve_doc_is_private_mesh_and_adr_stays_draft" time="0.010"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\001\\Desktop\\GabFin-ai-trade\\.worktrees\\gabfin-s01\\docs\\ADR-005-mobile-desk-readonly.md'">tests\api\test_mobile_desk_ro.py:243: in test_serve_doc_is_private_mesh_and_adr_stays_draft
+    adr = ADR.read_text(encoding="utf-8").splitlines()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\pathlib.py:1027: in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\pathlib.py:1013: in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\001\\Desktop\\GabFin-ai-trade\\.worktrees\\gabfin-s01\\docs\\ADR-005-mobile-desk-readonly.md'</failure></testcase></testsuite></testsuites>

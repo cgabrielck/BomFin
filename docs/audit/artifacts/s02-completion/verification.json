@@ -1,0 +1,20 @@
+{
+  "base": "f31fd661ec18f231829456442be0725d17968924",
+  "original_preserved_except_pyproject": true,
+  "lock_preserved": true,
+  "wheel_matches_source": true,
+  "wheel_sha256": "c55922a412fd0c084bc13889af20cb9aa7baaa4bc6b2c466a514531500d984c3",
+  "head": "c6d1443f227d650cf59dbe49330e890f06e5bf36",
+  "acceptance": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "4",
+    "tests": "1718",
+    "time": "67.681",
+    "timestamp": "2026-11-25T15:02:27.648352+08:00",
+    "hostname": "DESKTOP-BTBR5SC"
+  },
+  "documents_checked": 8,
+  "local_links_checked": 41
+}

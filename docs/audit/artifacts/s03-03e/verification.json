@@ -1,0 +1,22 @@
+{
+  "base": "953b5d274a10cb7aeaf84ae071f0bcadc1e26693",
+  "head": "87e295311fd7ef9dbb77c930084b15dc1b4dff23",
+  "scope": [
+    "services/gabfin/providers/futu/history.py",
+    "services/gabfin/providers/futu/history_wire.py",
+    "services/gabfin/providers/futu/runner.py",
+    "services/gabfin/providers/futu/worker.py",
+    "tests/gabfin/test_history_smoke.py"
+  ],
+  "unrelated_tracked_changes": [],
+  "original_lock_preserved": true,
+  "wheel_matches_python_source_files": 32,
+  "wheel_sha256": "b4d4902bc1e05c4934816e6225463ef6ca432f870ffb71af0ae281f8a926d044",
+  "clean_wheel_verified": true,
+  "live_result_revalidated": true,
+  "full_passed": 1902,
+  "full_skipped": 4,
+  "full_failed": 0,
+  "gabfin_passed": 694,
+  "source_status": "?? web/package-lock.json"
+}

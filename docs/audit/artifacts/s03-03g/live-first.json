@@ -1,0 +1,178 @@
+{
+  "started_at": "2026-11-25T14:55:25.266891+00:00",
+  "ended_at": "2026-11-25T14:56:31.841273+00:00",
+  "observation_seconds": 8,
+  "code": "US.AAPL",
+  "error": null,
+  "failure": null,
+  "running": false,
+  "stats": {
+    "accepted": 28,
+    "rejected": 0,
+    "coalesced": 0,
+    "pending": 0
+  },
+  "result": {
+    "version": 1,
+    "kind": "closed",
+    "cleanup": "unsubscribed",
+    "closed": true,
+    "errors": [],
+    "callbacks": 48,
+    "coalesced": 0,
+    "rejected": 20
+  },
+  "initial_samples": [
+    {
+      "schema_version": "1.0",
+      "event_id": "7964f583-e6d2-520e-a2fa-62abbda2dfd4",
+      "instrument_id": "11111111-1111-4111-8111-111111111111",
+      "event_at": "2026-11-25T14:55:26.623000Z",
+      "received_at": "2026-11-25T14:55:31.194948Z",
+      "available_at": "2026-11-25T14:55:31.214591Z",
+      "source": "futu",
+      "source_seq": null,
+      "dedup_key": "futu:quote:1b2eebfa0dc605d86a79a9e3255482457f7d2d5870b587432743d013ebd84220",
+      "payload": {
+        "schema_version": "1.0",
+        "instrument_id": "11111111-1111-4111-8111-111111111111",
+        "as_of": "2026-11-25T14:55:31.214591Z",
+        "feed": "futu",
+        "session": "unknown",
+        "bid": null,
+        "ask": null,
+        "last": {
+          "price": "350.38",
+          "event_at": "2026-11-25T14:55:26.623000Z",
+          "received_at": "2026-11-25T14:55:31.194948Z",
+          "available_at": "2026-11-25T14:55:31.214591Z",
+          "age_ms": 4591
+        },
+        "quality": [
+          "unknown",
+          "incomplete"
+        ],
+        "entitlements": {
+          "status": "unknown",
+          "checked_at": null,
+          "capability_snapshot_id": null
+        }
+      },
+      "kind": "quote"
+    },
+    {
+      "schema_version": "1.0",
+      "event_id": "23d5a2d6-9678-5f77-9294-e14220757456",
+      "instrument_id": "11111111-1111-4111-8111-111111111111",
+      "event_at": "2026-11-25T14:55:27.675000Z",
+      "received_at": "2026-11-25T14:55:31.464935Z",
+      "available_at": "2026-11-25T14:55:31.479459Z",
+      "source": "futu",
+      "source_seq": null,
+      "dedup_key": "futu:quote:3c3b0c6b702a8faa19277580500562d16a1311ab83b6cba99706f13a0b328f6d",
+      "payload": {
+        "schema_version": "1.0",
+        "instrument_id": "11111111-1111-4111-8111-111111111111",
+        "as_of": "2026-11-25T14:55:31.479459Z",
+        "feed": "futu",
+        "session": "unknown",
+        "bid": null,
+        "ask": null,
+        "last": {
+          "price": "350.425",
+          "event_at": "2026-11-25T14:55:27.675000Z",
+          "received_at": "2026-11-25T14:55:31.464935Z",
+          "available_at": "2026-11-25T14:55:31.479459Z",
+          "age_ms": 3804
+        },
+        "quality": [
+          "unknown",
+          "incomplete"
+        ],
+        "entitlements": {
+          "status": "unknown",
+          "checked_at": null,
+          "capability_snapshot_id": null
+        }
+      },
+      "kind": "quote"
+    },
+    {
+      "schema_version": "1.0",
+      "event_id": "ec95e2f8-39ab-5498-8707-a98a8eed6d0d",
+      "instrument_id": "11111111-1111-4111-8111-111111111111",
+      "event_at": "2026-11-25T14:55:28.373000Z",
+      "received_at": "2026-11-25T14:55:32.159902Z",
+      "available_at": "2026-11-25T14:55:32.173364Z",
+      "source": "futu",
+      "source_seq": null,
+      "dedup_key": "futu:quote:753a74e5d4627c353a563592788242fb5bd0605073ac0f01b2985aa045010844",
+      "payload": {
+        "schema_version": "1.0",
+        "instrument_id": "11111111-1111-4111-8111-111111111111",
+        "as_of": "2026-11-25T14:55:32.173364Z",
+        "feed": "futu",
+        "session": "unknown",
+        "bid": null,
+        "ask": null,
+        "last": {
+          "price": "350.4175",
+          "event_at": "2026-11-25T14:55:28.373000Z",
+          "received_at": "2026-11-25T14:55:32.159902Z",
+          "available_at": "2026-11-25T14:55:32.173364Z",
+          "age_ms": 3800
+        },
+        "quality": [
+          "unknown",
+          "incomplete"
+        ],
+        "entitlements": {
+          "status": "unknown",
+          "checked_at": null,
+          "capability_snapshot_id": null
+        }
+      },
+      "kind": "quote"
+    }
+  ],
+  "latest": {
+    "schema_version": "1.0",
+    "event_id": "3bfbe5b3-b7ed-5005-a68e-c8340ea23bc2",
+    "instrument_id": "11111111-1111-4111-8111-111111111111",
+    "event_at": "2026-11-25T14:55:34.836000Z",
+    "received_at": "2026-11-25T14:55:38.613148Z",
+    "available_at": "2026-11-25T14:55:38.625911Z",
+    "source": "futu",
+    "source_seq": null,
+    "dedup_key": "futu:quote:ef917443f00bb9e648ad55ef01f8352602fae684922e7b06d5677ffee7a1489f",
+    "payload": {
+      "schema_version": "1.0",
+      "instrument_id": "11111111-1111-4111-8111-111111111111",
+      "as_of": "2026-11-25T14:55:38.625911Z",
+      "feed": "futu",
+      "session": "unknown",
+      "bid": null,
+      "ask": null,
+      "last": {
+        "price": "350.355",
+        "event_at": "2026-11-25T14:55:34.836000Z",
+        "received_at": "2026-11-25T14:55:38.613148Z",
+        "available_at": "2026-11-25T14:55:38.625911Z",
+        "age_ms": 3789
+      },
+      "quality": [
+        "unknown",
+        "incomplete"
+      ],
+      "entitlements": {
+        "status": "unknown",
+        "checked_at": null,
+        "capability_snapshot_id": null
+      }
+    },
+    "kind": "quote"
+  },
+  "latency": "unverified",
+  "session": "unknown",
+  "catalog_metadata": "diagnostic_fixture_only"
+}

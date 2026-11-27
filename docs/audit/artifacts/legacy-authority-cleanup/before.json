@@ -1,0 +1,50 @@
+{
+  "source_sha": "42f96b3b8a39e40f2e4e579aa9e619814dc80e7b",
+  "lock_sha256": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6",
+  "files_sha256": {
+    "AGENTS.md": "b64e11e33e0612b284a719a91f50cf35c0ca8b042e83379ab89cfbf9c626192b",
+    "README.md": "1949bfe8999f3f0bec20bbbce76ff07fdba915ba9f90a1bf8d12d43b30eb8d08",
+    "PRODUCT.md": "f0405c5510ce90af267e83a67bf7650d6c9dc16117aff25acf855343831b38cd",
+    "docs/ARCHITECTURE_DECISION.md": "2eb52993a55b6696601f822304f33db61689da8b7fbe913afa453b64dd06fba6",
+    "docs/LOCAL_CURSOR_HANDOFF.md": "a424cddcd54fab53e4032e22730fea9be07e66765253175831355db1e8d3cc4d",
+    "docs/ADR-003-live-ai-trading-desk.md": "4a8e5e477ec8b47bc2f964c2a7f6865a2e59ec9223b27e5e4a462949a927e05b",
+    "docs/ADR-004-chart-engine.md": "a35f72ff31d36ed61b04aadb97904235d74b2b0716d7069fd1dbf00665a03718",
+    "docs/ADR-005-mobile-desk-readonly.md": "e7b6de988f32568e080f311f375ae696d68b5977ff7411198f43b869d44796c0",
+    "docs/ADR-006-futu-opend-desk-observe.md": "ea5ad23d4200ae882f3399d4f76834d9f4d55b0a753db9803a767696f32b607e",
+    "PROGRESS_LOG.md": "b96fe346d383bfcdb43baf38a5ec07c399321bd6103a2aa4da84dc3298021d1a",
+    "backend/trading/README.md": "79bc91e020f1f6c78c861171b6623f2ed65468453e51e6377ad9bc13fd4c7e84",
+    "backend/trading/ui/README.md": "dba07b5a54f0e9cab594392239dd842d135accf1f94f188d97c1592f74fd1c84",
+    "deploy/README.md": "3de3bbbb994b3e64cac7bc615482777c35f642b2270f16e0bb00d3136b0bb26d",
+    "docs/ACCOUNT_MANAGEMENT_DESIGN.md": "cf710103607d9c9f8f1a8e9bfccfbe86a87a9a773bbc8255e83c0a026a670a65",
+    "docs/AI_SMART_TRADER_METHOD.md": "2d92e82f9b12a316f761bc0cdcebfc48033cc0c2a6f8c66eb37b4ac92afe30e5",
+    "docs/AUDIT_REMEDIATION_PLAN_2026-10-21.md": "2879631eafccd7695da8d38faefd3afc64c201fcdcebe72441ebf090076e3b30",
+    "docs/AUTO_TRADING_ROADMAP.md": "74297ce76e40463294f64f55fe6bef401eb6b98ffb61e9e4fa5be8cafd4ac898",
+    "docs/BOUNDED_INTELLIGENCE_ACCEPTANCE.md": "c936bd94ab94f12b64fd5a8995284a3fc76faa6df0a187486863bb5f25031aa1",
+    "docs/CGAB_WORLD_CLASS_UPGRADE.md": "d170dfc7d3d9f0e70187bc37fba25a94048f60752fada63eab382c354efbc604",
+    "docs/CHARTS_INDICATORS_DESIGN.md": "9ce360cb69578e42fc4d13ba2698f69d2e069f13d965378d56500874578975f4",
+    "docs/DATA_FEED_AND_SUBSCRIPTIONS.md": "795344af82dc6a32609b8f3b07e38886e3eb08c8b8c6c1080d8f6e292de4ba02",
+    "docs/LAB_CITATION_TRY.md": "317118bf9440a90641062f4d6d906a1f8695f4d91ef56d7e642a838ef8a660cc",
+    "docs/LAB_PRODUCT_M7_BINDING.md": "d8e933d89abe16551257fac3a96ffa988a55dc3e7188980123490a3d23257e9e",
+    "docs/MODULAR_ARCHITECTURE.md": "fcfac7281d8ba950d0426abcffc939091302d15584524fddb15535022898b5cb",
+    "docs/NEXT_PHASE_PLAN.md": "25311d11d961bbf70e0ab18376dadb91bfe9c342fff7305b6de22959ab1404a0",
+    "docs/PAPER_VALIDATION_RUNBOOK.md": "fbac6f0248bfdd27837b7b1934df04c98f3753c1633dd8b68c3c911ce366a006",
+    "docs/PROCUREMENT_GUIDE.md": "0588d49ec4ca0de4135c112eddef323a6a9f4a5b85ee732ead4f95f42cd5c889",
+    "docs/QUALITY_ROADMAP.md": "6857bcc72be5e301f0fe88438ecb615b8bf5316584d66d3afe09dff52fce04c5",
+    "docs/REFERENCE_SIGNALS_DESIGN.md": "73f02fc9f6494d67a500f9afb6b733ddcd31add495a0e23862a4ca14819824d3",
+    "docs/STRATEGY_ADOPTION.md": "e03a51fb73845542d75ca8304935d4d1643c2520d4f6b3ac4621a5f5bc38da78",
+    "docs/TAILSCALE_SERVE.md": "f042bb886e32cac821beafe711658c5b3a40c36d08b53538f37913c9450015b6",
+    "docs/boomboom-modular-architecture.html": "ae175cc7779b58ffe6468ae4d781f49c0f608c1b6bf645dbcedf45ca80103f71",
+    "backend/api/mobile_desk.py": "097783c91bd016f4a92639c0f05fda68c6c54b501fa09e3e5d3163d5457acfb0",
+    "backend/trading/intents/models.py": "76b11bbb1c63c36aa83f23a8366b3775bda738f1655e0cd33ef391de8e1e158f",
+    "tests/api/test_mobile_desk_ro.py": "5c72bfd2800e59d1bde1a1b3e0e2a902e7c85e4a5356d492628915eaddfa8d86"
+  },
+  "production_body_ast": {
+    "backend/api/mobile_desk.py": "057563c4519e4b15fa7071c0e4ab9a9501f0020e8a0d3f568dc60247786cef94",
+    "backend/trading/intents/models.py": "327570721c53e4236caf6e1ddb07cfc90e541f74f54d718eb72f059d692dc543"
+  },
+  "canonical_sha256": {
+    "docs/superpowers/specs/2026-11-25-gabfin-system-design.md": "8da97d248415ab9a86876de98ad455a6fb66de3a5ed6bb7d14a8cadca87cbf70",
+    "docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md": "98552439cba3a5baf44da37daf35c45b74ac4fdb768b55ab334fac69d957b303"
+  },
+  "journal_existed": false
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="18" skipped="0" tests="18" time="2.102" timestamp="2026-11-25T15:27:29.426251+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_feed_runner" name="test_timeout_kills_and_reaps" time="1.438"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:14: in test_timeout_kills_and_reaps
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_failure_never_echoes_raw[raise RuntimeError('PRIVATE')]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:20: in test_failure_never_echoes_raw
+    r=invoke(worker(tmp_path,body));assert r['status'] in ('worker_failed','invalid_result') and 'PRIVATE' not in json.dumps(r)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_failure_never_echoes_raw[Path(sys.argv[1]).write_text('PRIVATE')]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:20: in test_failure_never_echoes_raw
+    r=invoke(worker(tmp_path,body));assert r['status'] in ('worker_failed','invalid_result') and 'PRIVATE' not in json.dumps(r)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_failure_never_echoes_raw[Path(sys.argv[1]).write_text('x'*20000)]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:20: in test_failure_never_echoes_raw
+    r=invoke(worker(tmp_path,body));assert r['status'] in ('worker_failed','invalid_result') and 'PRIVATE' not in json.dumps(r)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_safe_result_and_stdout_discard" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:26: in test_safe_result_and_stdout_discard
+    assert invoke(s)==p
+           ^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_untrusted_child_output_revalidated[change0]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:32: in test_untrusted_child_output_revalidated
+    assert invoke(s)=={'status':'invalid_result','metadata':None}
+           ^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_untrusted_child_output_revalidated[change1]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:32: in test_untrusted_child_output_revalidated
+    assert invoke(s)=={'status':'invalid_result','metadata':None}
+           ^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_untrusted_child_output_revalidated[change2]" time="0.005"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:32: in test_untrusted_child_output_revalidated
+    assert invoke(s)=={'status':'invalid_result','metadata':None}
+           ^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_untrusted_child_output_revalidated[change3]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:32: in test_untrusted_child_output_revalidated
+    assert invoke(s)=={'status':'invalid_result','metadata':None}
+           ^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_untrusted_child_output_revalidated[change4]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:32: in test_untrusted_child_output_revalidated
+    assert invoke(s)=={'status':'invalid_result','metadata':None}
+           ^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_untrusted_child_output_revalidated[change5]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:32: in test_untrusted_child_output_revalidated
+    assert invoke(s)=={'status':'invalid_result','metadata':None}
+           ^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_invalid_configuration_no_spawn[invalid-11111-3]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:36: in test_invalid_configuration_no_spawn
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_invalid_configuration_no_spawn[127.0.0.1-0-3]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:36: in test_invalid_configuration_no_spawn
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_invalid_configuration_no_spawn[127.0.0.1-True-3]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:36: in test_invalid_configuration_no_spawn
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_invalid_configuration_no_spawn[127.0.0.1-11111-0]" time="0.021"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:36: in test_invalid_configuration_no_spawn
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_invalid_configuration_no_spawn[127.0.0.1-11111-nan]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:36: in test_invalid_configuration_no_spawn
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_invalid_configuration_no_spawn[192.168.1.2-11111-3]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:36: in test_invalid_configuration_no_spawn
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase><testcase classname="tests.gabfin.test_feed_runner" name="test_secret_environment_not_inherited" time="0.005"><failure message="ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'">tests\gabfin\test_feed_runner.py:41: in test_secret_environment_not_inherited
+    assert invoke(s)['status']=='sdk_unavailable'
+           ^^^^^^^^^
+tests\gabfin\test_feed_runner.py:9: in invoke
+    from gabfin.providers.futu.runner import run_probe
+E   ModuleNotFoundError: No module named 'gabfin.providers.futu.runner'</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,29 @@
+{
+  "base": "a8d23d575baab94420595ca5cddf12255fb40ebc",
+  "head": "3073cf3b41ac2724979442960b314a0c92598ca0",
+  "scope": [
+    "services/gabfin/market/stream.py",
+    "services/gabfin/providers/futu/adapter.py",
+    "services/gabfin/providers/futu/quote_push.py",
+    "services/gabfin/providers/futu/quote_worker.py",
+    "services/gabfin/providers/futu/symbols.py",
+    "services/gabfin/providers/futu/symbols_wire.py",
+    "tests/gabfin/test_futu_quote_adapter.py",
+    "tests/gabfin/test_futu_quote_callback.py",
+    "tests/gabfin/test_quote_stream.py"
+  ],
+  "unrelated_tracked_preserved": true,
+  "original_lock_preserved": true,
+  "legacy_mock_journal_archived": true,
+  "wheel_matches_python_source_files": 40,
+  "wheel_sha256": "c50ea0dde0551d59b1294c5536924bcd7b12dec3269e4863e83a025e0fcd7ae7",
+  "clean_demo_verified": true,
+  "independent_review_complete": true,
+  "full_passed": 2021,
+  "full_skipped": 4,
+  "full_failed": 0,
+  "gabfin_passed": 813,
+  "live_failure": null,
+  "live_accepted": 14,
+  "source_status": "?? web/package-lock.json"
+}

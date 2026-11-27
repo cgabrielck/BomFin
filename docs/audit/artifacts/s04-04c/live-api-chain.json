@@ -1,0 +1,129 @@
+{
+  "started_at": "2026-11-26T06:05:38.955979+00:00",
+  "source": "futu",
+  "instrument_metadata": "diagnostic_fixture_only",
+  "http_ws_transport": "in_process_testclient",
+  "internal_transport": "real_loopback_tcp",
+  "ui_render_measured": false,
+  "trade_context_opened": false,
+  "before_metadata": {
+    "checked_at": "2026-11-26T06:05:44.118228Z",
+    "status": "metadata_available",
+    "quote_logged_in": true,
+    "total_used_quota": 0,
+    "remaining_quota": 100,
+    "errors": []
+  },
+  "api": {
+    "http_snapshot": {
+      "schema_version": "1.0",
+      "epoch": "073522a5-0936-4dd7-a729-32d68177bf8a",
+      "cursor": 4,
+      "as_of": "2026-11-26T06:05:49.117003Z",
+      "quotes": [
+        {
+          "schema_version": "1.0",
+          "event_id": "10f43f79-bc4d-56d9-8e3b-0ecb3e7814f3",
+          "instrument_id": "11111111-1111-4111-8111-111111111111",
+          "event_at": "2026-11-25T21:00:00Z",
+          "received_at": "2026-11-26T06:05:48.765169Z",
+          "available_at": "2026-11-26T06:05:48.783495Z",
+          "source": "futu",
+          "source_seq": null,
+          "dedup_key": "futu:quote:d0dd5f51e71d496b421cd7270e9cb5842eb857f5ccd532ca1483a01aac70bff5",
+          "payload": {
+            "schema_version": "1.0",
+            "instrument_id": "11111111-1111-4111-8111-111111111111",
+            "as_of": "2026-11-26T06:05:48.783495Z",
+            "feed": "futu",
+            "session": "unknown",
+            "bid": null,
+            "ask": null,
+            "last": {
+              "price": "355.58",
+              "event_at": "2026-11-25T21:00:00Z",
+              "received_at": "2026-11-26T06:05:48.765169Z",
+              "available_at": "2026-11-26T06:05:48.783495Z",
+              "age_ms": 32748783
+            },
+            "quality": [
+              "unknown",
+              "incomplete"
+            ],
+            "entitlements": {
+              "status": "unknown",
+              "checked_at": null,
+              "capability_snapshot_id": null
+            }
+          },
+          "kind": "quote"
+        }
+      ],
+      "bars": [],
+      "health": {
+        "schema_version": "1.0",
+        "source": "futu",
+        "connected": true,
+        "heartbeat_at": "2026-11-26T06:05:48.264476Z",
+        "gap_pending": false,
+        "connection_started_at": null
+      },
+      "gap": null
+    },
+    "websocket_snapshot": true,
+    "logout_revoked": true
+  },
+  "freshness": {
+    "schema_version": "1.0",
+    "eligible": false,
+    "reasons": [
+      "policy_unapproved",
+      "calendar_unverified",
+      "session_ineligible",
+      "realtime_unverified",
+      "entitlement_unverified",
+      "quote_quality_flagged",
+      "quote_incomplete",
+      "quote_stale"
+    ],
+    "ages_ms": {
+      "bid": null,
+      "ask": null,
+      "last": 32749318
+    },
+    "evaluated_at": "2026-11-26T06:05:49.318883Z",
+    "policy_version": "diagnostic-unapproved"
+  },
+  "feeds": [
+    {
+      "running": false,
+      "result": {
+        "version": 1,
+        "kind": "closed",
+        "cleanup": "unsubscribed",
+        "closed": true,
+        "errors": [],
+        "callbacks": 1,
+        "coalesced": 0,
+        "rejected": 0
+      },
+      "failure": null,
+      "stats": {
+        "accepted": 1,
+        "rejected": 0,
+        "coalesced": 0,
+        "pending": 0
+      }
+    }
+  ],
+  "after_metadata": {
+    "checked_at": "2026-11-26T06:06:51.481392Z",
+    "status": "metadata_available",
+    "quote_logged_in": true,
+    "total_used_quota": 0,
+    "remaining_quota": 100,
+    "errors": []
+  },
+  "ended_at": "2026-11-26T06:06:51.612545+00:00",
+  "success": true
+}

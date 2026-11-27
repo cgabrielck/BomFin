@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="1.782" timestamp="2026-11-25T14:52:47.739233+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_support_contracts" name="test_model_unknown_cost_and_failure" time="1.325"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.support'">tests\gabfin\test_support_contracts.py:8: in test_model_unknown_cost_and_failure
+    from gabfin.contracts.support import ModelResult
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'</failure></testcase><testcase classname="tests.gabfin.test_support_contracts" name="test_candidate_expiry" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.support'">tests\gabfin\test_support_contracts.py:13: in test_candidate_expiry
+    from gabfin.contracts.support import CandidateObservation
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'</failure></testcase><testcase classname="tests.gabfin.test_support_contracts" name="test_strategy_future_bar_rejected" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.support'">tests\gabfin\test_support_contracts.py:17: in test_strategy_future_bar_rejected
+    from gabfin.contracts.support import StrategyContext
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'</failure></testcase><testcase classname="tests.gabfin.test_support_contracts" name="test_reconciliation_cannot_allow_mismatch" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.support'">tests\gabfin\test_support_contracts.py:20: in test_reconciliation_cannot_allow_mismatch
+    from gabfin.contracts.support import ReconciliationResult
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'</failure></testcase><testcase classname="tests.gabfin.test_support_contracts" name="test_proposal_unapproved_by_default" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.contracts.support'">tests\gabfin\test_support_contracts.py:23: in test_proposal_unapproved_by_default
+    from gabfin.contracts.support import HarnessProposal
+E   ModuleNotFoundError: No module named 'gabfin.contracts.support'</failure></testcase></testsuite></testsuites>

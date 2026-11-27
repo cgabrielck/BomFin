@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="17" skipped="0" tests="17" time="1.968" timestamp="2026-11-25T15:19:30.169387+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_feed_preflight" name="test_safe_known_zero_metadata" time="1.417"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:21: in test_safe_known_zero_metadata
+    c=Context();r=inspect(c);assert c.closed and r['remaining_quota']==0 and r['status']=='metadata_available';assert 'PRIVATE' not in json.dumps(r)
+                  ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_invalid_quota_is_unknown[None]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:24: in test_invalid_quota_is_unknown
+    c=Context(quota=(0,{'total_used':2,'remain':value}));r=inspect(c);assert r['remaining_quota'] is None and r['status']=='metadata_incomplete' and c.closed
+                                                           ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_invalid_quota_is_unknown[-1]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:24: in test_invalid_quota_is_unknown
+    c=Context(quota=(0,{'total_used':2,'remain':value}));r=inspect(c);assert r['remaining_quota'] is None and r['status']=='metadata_incomplete' and c.closed
+                                                           ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_invalid_quota_is_unknown[True]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:24: in test_invalid_quota_is_unknown
+    c=Context(quota=(0,{'total_used':2,'remain':value}));r=inspect(c);assert r['remaining_quota'] is None and r['status']=='metadata_incomplete' and c.closed
+                                                           ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_invalid_quota_is_unknown[1.5]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:24: in test_invalid_quota_is_unknown
+    c=Context(quota=(0,{'total_used':2,'remain':value}));r=inspect(c);assert r['remaining_quota'] is None and r['status']=='metadata_incomplete' and c.closed
+                                                           ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_invalid_quota_is_unknown[3]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:24: in test_invalid_quota_is_unknown
+    c=Context(quota=(0,{'total_used':2,'remain':value}));r=inspect(c);assert r['remaining_quota'] is None and r['status']=='metadata_incomplete' and c.closed
+                                                           ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_invalid_quota_is_unknown[9007199254740992]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:24: in test_invalid_quota_is_unknown
+    c=Context(quota=(0,{'total_used':2,'remain':value}));r=inspect(c);assert r['remaining_quota'] is None and r['status']=='metadata_incomplete' and c.closed
+                                                           ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_errors_are_sanitized_and_closed[state]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:27: in test_errors_are_sanitized_and_closed
+    c=Context(fail=failure);r=inspect(c);assert c.closed and r['errors'] and 'PRIVATE' not in json.dumps(r)
+                              ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_errors_are_sanitized_and_closed[quota]" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:27: in test_errors_are_sanitized_and_closed
+    c=Context(fail=failure);r=inspect(c);assert c.closed and r['errors'] and 'PRIVATE' not in json.dumps(r)
+                              ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_errors_are_sanitized_and_closed[close]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:27: in test_errors_are_sanitized_and_closed
+    c=Context(fail=failure);r=inspect(c);assert c.closed and r['errors'] and 'PRIVATE' not in json.dumps(r)
+                              ^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_no_implicit_quote_permission[state0]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:30: in test_no_implicit_quote_permission
+    r=inspect(Context(state=state));assert r['status']!='metadata_available' and 'PRIVATE' not in json.dumps(r)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_no_implicit_quote_permission[state1]" time="0.004"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:30: in test_no_implicit_quote_permission
+    r=inspect(Context(state=state));assert r['status']!='metadata_available' and 'PRIVATE' not in json.dumps(r)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_no_implicit_quote_permission[state2]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:30: in test_no_implicit_quote_permission
+    r=inspect(Context(state=state));assert r['status']!='metadata_available' and 'PRIVATE' not in json.dumps(r)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_no_implicit_quote_permission[state3]" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:30: in test_no_implicit_quote_permission
+    r=inspect(Context(state=state));assert r['status']!='metadata_available' and 'PRIVATE' not in json.dumps(r)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_preflight.py:18: in inspect
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_naive_time_closes_without_call" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:32: in test_naive_time_closes_without_call
+    from gabfin.providers.futu.capabilities import inspect_quote_context
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_preflight_default_does_not_connect" time="0.002"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:37: in test_preflight_default_does_not_connect
+    from gabfin.providers.futu.preflight import readiness
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase><testcase classname="tests.gabfin.test_feed_preflight" name="test_preflight_listener_not_entitlement" time="0.003"><failure message="ModuleNotFoundError: No module named 'gabfin.providers'">tests\gabfin\test_feed_preflight.py:42: in test_preflight_listener_not_entitlement
+    from gabfin.providers.futu.preflight import readiness
+E   ModuleNotFoundError: No module named 'gabfin.providers'</failure></testcase></testsuite></testsuites>

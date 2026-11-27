@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.373" timestamp="2026-11-26T02:34:38.655348+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_active_consumer_sees_late_process_failure_even_when_close_started_first" time="1.557"><failure message="StopAsyncIteration">tests\gabfin\test_futu_quote_adapter.py:432: in test_active_consumer_sees_late_process_failure_even_when_close_started_first
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:431: in scenario
+    await task
+E   StopAsyncIteration</failure></testcase></testsuite></testsuites>

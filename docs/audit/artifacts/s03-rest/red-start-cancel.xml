@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="3" time="3.030" timestamp="2026-11-26T03:07:54.591877+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_feed_supervisor" name="test_two_feed_lifecycles_recover_without_mixing_sessions_or_losing_cleanup" time="1.462" /><testcase classname="tests.gabfin.test_feed_supervisor" name="test_stop_during_subscribe_cancels_before_more_provider_work" time="0.517"><failure message="TimeoutError">tests\gabfin\test_feed_supervisor.py:60: in subscribe
+    await asyncio.Event().wait()
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\locks.py:212: in wait
+    await fut
+E   asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+tests\gabfin\test_feed_supervisor.py:71: in test_stop_during_subscribe_cancels_before_more_provider_work
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_feed_supervisor.py:69: in scenario
+    await asyncio.wait_for(task, .5)
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\tasks.py:519: in wait_for
+    async with timeouts.timeout(timeout):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\timeouts.py:115: in __aexit__
+    raise TimeoutError from exc_val
+E   TimeoutError</failure></testcase><testcase classname="tests.gabfin.test_feed_supervisor" name="test_unverified_cleanup_prevents_starting_a_second_context" time="0.036" /></testsuite></testsuites>

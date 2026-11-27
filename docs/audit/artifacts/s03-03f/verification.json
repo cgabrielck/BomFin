@@ -1,0 +1,22 @@
+{
+  "base": "87e295311fd7ef9dbb77c930084b15dc1b4dff23",
+  "head": "a8d23d575baab94420595ca5cddf12255fb40ebc",
+  "scope": [
+    "services/gabfin/market/__init__.py",
+    "services/gabfin/market/subscriptions.py",
+    "services/gabfin/providers/futu/symbols.py",
+    "tests/gabfin/test_subscription_planner.py",
+    "tests/gabfin/test_symbols.py"
+  ],
+  "all_previous_tracked_files_preserved": true,
+  "original_lock_preserved": true,
+  "wheel_matches_python_source_files": 35,
+  "wheel_sha256": "0926f7a7e1dddcebfe358ac8f2eb52d54b04ab78837dad79aa8cca0f94e5951a",
+  "clean_wheel_demo_verified": true,
+  "independent_review_complete": true,
+  "full_passed": 1959,
+  "full_skipped": 4,
+  "full_failed": 0,
+  "gabfin_passed": 751,
+  "source_status": "?? web/package-lock.json"
+}

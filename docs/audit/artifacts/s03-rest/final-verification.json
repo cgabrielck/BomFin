@@ -1,0 +1,90 @@
+{
+  "commit": "1802198648ce465db5f3dba79a342756a7f9ccc5",
+  "tree": "63f71a854aefff3de147404f82e6fd9fda7b315a",
+  "full_suite": {
+    "passed": 2108,
+    "skipped": 4,
+    "warnings": 1,
+    "exit_code": 0,
+    "seconds": 130.78
+  },
+  "local_receipt_to_consumer_ms": 43.875,
+  "live_chain_success": true,
+  "source_freshness_eligible": false,
+  "calendar_final_wheel_verified": true,
+  "wheel": {
+    "installed_root": "C:\\Users\\001\\Desktop\\GabFin-ai-trade\\.tools\\s03-rest-wheel-check\\Lib\\site-packages\\gabfin",
+    "python_modules_checked": 51,
+    "modules_imported": 50,
+    "schema_matches": true,
+    "sdk_present": false,
+    "pandas_present": false,
+    "calendar_extra_present": false,
+    "wheel_sha256": "11e6e81e0657b6e8d97fb4995861ebfa4980626c8a6d4069c7fe56f0be384e2a"
+  },
+  "preservation": {
+    "baseline_head": "3073cf3b41ac2724979442960b314a0c92598ca0",
+    "tracked_baseline_files": 543,
+    "owned_files": [
+      "config/market-instrument-example.json",
+      "docs/market-data-host.md",
+      "pyproject.toml",
+      "schemas/gabfin-1.0.json",
+      "services/gabfin/contracts/feed.py",
+      "services/gabfin/contracts/internal_stream.py",
+      "services/gabfin/contracts/subscriptions.py",
+      "services/gabfin/market/bars.py",
+      "services/gabfin/market/coordinator.py",
+      "services/gabfin/market/freshness.py",
+      "services/gabfin/market/host.py",
+      "services/gabfin/market/internal_stream.py",
+      "services/gabfin/market/replay.py",
+      "services/gabfin/market/sequences.py",
+      "services/gabfin/market/supervisor.py",
+      "services/gabfin/protocols.py",
+      "services/gabfin/providers/exchange_calendar.py",
+      "services/gabfin/providers/futu/adapter.py",
+      "services/gabfin/providers/futu/quote_push.py",
+      "tests/gabfin/test_bar_builder.py",
+      "tests/gabfin/test_exchange_calendar.py",
+      "tests/gabfin/test_feed_supervisor.py",
+      "tests/gabfin/test_freshness.py",
+      "tests/gabfin/test_futu_quote_adapter.py",
+      "tests/gabfin/test_futu_quote_callback.py",
+      "tests/gabfin/test_internal_market_stream.py",
+      "tests/gabfin/test_market_coordinator.py",
+      "tests/gabfin/test_market_host.py"
+    ],
+    "unexpected_baseline_changes": [],
+    "unstaged_tracked": [],
+    "original_lock_sha256": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6",
+    "original_lock_preserved": true,
+    "index_tree": "63f71a854aefff3de147404f82e6fd9fda7b315a"
+  },
+  "post_live": {
+    "sdk_worker_count": 0,
+    "opend_listeners": [
+      {
+        "LocalAddress": "127.0.0.1",
+        "LocalPort": 11111,
+        "OwningProcess": 29100
+      }
+    ],
+    "checked_at_utc": "2026-11-26T01:03:35.2556950Z"
+  },
+  "g2_release_gate": "open",
+  "ui_render_verified": false,
+  "trading_started": false,
+  "pushed": false,
+  "final_git_status": [
+    "?? web/package-lock.json"
+  ],
+  "final_lock_sha256": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6",
+  "dependency_checks": {
+    "clean_wheel_packages": 13,
+    "calendar_env_packages": 20,
+    "both_compatible": true
+  },
+  "documentation_review_complete": true,
+  "documentation_links_checked": true
+}

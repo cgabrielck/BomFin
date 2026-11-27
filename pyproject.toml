@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gabfin"
+version = "0.1.0"
+description = "Versioned domain contracts for the new GabFin architecture"
+requires-python = ">=3.12"
+dependencies = ["pydantic==2.14.4", "fastapi==0.165.0", "tzdata==2026.6; sys_platform == 'win32'"]
+
+[project.optional-dependencies]
+calendar = ["exchange-calendars==4.13.3"]
+web = ["uvicorn==0.54.0", "websockets==17.4"]
+tape = ["pyarrow>=17.0.0"]
+
+[tool.setuptools.packages.find]
+where = ["services"]
+include = ["gabfin", "gabfin.*"]
+namespaces = false

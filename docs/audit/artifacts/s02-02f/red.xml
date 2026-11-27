@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="55" skipped="0" tests="55" time="5.339" timestamp="2026-11-25T14:42:15.486679+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_identity_contracts" name="test_role_roundtrip[owner]" time="4.123"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:14: in test_role_roundtrip
+    r=parse('Principal',principal()|{'role':role,'scope':[]});assert r.scope==()
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_role_roundtrip[chat]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:14: in test_role_roundtrip
+    r=parse('Principal',principal()|{'role':role,'scope':[]});assert r.scope==()
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_role_roundtrip[research]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:14: in test_role_roundtrip
+    r=parse('Principal',principal()|{'role':role,'scope':[]});assert r.scope==()
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_role_roundtrip[strategy]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:14: in test_role_roundtrip
+    r=parse('Principal',principal()|{'role':role,'scope':[]});assert r.scope==()
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_role_roundtrip[executor]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:14: in test_role_roundtrip
+    r=parse('Principal',principal()|{'role':role,'scope':[]});assert r.scope==()
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[read_account]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[resolve_symbols]" time="0.002"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[start_research]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[read_report]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[draft_trade_plan]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[read_market]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[manage_watchlist]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[propose_strategy]" time="0.002"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[strategy:emit]" time="0.002"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[submit_order]" time="0.019"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[cancel_order]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[start_worker]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[pause_worker]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[resume_worker]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[write_policy]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_capability_names[approve_proposal]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:17: in test_capability_names
+    def test_capability_names(capability):assert parse('Principal',principal()|{'scope':[capability]}).scope[0]==capability
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change0]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change1]" time="0.004"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change2]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change3]" time="0.004"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change4]" time="0.002"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change5]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change6]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change7]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change8]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change9]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change10]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change11]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change12]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_principal[change13]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:20: in test_bad_principal
+    with pytest.raises(ValidationError):parse('Principal',principal()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_scope_is_required_and_no_default_grants" time="0.002"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:23: in test_scope_is_required_and_no_default_grants
+    with pytest.raises(ValidationError):parse('Principal',p)
+                                        ^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[account]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[instrument]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[research_job]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[research_report]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[watchlist]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[order]" time="0.004"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[strategy]" time="0.004"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[policy]" time="0.004"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[proposal]" time="0.004"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_kinds[artifact]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:27: in test_resource_kinds
+    r=parse('Resource',resource()|{'kind':kind});assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_resource[change0]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:30: in test_bad_resource
+    with pytest.raises(ValidationError):parse('Resource',resource()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_resource[change1]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:30: in test_bad_resource
+    with pytest.raises(ValidationError):parse('Resource',resource()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_resource[change2]" time="0.004"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:30: in test_bad_resource
+    with pytest.raises(ValidationError):parse('Resource',resource()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_resource[change3]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:30: in test_bad_resource
+    with pytest.raises(ValidationError):parse('Resource',resource()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_resource[change4]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:30: in test_bad_resource
+    with pytest.raises(ValidationError):parse('Resource',resource()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_bad_resource[change5]" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:30: in test_bad_resource
+    with pytest.raises(ValidationError):parse('Resource',resource()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_resource_requires_owner" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:33: in test_resource_requires_owner
+    with pytest.raises(ValidationError):parse('Resource',p)
+                                        ^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_metadata_does_not_authenticate" time="0.003"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:35: in test_metadata_does_not_authenticate
+    r=parse('Principal',principal()|{'scope':['submit_order']})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_identity_contracts" name="test_schemas" time="0.004"><failure message="ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_identity_contracts.py:39: in test_schemas
+    schema=type(parse(name,p)).model_json_schema(mode='serialization')
+                ^^^^^^^^^^^^^
+tests\gabfin\test_identity_contracts.py:10: in parse
+    from gabfin.contracts import identity
+E   ImportError: cannot import name 'identity' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,23 @@
+{
+  "synthetic_only": true,
+  "accepted_symbols": [
+    "US.MSFT",
+    "US.AAPL261218C350000",
+    "US.AAPL261218P350000"
+  ],
+  "subscribe_symbols": [
+    "US.MSFT",
+    "US.AAPL261218C350000",
+    "US.AAPL261218P350000"
+  ],
+  "unsubscribe_symbols": [
+    "US.AAPL"
+  ],
+  "reason": [
+    "equity_quota_exhausted"
+  ],
+  "apply_allowed": true,
+  "latency_label_unchanged": "unknown",
+  "no_futu_sdk": true,
+  "no_pandas": true
+}

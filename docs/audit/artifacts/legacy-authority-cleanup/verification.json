@@ -1,0 +1,25 @@
+{
+  "base_sha": "42f96b3b8a39e40f2e4e579aa9e619814dc80e7b",
+  "head_sha_at_verification": "2dba0be7adf1f74a489031a1774edd5fd4dd15d4",
+  "changed_paths": 35,
+  "removed_legacy_adrs": 4,
+  "retired_legacy_pages": 23,
+  "new_or_rewritten_links": 27,
+  "new_broken_links": [],
+  "preexisting_broken_links": [],
+  "production_ast_preserved": true,
+  "unrelated_test_functions_preserved": 19,
+  "baseline_evidence_preserved": true,
+  "lockfile_preserved": true,
+  "red": {
+    "failures": 1
+  },
+  "green": {
+    "passed": 58,
+    "skipped": 0,
+    "failures": 0,
+    "seconds": 5.964
+  },
+  "journal_created": false,
+  "worker_pid_present": false
+}

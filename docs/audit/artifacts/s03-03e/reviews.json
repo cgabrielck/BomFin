@@ -1,0 +1,10 @@
+{
+  "base": "953b5d274a10cb7aeaf84ae071f0bcadc1e26693",
+  "command": "git diff --cached 953b5d274a10cb7aeaf84ae071f0bcadc1e26693",
+  "commits_at_review": [],
+  "scope": ["services/gabfin/providers/futu/history.py", "services/gabfin/providers/futu/history_wire.py", "services/gabfin/providers/futu/runner.py", "services/gabfin/providers/futu/worker.py", "tests/gabfin/test_history_smoke.py"],
+  "standards": {"agent": "/root/history_standards", "initial_context": "fork_turns=none", "final_unresolved": 0},
+  "spec": {"agent": "/root/history_spec", "initial_context": "fork_turns=none", "final_unresolved": 0},
+  "resolved": ["SDK internal pagination", "SDK stale OHLC across records", "init/import close paths", "metadata/read/final-quota budgets", "per-window historical evidence", "malformed response classification", "canonical UTC and skipped-phase implications"],
+  "limitations": ["No realtime, full-session or trading-authority proof; no guarantee of cleanup after arbitrary process termination."]
+}

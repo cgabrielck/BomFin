@@ -1,0 +1,22 @@
+{
+  "base": "2607a81a073a5fac2286b0fc0aa5742a5f6fabba",
+  "head": "953b5d274a10cb7aeaf84ae071f0bcadc1e26693",
+  "scope": [
+    "pyproject.toml",
+    "services/gabfin/providers/futu/options.py",
+    "services/gabfin/providers/futu/runner.py",
+    "services/gabfin/providers/futu/worker.py",
+    "tests/gabfin/test_options_smoke.py"
+  ],
+  "unrelated_tracked_changes": [],
+  "original_lock_preserved": true,
+  "wheel_matches_python_source_files": 30,
+  "wheel_sha256": "1233edfee8feeccf5f544caab91f5f1323e04f28ba560fd379932c80c039fa7b",
+  "clean_wheel_verified": true,
+  "live_result_revalidated": true,
+  "full_passed": 1838,
+  "full_skipped": 4,
+  "full_failed": 0,
+  "gabfin_passed": 630,
+  "source_status": "?? web/package-lock.json"
+}

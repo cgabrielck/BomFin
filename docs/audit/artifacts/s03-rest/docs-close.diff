@@ -1,0 +1,405 @@
+--- before/docs/audit/feed-entitlements.md
++++ after/docs/audit/feed-entitlements.md
+@@ -79,3 +79,38 @@
+ - Final source age, quota (now remaining 100 rather than earlier 300), timestamps,
+   limits and sanitized evidence are owned by [03g report](s03-03g-stream-2026-11-26.md).
+   The quota difference's cause is unverified. PRE/POST live evidence is still open.
++
++## S03 final chain — 2026-11-26 HKT
++
++- 09:01:48–09:03:00 HKT：clean wheel host 經獨立 SDK、authenticated internal stream，
++  向獨立 consumer process 交付 1 個 quote／4 個 updates；health connected、quote state
++  resynced、consumer 無錯誤。[實際證據](artifacts/s03-rest/live-chain.json)。
++- Source 為 Nov 25 21:00 UTC（16:00 New York）的收市價；capture 已到 Nov 26 01:01 UTC。
++  不是當時即時或 POST 價格。Receipt→consumer 約 43.9 ms 只代表這一筆本機轉送，
++  不能冒充來源市場 latency。沒有 UI render 量測。
++- Freshness 實際拒絕：舊價、缺 BBO、未知 session／entitlement／calendar 及未批准政策。
++  Connection／quote resync 不會改成新價格，也不會產生交易授權。
++- Metadata 前後均 login=true、total_used=0、remaining=100；capabilities 保留
++  latency=unknown、sessions=[]、live_manifest_unverified。未推算其他 quota pools。
++  明確 unsubscribe、context close、worker 退出成功；OpenD 保持原 listener。
++
++## G2 未放行項目與路線
++
++| 缺口 | 已有證據及仍欠甚麼 | 解除路線 |
++|---|---|---|
++| Realtime／BBO | Quote-only last；沒有逐 instrument/channel 權益及 bid/ask 實測 | 核對 API manifest，延伸已獲授權 channel，再作有來源時鐘的限時 smoke |
++| PRE／POST | 03e 只有部分歷史 PRE/RTH；本次舊 regular close 不能補證明 | 在適用 session 核對時戳與權益；歷史 POST 與 live POST 分開驗證 |
++| Trade/bar 補缺 | 已有診斷與 canonical engine 測試，尚未接真實完整 backfill | 受信 history adapter 提供 scope／pagination／unique-count receipt，再實測斷線恢復 |
++| Freshness 批准 | 5 秒仍只是非生產提案 | 量測 feed latency 後批准版本政策；缺證據維持拒絕新入場 |
++
++成本候選（2026-11-26 查閱，沒有購買／切換）：
++
++| 路線 | 官方可見成本與範圍 | 限制 |
++|---|---|---|
++| 先核實現有 Futu | 增量費用尚未確定，先核對現有 API 權益 | App 與 API 權益可不同；資格、coverage、PRE/POST 與用途不能由 login 推定 |
++| Alpaca Basic | 免費，股票即時僅 IEX，WebSocket 30 symbols；期權 indicative | 不能當完整市場 BBO／全市場即時；帳戶與用途資格另核對 |
++| Alpaca Algo Trader Plus | 官方 Trading API 個人方案 US$99/月，股票所有美國交易所、期權 OPRA | 尚未接入或購買；PRE/POST、用途授權及合約條件仍需驗證 |
++
++來源：[Futu authorities](https://openapi.futunn.com/futu-api-doc/en/intro/authority.html)、
++[Alpaca Market Data plans](https://docs.alpaca.markets/us/docs/about-market-data-api)。
++後續驗收由 [G2 票](../tickets/s03-stream/issues/03-feed-evidence-g2.md) 追蹤。
+--- before/docs/memory/architecture.md
++++ after/docs/memory/architecture.md
+@@ -32,11 +32,13 @@
+ - Policy/order declaration validation and evidence-aware event shapes now exist;
+   runtime approval/OMS remain later: [02d report](../audit/s02-02d-orders-policy-2026-11-25.md).
+ 
+-- Feed capability/subscription demand and decision contracts now exist; allocator
+-  and provider checks remain later: [02e report](../audit/s02-02e-subscriptions-2026-11-25.md).
++- Feed capability/subscription contracts originated in
++  [02e report](../audit/s02-02e-subscriptions-2026-11-25.md); allocator/provider
++  implementation followed in S03, whose current scope is linked below.
+ 
+-- Explicit identity/capability/resource declarations exist; actual session/auth
+-  enforcement remains Task 3: [02f report](../audit/s02-02f-identity-2026-11-25.md).
++- Identity/capability/resource declarations originated in
++  [02f report](../audit/s02-02f-identity-2026-11-25.md); actual session/auth enforcement
++  followed in the completed S02 foundation linked below.
+ 
+ - JobLease/Reservation declarations preserve unknown spend and lease intervals;
+   transactional scheduler/budget services remain Task 6: [02g report](../audit/s02-02g-jobs-budget-2026-11-25.md).
+@@ -66,6 +68,8 @@
+   use explicit asset/session/channel support and separate Futu quota pools;
+   snapshot freeze/deltas and deferred provider integration: [03f report](../audit/s03-03f-planner-2026-11-25.md).
+ 
+-- Single-use US equity FeedAdapter now isolates SDK callbacks over a private pipe;
+-  provider normalization precedes typed QuoteStream.apply/latest/pending slots.
+-  Limits, lifecycle and deferred persistent/API streaming: [03g report](../audit/s03-03g-stream-2026-11-26.md).
++- S03 now owns freshness/calendar checks, trade bars, bounded state/replay,
++  verified recovery, managed lifecycle and authenticated internal streaming.
++  Futu live producer remains single-equity quote-only; API/UI rendering is S04.
++  Commands, interfaces, verified boundaries and G2 hold:
++  [S03 report](../audit/s03-completion-2026-11-26.md).
+--- before/docs/memory/execution.md
++++ after/docs/memory/execution.md
+@@ -1,25 +1,22 @@
+ # Execution checkpoint
+ 
+-- Section / unit: S03 remainder — in progress; user authorized completing all S03.
+-- Checkout: `C:/Users/001/Desktop/GabFin-ai-trade/.worktrees/gabfin-s01`.
+-- Branch: `codex/s01-source-baseline`.
+-- Active unit base: `3073cf3b41ac2724979442960b314a0c92598ca0`.
+-- Current HEAD: `3073cf3b41ac2724979442960b314a0c92598ca0`, not pushed.
+-- Working tree: new feed contracts, freshness, bars, coordinator/replay and tests
+-  are uncommitted. Original untracked web/package-lock.json retained.
+-- Added bounded quote-only FeedAdapter, private SDK pipe and typed latest cache;
+-  source times, strict IPC, coalescing and lifecycle/error handling verified.
+-- Actual source times, rights and counters: [feed register](../audit/feed-entitlements.md).
+-  Changing current-day callbacks now observed; live rights/latency remain unverified.
+-- Tests, independent Standards/Spec review, wheel/clean install and preservation:
+-  [03g report](../audit/s03-03g-stream-2026-11-26.md). Final full suite passed;
+-  skipped optional checks and an intermittent legacy failure remain explicit there.
+-- Active ticket: [S03 remainder](../tickets/s03-stream/issues/02-market-state-recovery.md).
+-  Freshness/bar first 28 cases and coordinator first 6 cases ran; no completion
+-  claim yet. Artifacts: docs/audit/artifacts/s03-rest, baseline snapshot before.json.
+-- Next exact action: resolve independent review findings in
+-  docs/audit/artifacts/s03-rest/review-resolution.md; then final full/wheel/live-chain,
+-  reviewer followups, local commit and checkpoint. No final completion claim yet.
+-- Implementation/review routing: [workflow](../agents/workflow.md).
+-- S03 remains incomplete: realtime/PRE/POST evidence, live manifest/apply,
+-  persistent lifecycle/API stream, freshness, bar building and replay. No trading.
++- Section / unit: S03 工程收尾完成；G2 真實行情權益 gate 未放行。
++- Checkout: `C:/Users/001/Desktop/GabFin-ai-trade/.worktrees/gabfin-s01`。
++- Branch: `codex/s01-source-baseline`。
++- Unit base: `3073cf3b41ac2724979442960b314a0c92598ca0`。
++- Current HEAD: `1802198648ce465db5f3dba79a342756a7f9ccc5`，僅本機，未 push。
++- Reviewed/verified tree: `63f71a854aefff3de147404f82e6fd9fda7b315a`。
++- Tracked 工作樹乾淨；原 untracked `web/package-lock.json` 保留且雜湊不變。
++- Freshness、trade bars、coordinator/recovery/replay、managed lifecycle、
++  authenticated loopback stream 及 quote-only host 已交付。
++- 最終回歸、雙軸獨立複查、乾淨 wheel、真實 consumer 鏈路、保留驗證：
++  [S03 完成報告](../audit/s03-completion-2026-11-26.md)。未執行關卡不視為通過。
++- 行情時鐘、權益、配額及 G2 成本候選：[feed register](../audit/feed-entitlements.md)。
++  本次是舊收市價；freshness 實際拒絕，不能宣稱 realtime／BBO／PRE／POST 可用。
++- [工程票](../tickets/s03-stream/issues/02-market-state-recovery.md) 已完成；
++  [G2 票](../tickets/s03-stream/issues/03-feed-evidence-g2.md) 保持未完成。
++- Next Section: S04 新前端殼與圖表，尚未開始；先讀 Task 7 與研究體驗追加驗收，
++  沿用既有需求，只針對 UI 新取捨 grilling。UI render tracing 續接 S04。
++- G2 可以另作有界驗證；缺 channel／權益證據及未批准政策維持拒絕新入場。
++- 不購買、不啟動交易、不 push/deploy；不重啟既有 OpenD。
++- 實作／審查路由：[workflow](../agents/workflow.md)。
+--- before/docs/memory/progress.md
++++ after/docs/memory/progress.md
+@@ -1,4 +1,11 @@
+ # Recent progress
++
++## 2026-11-26 — S03 工程收尾完成，G2 未放行
++
++- 已提交 1802198；freshness／bar／recovery／stream／lifecycle 交付。
++- 最終回歸、雙軸獨立複查、乾淨 wheel 及真實 consumer 鏈路：
++  [S03 report](../audit/s03-completion-2026-11-26.md)。
++- 實際是舊收市價，權益 gate 仍 open；下一節 S04 尚未開始，沒有交易／部署。
+ 
+ ## 2026-11-26 — S03/03g callback／有界 cache 完成
+ 
+@@ -52,10 +59,3 @@
+ - 新增 preflight 與安全 metadata inspection，提交 06f240c。
+ - 實際驗證及環境缺項見 [03a report](../audit/s03-03a-preflight-2026-11-25.md) 與 feed-entitlements。
+ - 下一單位 03b SDK／子程序準備；未啟動 OpenD 或驗證真實行情。
+-
+-## 2026-11-25 — 整個 S02 基礎完成
+-
+-- 完成剩餘契約／共用 schema、SQLite、session／授權，提交 c6d1443。
+-- 最終驗證、修正及外部關卡由 [S02 report](../audit/s02-completion-2026-11-25.md) 擁有。
+-- 下一節為 S03；沒有啟動交易或接入真實帳戶。
+-
+--- before/docs/memory/tasks.md
++++ after/docs/memory/tasks.md
+@@ -1,19 +1,18 @@
+ # Pending tasks
+ 
+-## T018 — S03 / 03h: freshness / heartbeat / bar behavior
++## T019 — S04 新前端殼與圖表（尚未開始）
+ 
+-- 03g isolated callback/typed bounded cache completed; [03g report](../audit/s03-03g-stream-2026-11-26.md)
+-  owns tests, review, cleanup and implementation limits.
+-- Next: define and test freshness/heartbeat and bar boundaries from Task 5:
+-  capture-time ages vs current eligibility, no-new-trade vs disconnection,
+-  duplicate/late events and session rules. Quote callbacks cannot supply trade volume.
+-- Distinguish old-price reads from current realtime/PRE/POST evidence; closed-market
+-  data alone cannot establish those rights. [Feed evidence](../audit/feed-entitlements.md).
+-- Full catalog import, live capability manifest/provider apply, persistent SDK
+-  lifecycle and authenticated API stream/replay
+-  integration remain future work. No option trading in V1 or account/trade context.
+-- Implementation/review policy: [workflow](../agents/workflow.md).
+-- Keep the legacy intermittent Windows JSONIntentStore failure visible;
+-  evidence and unresolved root cause are owned by the 03g report.
+-- Preserve source HEAD, evidence and original lockfile. No purchase,
+-  trading, push/deploy. Do not restart existing OpenD casually.
++- S03 工程已完成；最新提交／驗證由 [execution](execution.md) 與
++  [完成報告](../audit/s03-completion-2026-11-26.md) 擁有。
++- 下一個建置 Section 是 S04／主計劃 Task 7；先讀相關規格、研究體驗追加驗收
++  與 workflow，按功能切片。UI 顯示來源、資料時間、stale／缺資料及錯誤狀態。
++- 前端 bridge 延續 source→consumer tracing 至 UI render，不將舊 close 當 realtime。
++
++## T020 — G2 行情權益／provider channel 證據
++
++- [G2 票](../tickets/s03-stream/issues/03-feed-evidence-g2.md) 未完成；實際證據、
++  解除路線與成本候選由 [feed register](../audit/feed-entitlements.md) 擁有。
++- 不因 closed-market 舊價、quote login 或 quota 放行自動入場。
++- Windows JSONIntentStore 間歇性問題仍由 [03g report](../audit/s03-03g-stream-2026-11-26.md)
++  追蹤，這次全套通過不代表其根因已修復。
++- 保留原檔及證據；不購買、不交易、不 push/deploy，不隨意重啟 OpenD。
+--- before/docs/memory/tooling.md
++++ after/docs/memory/tooling.md
+@@ -43,3 +43,6 @@
+   [03e report](../audit/s03-03e-history-2026-11-25.md).
+ - `.tools/s03-03f-wheel-check` runs the synthetic planner demonstration without
+   futu/pandas or provider I/O; [03f report](../audit/s03-03f-planner-2026-11-25.md).
++- `.tools/s03-rest-wheel-check` verifies the final market wheel without SDK/pandas;
++  `.tools/s03-calendar` adds pinned optional calendar export separately.
++  Evidence and scripts: [S03 report](../audit/s03-completion-2026-11-26.md).
+--- before/docs/superpowers/plans/2026-11-25-gabfin-plus-sections.md
++++ after/docs/superpowers/plans/2026-11-25-gabfin-plus-sections.md
+@@ -1,6 +1,6 @@
+ # GabFin 第一版：Plus 額度下的分段執行指南
+ 
+-日期：2026-11-25，Asia/Hong_Kong。狀態：S01 與 S02 基礎已完成；其餘按 checkpoint 推進，原工作單位數僅為初估。
++日期：2026-11-25，Asia/Hong_Kong。狀態：S01、S02 基礎與 S03 工程已完成；G2 權益仍未放行，下一節 S04 尚未開始。原工作單位數僅為初估。
+ 
+ 本文件調整執行粒度，不改變已確認功能。需求以 [架構設計](../specs/2026-11-25-gabfin-system-design.md) 為準；檔案、契約、測試與驗收以 [24-task 主計劃](2026-11-25-gabfin-upgrade-plan.md) 為準。
+ 
+--- before/docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md
++++ after/docs/superpowers/plans/2026-11-25-gabfin-upgrade-plan.md
+@@ -191,24 +191,31 @@
+ **Files:** Create `services/gabfin/providers/futu/{adapter,capabilities,symbols}.py`、`services/gabfin/market/subscriptions.py`、`tests/gabfin/market/test_feed_capabilities.py`、`docs/audit/feed-entitlements.md`。
+ **Interfaces:** `FeedAdapter`；`plan_subscriptions(demands: list[Demand], caps: FeedCapabilities) -> SubscriptionPlan`。
+ 
+-- [ ] Fake adapter 測試：持倉優先、相同訂閱去重、離頁 unsubscribe、超額時有 reason、股票／期權 instrument 不混淆。
+-- [ ] Run `python -m pytest tests/gabfin/market/test_feed_capabilities.py -q`，確認失敗。
+-- [ ] 移植舊 symbol／quota 邏輯中可驗證部分；OpenD SDK 隔離程序，只開行情 context，不 unlock trade。
++- [x] Fake adapter 測試：持倉優先、相同訂閱去重、離頁 unsubscribe、超額時有 reason、股票／期權 instrument 不混淆。
++- [x] Catalog／planner 的公開測試先 RED 後 GREEN；實際路徑為 `tests/gabfin/test_symbols.py`、`tests/gabfin/test_subscription_planner.py`，證據見 03f 報告。
++- [x] 移植舊 symbol／quota 邏輯中可驗證部分；OpenD SDK 隔離程序，只開行情 context，不 unlock trade。
+ - [ ] 在擁有者主機做最小 smoke：一股 quote、bar、指定期權 chain／quote、PRE/POST 能力；記時間、權限及配額，不記帳號。
+-- [ ] 能力不足時輸出具體 G2 缺口及成本候選，不能偷偷改資料源標籤。
+-- [ ] Commit `feat: add capability-aware OpenD market adapter`。
++- [x] 能力不足時輸出具體 G2 缺口及成本候選，不能偷偷改資料源標籤。
++- [x] 本機提交 capability-aware adapter／planner；03f、03g 及收尾提交見 S03 報告。
+ 
+ ### Task 5 — 真正推送、Bar Builder、新鮮度與重播
+ 
+ **Files:** Create `services/gabfin/market/{coordinator,bars,freshness,replay,stream}.py`、`tests/gabfin/market/test_stream_replay.py`。
+ **Interfaces:** `apply(event: MarketEvent) -> list[MarketUpdate]`；`snapshot(keys) -> MarketSnapshot`；`entry_eligible(snapshot, policy, now) -> FreshnessDecision`。
+ 
+-- [ ] 測試 duplicate tick 不增加 volume、late tick 修訂正確 bar、DST／休市 session、斷線補缺、無新成交但 heartbeat 健康。
+-- [ ] Run `python -m pytest tests/gabfin/market/test_stream_replay.py -q`，確認失敗。
+-- [ ] 以 provider callback 推送到有界 queue，不再用 15 秒 snapshot 假裝即時；歷史 REST 只作初始化及補缺。
+-- [ ] 跨程序初期採 loopback authenticated internal stream，由單一市場程序服務；驗證 scope、不得公開監聽，版本不相容立即拒絕。
+-- [ ] quotes 可合併最新值，委託事件不可丟棄；slow consumer 斷線後要求 snapshot，禁止無限 queue。
++- [x] 測試 duplicate tick 不增加 volume、late tick 修訂正確 bar、DST／休市 session、斷線補缺、無新成交但 heartbeat 健康。
++- [x] Bar／freshness／coordinator／stream 公開行為先 RED 後 GREEN；實際測試位於 `tests/gabfin/test_{bar_builder,freshness,market_coordinator,internal_market_stream}.py`，證據見 S03 報告。
++- [x] 以 provider callback 推送到有界 queue，不再用 15 秒 snapshot 假裝即時。
++- [ ] 接通真實 history adapter，歷史 REST 只作初始化及補缺；本次交付可驗證的 recovery seam，真實接入與補缺證據留在 [G2 票](../../tickets/s03-stream/issues/03-feed-evidence-g2.md)。
++- [x] 跨程序初期採 loopback authenticated internal stream，由單一市場程序服務；驗證 scope、不得公開監聽，版本不相容立即拒絕。
++- [x] quotes 可合併最新值；行情通道拒絕委託，slow consumer 斷線後要求 snapshot，禁止無限 queue。
++- [ ] 委託事件不可丟棄；此傳遞保證由 S08 OMS／交易事件通道驗證，行情通道拒收不是委託交付證據。保留原要求。
+ - [ ] 重跑並記 event→receive→state→UI tracing；commit `feat: deliver replayable market events and freshness`。
++
++S03 工程收尾於 2026-11-26 完成；[交付／驗證／界線](../../audit/s03-completion-2026-11-26.md)。
++Task 4 的完整 realtime／BBO／PRE／POST 證據仍屬 G2 open gate，不能勾成通過。
++Task 5 已完成 source→receive→state→consumer 實測及本機提交 1802198；
++UI render tracing 續接 S04，最後一項尚未完整驗收。既有確認需求沒有刪除。
+ 
+ ### Task 6 — 持久化任務、取消及模型費用帳本
+ 
+@@ -521,7 +528,7 @@
+ Plus 額度有限時，按 [12 個 Sections 執行指南](2026-11-25-gabfin-plus-sections.md) 分成小型可驗收工作；最新進度見 `docs/memory/execution.md`。此拆分不縮減第一版需求。
+ 
+ 新 Codex session 先讀 root AGENTS 和 `docs/memory/tasks.md`；做架構工作再讀 spec，執行任務只讀本計劃的對應 task、契約及必要來源。
+-S01 與整個 S02 基礎已完成；下一單位為 S03/03a，實際進度以 execution checkpoint 為準。研究體驗補強及 Tasks 2/6/8/9/14/15/16/18/19/23 的追加驗收見 [研究體驗實施計劃](2026-11-25-gabfin-research-experience-plan.md)。
++S01、S02 基礎與 S03 工程已完成；G2 權益 gate 保持 open，下一 Section 為 S04，實際進度以 execution checkpoint 為準。研究體驗補強及 Tasks 2/6/8/9/14/15/16/18/19/23 的追加驗收見 [研究體驗實施計劃](2026-11-25-gabfin-research-experience-plan.md)。
+ 執行方式建議先 Native／順序完成共享契約與 baseline，再在明確邊界按需要分派獨立工作，避免重複上下文和共享檔案衝突。
+ 
+-S02 / Tasks 2–3 foundation completed locally; acceptance/limits: [S02 completion report](../../audit/s02-completion-2026-11-25.md). Actual HTTPS/iPhone and broad security gates remain Tasks 18/23. Next Section is S03; use execution checkpoint.
++S02 / Tasks 2–3 foundation completed locally; acceptance/limits: [S02 completion report](../../audit/s02-completion-2026-11-25.md). Actual HTTPS/iPhone and broad security gates remain Tasks 18/23. S03 engineering is now delivered; G2 remains open. Next Section is S04; use execution checkpoint.
+--- before/docs/tickets/s03-stream/issues/02-market-state-recovery.md
++++ after/docs/tickets/s03-stream/issues/02-market-state-recovery.md
+@@ -1,6 +1,6 @@
+ # S03 remainder — 行情狀態、新鮮度及恢復
+ 
+-Status: in-progress
++Status: done
+ Blocked by: none（03g 已完成）
+ 
+ 規格：[主計劃 Task 4–5](../../../superpowers/plans/2026-11-25-gabfin-upgrade-plan.md)、
+@@ -9,21 +9,21 @@
+ 
+ ## 驗收
+ 
+-- [ ] Freshness 以讀取時 now／來源時間判斷，heartbeat 與最後市場事件分開；
++- [x] Freshness 以讀取時 now／來源時間判斷，heartbeat 與最後市場事件分開；
+   未知／延遲權益、clock skew、gap、錯誤 session 或未批准政策禁止新入場。
+   不預設任何已批准的秒數；結果只是行情條件，不是交易授權。
+-- [ ] TradeMarketEvent 建 bar：duplicate 不重算 volume，late event 修訂正確時間窗，
++- [x] TradeMarketEvent 建 bar：duplicate 不重算 volume，late event 修訂正確時間窗，
+   forming/final/corrected、來源時序、交易所 session/DST／休市與有界記憶體皆可測。
+   Quote 不會冒充 trade 或產生虛構成交量。
+-- [ ] Coordinator 以 apply/snapshot 公開介面提供 latest 狀態、序號及有界 replay；
++- [x] Coordinator 以 apply/snapshot 公開介面提供 latest 狀態、序號及有界 replay；
+   斷線時 gap 明確，只有已驗證完整補缺才解除，重播不使用尚不可得資料。
+-- [ ] 私有跨程序 stream 僅監聽 loopback，驗證版本、身份、scope、到期；
++- [x] 私有跨程序 stream 僅監聽 loopback，驗證版本、身份、scope、到期；
+   慢讀者有界／斷線且必須重新 snapshot，行情通道拒絕委託事件。
+-- [ ] 接通 feed lifecycle 與同一市場狀態；取消、重連、補缺失敗不變成健康。
++- [x] 接通 feed lifecycle 與同一市場狀態；取消、重連、補缺失敗不變成健康。
+   有限診斷與常駐主機行為的驗證範圍明示，不把 fake 當 provider 真實證據。
+-- [ ] 覆核既有 quota／catalog／entitlement smoke，列明 G2 缺口及可選路線；
++- [x] 覆核既有 quota／catalog／entitlement smoke，列明 G2 缺口及可選路線；
+   不採購、不升級權益、不啟動交易。
+-- [ ] 完整回歸、獨立 Standards／Spec 審查、wheel／乾淨安裝及限時真實鏈路驗證。
++- [x] 完整回歸、獨立 Standards／Spec 審查、wheel／乾淨安裝及限時真實鏈路驗證。
+ 
+ ## 公開測試面及工程取捨
+ 
+@@ -37,3 +37,7 @@
+ 
+ - Base `3073cf3b41ac2724979442960b314a0c92598ca0`，分支 codex/s01-source-baseline。
+ - G2 未證實的項目必須保持 open；完成實作不代表可以啟動 paper/live execution。
++
++- 收尾提交／最終驗證：[S03 工程交付報告](../../../audit/s03-completion-2026-11-26.md)。
++- 工程驗收完成；G2 權益／真實 channel 缺口保留於 [獨立後續票](03-feed-evidence-g2.md)，
++  沒有宣稱外部行情 gate 通過；S04 UI rendering 尚未開始。
+--- before/docs/audit/s03-completion-2026-11-26.md
++++ after/docs/audit/s03-completion-2026-11-26.md
+@@ -0,0 +1,72 @@
++# S03 工程交付與驗證
++
++S03 程式收尾完成；**G2 行情權益關卡仍未放行**。完成工程交付不代表已取得
++即時／BBO／PRE／POST 權限，也不代表已啟動 paper 或真實交易。
++
++- Checkout：`C:/Users/001/Desktop/GabFin-ai-trade/.worktrees/gabfin-s01`。
++- Branch：`codex/s01-source-baseline`；base `3073cf3b41ac2724979442960b314a0c92598ca0`。
++- 本機提交：`1802198648ce465db5f3dba79a342756a7f9ccc5`，未 push。
++- 審查／測試／提交的同一棵樹：`63f71a854aefff3de147404f82e6fd9fda7b315a`，28 個檔案。
++- [工作票](../tickets/s03-stream/issues/02-market-state-recovery.md)、
++  [主機使用說明](../../.worktrees/gabfin-s01/docs/market-data-host.md)。
++
++## 已交付
++
++- Freshness 在讀取時重新計算來源價格年齡，獨立核對 provider heartbeat、
++  calendar 現時 session、權益、BBO、品質與政策。缺證據即拒絕；沒有預設批准秒數。
++- Trade bar 使用 UTC session windows，處理 duplicate、late correction、finalization、
++  DST／休市、Decimal 精度與保留上限。Trade ID 與 dedup key 同時核對，quote 不產生成交量。
++- 單市場 coordinator 提供 latest snapshot、有界 replay、epoch/cursor 及明確 gap。
++  來源序號預設 opaque；只有明確宣告 contiguous 才偵測缺號，重置／衝突須新 epoch。
++- 補缺逐 instrument/channel/timeframe 核對範圍、唯一紀錄筆數、分頁及空頁證明。
++  拒收／時鐘偏移／重複資料不能補齊缺口。Quote snapshot 只恢復 quote 狀態。
++- Loopback authenticated internal stream 驗證身份、scope、到期及版本；行情通道拒絕委託。
++  Resume 綁定 session 與股票集合；慢讀者或連線錯誤須先取得新 snapshot。
++- Managed feed lifecycle 在重試前驗證完整釋放回條；心跳失效會關閉舊 context 再重連。
++  清理失敗停止建立 context；有限診斷的訂閱失敗會傳回非成功結果。
++- 已接一股 quote-only Futu host、實際 login/quota capabilities 查詢及前景常駐入口。
++  `run_plan` 只接受新 context 的可靠完整計劃，不接管不明的舊訂閱。
++- 可選 `exchange-calendars==4.13.3` exporter，主程序毋須 pandas／SDK。
++
++## 實際驗證
++
++- 最終完整回歸：**2108 passed、4 skipped、1 warning，exit 0，130.78 秒**。
++  [完整輸出](artifacts/s03-rest/full-reviewed.log)、[JUnit](artifacts/s03-rest/full-reviewed.xml)。
++  Skip 均因未安裝可選 `psycopg`；warning 為既有 Pandas4Warning。
++  沒有重跑未變更的前端 build／已知失敗 typecheck；不宣稱它們通過。
++- 獨立 Standards／Spec 以全新 reviewer 上下文審查；修正後對同一最終樹複查，
++  未發現剩餘程式 blocker。兩者分別重跑 7／8 個聚焦案例。
++  [審查紀錄](artifacts/s03-rest/reviews.json)。
++- [RED／GREEN 及失敗修正紀錄](artifacts/s03-rest/review-resolution.md) 保留預期失敗、
++  中途測試錯誤與最終結果；較早的 full-before-review／full-final 不取代最後回歸。
++- Wheel build／乾淨安裝成功；SHA256
++  `11e6e81e0657b6e8d97fb4995861ebfa4980626c8a6d4069c7fe56f0be384e2a`。
++  51 個 Python 檔案與 source／安裝內容一致，50 個模組可匯入、schema 一致，
++  環境沒有 Futu SDK、pandas 或 calendar extra。
++  [驗證](artifacts/s03-rest/wheel-verification.json)、[腳本](artifacts/s03-rest/check-wheel.py)。
++- Calendar extra 獨立安裝；最終 wheel 匯出 2026 XNYS 251 個 regular sessions。
++  核對 Thanksgiving 休市、翌日提早收市及兩個 DST 開市時刻；
++  [日曆驗證](artifacts/s03-rest/calendar-verification.json)、
++  [NYSE 官方依據](https://www.nyse.com/trade/hours-calendars)。
++- 真實 SDK → coordinator → authenticated stream → **獨立 consumer process** 成功，
++  consumer 收到 quote／health，quote 狀態恢復，無 consumer 錯誤。
++  明確反訂閱、context 關閉及 worker 退出成功。
++  [實際鏈路](artifacts/s03-rest/live-chain.json)、[腳本](artifacts/s03-rest/live-chain.py)。
++  行情來源時間／權益／配額的解讀由 [feed register](feed-entitlements.md) 擁有。
++- [事後檢查](artifacts/s03-rest/post-live-check.json)：SDK worker 0，原 OpenD PID 29100
++  仍監聽 loopback。沒有關閉／重啟 OpenD，沒有交易／帳戶 context、unlock 或下單。
++- [保留驗證](artifacts/s03-rest/preservation.json)：543 個原 tracked 檔案，除本單位範圍
++  沒有非預期變更；原 untracked `web/package-lock.json` 雜湊一致。
++  Full tests 產生的 mock journal 已歸檔；移動前核對 baseline 確認原本不存在及兩端路徑。
++
++## 界線與下一步
++
++- 真實 producer 目前只有一股 quote，缺 BBO／已驗證 session 與 latency 標籤。
++  Trade/bar/history 引擎已透過受信 adapter seam 測試；不是實際 Futu tick／bar 補缺證據。
++  Catalog 是有限且 caller 核對的 metadata，不是完整市場 security master 匯入。
++- 本次取得舊收市價；「connected／quote resynced」與「可用於新入場」分開，
++  freshness 實際回傳拒絕。沒有批准 5 秒門檻或任何交易政策。
++- G2 具體缺口、解除方法及成本候選見 [feed register](feed-entitlements.md)；
++  [後續票](../tickets/s03-stream/issues/03-feed-evidence-g2.md) 保持未完成。
++- Source→receive→state→consumer 已有實際 tracing；UI render 尚未量測，續接 S04。
++  下一 Section 是 S04 前端殼與圖表；本次沒有開始 S04、部署或啟動 paper trade。
+--- before/docs/tickets/s03-stream/issues/03-feed-evidence-g2.md
++++ after/docs/tickets/s03-stream/issues/03-feed-evidence-g2.md
+@@ -0,0 +1,24 @@
++# G2 — 真實行情權益與 channel 證據
++
++Status: blocked
++Blocked by: 缺少已核對的 instrument/channel/session 權益與可用時段證據；不是使用者批准不足。
++
++規格：[主計劃 Task 4–5](../../../superpowers/plans/2026-11-25-gabfin-upgrade-plan.md)、
++[設計 §7.2](../../../superpowers/specs/2026-11-25-gabfin-system-design.md)。
++
++S03 工程已交付；本票保留外部 release gate，不代表即時行情已可用於自動交易。
++權益事實、觀察時間及成本候選由 [feed register](../../../audit/feed-entitlements.md) 擁有。
++
++## 驗收與解除方法
++
++- [ ] 核對 API 的 instrument/channel/session/latency manifest，不能以 UI LV3、
++  quote login、quota 或舊收市價代替權益證明。
++  股票與期權分開核對，列明歷史資料粒度／範圍及用途限制。
++- [ ] 在可用交易時段，限時取得有來源時間的 BBO／last、PRE／POST 證據；
++  未獲授權的項目逐項說明，不能偷偷更改 feed／latency 標籤。
++- [ ] 視已證實的 channel 延伸 Futu adapter，接 canonical catalog／history recovery；
++  Trade/bar 的真實 provider 補缺驗證與 fake 測試分開記錄。
++- [ ] 取得足夠 latency 證據後另行批准 freshness policy；未批准維持拒絕新入場。
++
++不採購、不改會員權益、不讀帳戶、不開交易 context。若需供應商切換或付費，
++先提供具體 coverage／限制／費用供使用者決定。S04 的離線 UI 工作可獨立進行。

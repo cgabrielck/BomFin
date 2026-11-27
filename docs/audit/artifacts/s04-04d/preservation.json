@@ -1,0 +1,38 @@
+{
+  "baseline_head": "a434de2134550f6dc6ff32b593327192d309ffda",
+  "tracked_baseline_files": 603,
+  "owned_files": [
+    "apps/desk-web/README.md",
+    "apps/desk-web/package.json",
+    "apps/desk-web/public/demo/bars/AAPL.json",
+    "apps/desk-web/public/demo/bars/MSFT.json",
+    "apps/desk-web/public/demo/bars/NVDA.json",
+    "apps/desk-web/public/third-party/lightweight-charts-LICENSE.txt",
+    "apps/desk-web/public/third-party/lightweight-charts-NOTICE.txt",
+    "apps/desk-web/src/app/styles.css",
+    "apps/desk-web/src/features/chart/ChartCanvas.tsx",
+    "apps/desk-web/src/features/chart/ChartPanel.tsx",
+    "apps/desk-web/src/features/chart/bar-series.ts",
+    "apps/desk-web/src/features/chart/chart-port.ts",
+    "apps/desk-web/src/features/market/StockDetail.tsx",
+    "apps/desk-web/src/features/market/useMarketSubscription.ts",
+    "apps/desk-web/src/shared/transport/live.ts",
+    "apps/desk-web/src/shared/transport/market.ts",
+    "package-lock.json",
+    "playwright.config.ts",
+    "scripts/check-demo-fixtures.py",
+    "scripts/generate-chart-fixtures.py",
+    "tests/e2e/chart.spec.ts",
+    "tests/e2e/fixtures/market-server.py",
+    "tests/e2e/fixtures/secure-market.ts",
+    "tests/e2e/secure-market.spec.ts"
+  ],
+  "unexpected_baseline_changes": [],
+  "unstaged_tracked": [],
+  "untracked": [
+    "web/package-lock.json"
+  ],
+  "original_lock_sha256": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6",
+  "original_lock_preserved": true,
+  "index_tree": "8a9f825027d1f7ca57ed50f07b480584849f28aa"
+}

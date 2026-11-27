@@ -1,0 +1,7 @@
+{
+  "baseline_files": 563,
+  "unexpected_changes": [],
+  "original_lock_sha256": "d12d71781c1f43a4083c9a806fc680ecafa8748d10da66f2674b3dfd5bcdc5d6",
+  "original_lock_preserved": true,
+  "allowed_baseline_change": ".gitignore: add test-results/playwright-report ignores"
+}

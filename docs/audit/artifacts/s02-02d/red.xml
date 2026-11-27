@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="58" skipped="0" tests="58" time="2.324" timestamp="2026-11-25T11:32:18.920155+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_roundtrip[PolicyVersion-policy]" time="1.313"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:24: in test_roundtrip
+    r=parse(name,make());assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_roundtrip[PolicyVersion-approved_policy]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:24: in test_roundtrip
+    r=parse(name,make());assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_roundtrip[RiskDecision-decision]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:24: in test_roundtrip
+    r=parse(name,make());assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_roundtrip[OrderCommand-command]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:24: in test_roundtrip
+    r=parse(name,make());assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_roundtrip[OrderEvent-event]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:24: in test_roundtrip
+    r=parse(name,make());assert type(r).model_validate_json(r.model_dump_json())==r
+      ^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_missing_policy_bound_never_approved[per_trade_risk]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:28: in test_missing_policy_bound_never_approved
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_missing_policy_bound_never_approved[daily_loss]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:28: in test_missing_policy_bound_never_approved
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_missing_policy_bound_never_approved[runtime_drawdown]" time="0.002"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:28: in test_missing_policy_bound_never_approved
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_missing_policy_bound_never_approved[gross_exposure_leverage]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:28: in test_missing_policy_bound_never_approved
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_missing_policy_bound_never_approved[missing_data_policy]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:28: in test_missing_policy_bound_never_approved
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_draft[change0]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:31: in test_invalid_draft
+    with pytest.raises(ValidationError):parse('PolicyVersion',policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_draft[change1]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:31: in test_invalid_draft
+    with pytest.raises(ValidationError):parse('PolicyVersion',policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_draft[change2]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:31: in test_invalid_draft
+    with pytest.raises(ValidationError):parse('PolicyVersion',policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_draft[change3]" time="0.002"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:31: in test_invalid_draft
+    with pytest.raises(ValidationError):parse('PolicyVersion',policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_draft[change4]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:31: in test_invalid_draft
+    with pytest.raises(ValidationError):parse('PolicyVersion',policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_approval[change0]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:34: in test_invalid_approval
+    with pytest.raises(ValidationError):parse('PolicyVersion',approved_policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_approval[change1]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:34: in test_invalid_approval
+    with pytest.raises(ValidationError):parse('PolicyVersion',approved_policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_approval[change2]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:34: in test_invalid_approval
+    with pytest.raises(ValidationError):parse('PolicyVersion',approved_policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_approval[change3]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:34: in test_invalid_approval
+    with pytest.raises(ValidationError):parse('PolicyVersion',approved_policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_approval[change4]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:34: in test_invalid_approval
+    with pytest.raises(ValidationError):parse('PolicyVersion',approved_policy()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_bound[per_trade_risk-1.1]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:38: in test_invalid_bound
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_bound[daily_loss--1]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:38: in test_invalid_bound
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_bound[gross_exposure_leverage-0]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:38: in test_invalid_bound
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_bound[per_trade_risk-0.01]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:38: in test_invalid_bound
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_bound[runtime_drawdown-True]" time="0.004"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:38: in test_invalid_bound
+    with pytest.raises(ValidationError):parse('PolicyVersion',p)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change0]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change1]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change2]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change3]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change4]" time="0.002"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change5]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change6]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change7]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_risk_approval[change8]" time="0.004"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:41: in test_invalid_risk_approval
+    with pytest.raises(ValidationError):parse('RiskDecision',decision()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_denial_has_no_sizing" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:43: in test_denial_has_no_sizing
+    p=decision();p.update(approved=False,quantity=None,risk_amount=None);assert parse('RiskDecision',p).approved is False
+                                                                                ^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_command[change0]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:47: in test_invalid_command
+    with pytest.raises(ValidationError):parse('OrderCommand',command()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_command[change1]" time="0.002"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:47: in test_invalid_command
+    with pytest.raises(ValidationError):parse('OrderCommand',command()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_command[change2]" time="0.004"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:47: in test_invalid_command
+    with pytest.raises(ValidationError):parse('OrderCommand',command()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_command[change3]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:47: in test_invalid_command
+    with pytest.raises(ValidationError):parse('OrderCommand',command()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_command[change4]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:47: in test_invalid_command
+    with pytest.raises(ValidationError):parse('OrderCommand',command()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_command[change5]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:47: in test_invalid_command
+    with pytest.raises(ValidationError):parse('OrderCommand',command()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_command[change6]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:47: in test_invalid_command
+    with pytest.raises(ValidationError):parse('OrderCommand',command()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_command[change7]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:47: in test_invalid_command
+    with pytest.raises(ValidationError):parse('OrderCommand',command()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_regular_market_and_extended_limit" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:49: in test_regular_market_and_extended_limit
+    assert parse('OrderCommand',command()|{'type':'market','limit_price':None}).type=='market'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_missing_price_does_not_fabricate_fill[partial]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:53: in test_missing_price_does_not_fabricate_fill
+    r=parse('OrderEvent',event()|{'status':status,'cum_fill_qty':'1'})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_missing_price_does_not_fabricate_fill[filled]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:53: in test_missing_price_does_not_fabricate_fill
+    r=parse('OrderEvent',event()|{'status':status,'cum_fill_qty':'1'})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_missing_price_does_not_fabricate_fill[canceled]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:53: in test_missing_price_does_not_fabricate_fill
+    r=parse('OrderEvent',event()|{'status':status,'cum_fill_qty':'1'})
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change0]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change1]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change2]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change3]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change4]" time="0.002"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change5]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change6]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change7]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_invalid_fill_observation[change8]" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:57: in test_invalid_fill_observation
+    with pytest.raises(ValidationError):parse('OrderEvent',event()|change)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_broker_evidence_and_canceled_partial" time="0.003"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:60: in test_broker_evidence_and_canceled_partial
+    r=parse('OrderEvent',p);assert json.loads(r.model_dump_json())['fill_price']=='100.10'
+      ^^^^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase><testcase classname="tests.gabfin.test_order_policy_contracts" name="test_schemas" time="0.005"><failure message="ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)">tests\gabfin\test_order_policy_contracts.py:64: in test_schemas
+    assert type(parse(name,make())).model_json_schema(mode='serialization')['additionalProperties'] is False
+                ^^^^^^^^^^^^^^^^^^
+tests\gabfin\test_order_policy_contracts.py:19: in parse
+    from gabfin.contracts import policy as pol, order
+E   ImportError: cannot import name 'policy' from 'gabfin.contracts' (C:\Users\001\Desktop\GabFin-ai-trade\.worktrees\gabfin-s01\services\gabfin\contracts\__init__.py)</failure></testcase></testsuite></testsuites>

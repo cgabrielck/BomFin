@@ -1,0 +1,11 @@
+{
+  "base": "87e295311fd7ef9dbb77c930084b15dc1b4dff23",
+  "command": "git diff --cached 87e295311fd7ef9dbb77c930084b15dc1b4dff23",
+  "commits_at_review": [],
+  "scope": ["services/gabfin/market/__init__.py", "services/gabfin/market/subscriptions.py", "services/gabfin/providers/futu/symbols.py", "tests/gabfin/test_symbols.py", "tests/gabfin/test_subscription_planner.py"],
+  "standards": {"agent": "/root/planner_standards", "initial_context": "fork_turns=none", "final_blocking": 0},
+  "spec": {"agent": "/root/planner_spec", "initial_context": "fork_turns=none", "final_unresolved": 0},
+  "resolved": ["Unconditional snapshot freeze and affected-current pool checks", "Missing current catalog entries freeze with reasons", "Empty ticker and cross-asset option code rejection", "Non-US option registration with per-demand rejection", "Scoped asset/session channel support", "Exact option strike comparison independent of Decimal context", "Shared ticker grammar"],
+  "assessed_heuristic": "Reused public NonNegativeCounter. Kept the small internal channel-shape check to avoid importing private _ChannelSpec or altering shared wire schema; ChannelSupport adds explicit asset/session scope.",
+  "limitations": ["Advisory logical delta only; caller supplies authenticated demands, context ownership and verified metadata. No live provider apply or trading authorization."]
+}

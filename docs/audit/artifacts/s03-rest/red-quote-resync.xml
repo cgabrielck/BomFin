@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.899" timestamp="2026-11-26T03:17:24.049071+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_market_coordinator" name="test_new_connection_full_snapshot_resyncs_duplicate_quote_without_refreshing_source_price" time="1.284"><failure message="TypeError: MarketCoordinator.recover_latest_quotes() takes 1 positional argument but 2 were given">tests\gabfin\test_market_coordinator.py:104: in test_new_connection_full_snapshot_resyncs_duplicate_quote_without_refreshing_source_price
+    assert market.recover_latest_quotes([current])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: MarketCoordinator.recover_latest_quotes() takes 1 positional argument but 2 were given</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="2.340" timestamp="2026-11-26T08:58:22.350212+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_internal_market_stream" name="test_resume_cursor_cannot_switch_its_snapshot_instrument_set" time="1.400"><failure message="AssertionError: assert ('resumed' == 'error'&#10;  &#10;  - error&#10;  + resumed)">tests\gabfin\test_internal_market_stream.py:141: in test_resume_cursor_cannot_switch_its_snapshot_instrument_set
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_internal_market_stream.py:138: in scenario
+    assert response.kind == 'error' and response.code == 'snapshot_required'
+E   AssertionError: assert ('resumed' == 'error'
+E     
+E     - error
+E     + resumed)</failure></testcase><testcase classname="tests.gabfin.test_internal_market_stream" name="test_write_timeout_invalidates_resume_until_another_full_snapshot" time="0.109"><failure message="AssertionError: assert ('resumed' == 'error'&#10;  &#10;  - error&#10;  + resumed)">tests\gabfin\test_internal_market_stream.py:174: in test_write_timeout_invalidates_resume_until_another_full_snapshot
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_internal_market_stream.py:171: in scenario
+    assert response.kind == 'error' and response.code == 'snapshot_required'
+E   AssertionError: assert ('resumed' == 'error'
+E     
+E     - error
+E     + resumed)</failure></testcase></testsuite></testsuites>

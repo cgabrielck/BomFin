@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="24" time="2.020" timestamp="2026-11-25T22:50:29.829076+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_quote_stream" name="test_callback_becomes_typed_snapshot_with_honest_provenance" time="1.131" /><testcase classname="tests.gabfin.test_quote_stream" name="test_slow_consumer_has_one_pending_latest_and_snapshot_is_defensive" time="0.060"><failure message="pydantic_core._pydantic_core.ValidationError: 1 validation error for QuotePoint&#10;price&#10;  Instance is frozen [type=frozen_instance, input_value=Decimal('1'), input_type=Decimal]&#10;    For further information visit https://errors.pydantic.dev/2.14/v/frozen_instance">tests\gabfin\test_quote_stream.py:49: in test_slow_consumer_has_one_pending_latest_and_snapshot_is_defensive
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_quote_stream.py:44: in scenario
+    event.payload.last.price = Decimal('1')
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pydantic\main.py:1116: in __setattr__
+    elif (setattr_handler := self._setattr_handler(name, value)) is not None:
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pydantic\main.py:1152: in _setattr_handler
+    _check_frozen(cls, name, value)
+.venv\Lib\site-packages\pydantic\main.py:104: in _check_frozen
+    raise ValidationError.from_exception_data(
+E   pydantic_core._pydantic_core.ValidationError: 1 validation error for QuotePoint
+E   price
+E     Instance is frozen [type=frozen_instance, input_value=Decimal('1'), input_type=Decimal]
+E       For further information visit https://errors.pydantic.dev/2.14/v/frozen_instance</failure></testcase><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch0]" time="0.003" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch1]" time="0.002" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch2]" time="0.002" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch3]" time="0.003" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch4]" time="0.003" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch5]" time="0.004" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch6]" time="0.003" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch7]" time="0.003" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch8]" time="0.003" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch9]" time="0.002" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch10]" time="0.002" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch11]" time="0.003" /><testcase classname="tests.gabfin.test_quote_stream" name="test_invalid_input_does_not_replace_cache[patch12]" time="0.003" /><testcase classname="tests.gabfin.test_quote_stream" name="test_late_and_duplicate_quotes_do_not_regress_or_refresh_age" time="0.003"><failure message="AssertionError: assert not True&#10; +  where True = accept({'version': 1, 'kind': 'quote', 'code': 'US.AAPL', 'price': '100.250', ...}, available_at=(datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=60)))&#10; +    where accept = &lt;gabfin.market.stream.QuoteStream object at 0x0000015DFC5DDC40&gt;.accept&#10; +    and   {'version': 1, 'kind': 'quote', 'code': 'US.AAPL', 'price': '100.250', ...} = wire('100.250')&#10;[+1 more line; full report in element text]">tests\gabfin\test_quote_stream.py:71: in test_late_and_duplicate_quotes_do_not_regress_or_refresh_age
+    assert not stream.accept(wire('100.250'), available_at=NOW + timedelta(minutes=1))
+E   AssertionError: assert not True
+E    +  where True = accept({'version': 1, 'kind': 'quote', 'code': 'US.AAPL', 'price': '100.250', ...}, available_at=(datetime.datetime(2026, 11, 25, 15, 0, tzinfo=datetime.timezone.utc) + datetime.timedelta(seconds=60)))
+E    +    where accept = &lt;gabfin.market.stream.QuoteStream object at 0x0000015DFC5DDC40&gt;.accept
+E    +    and   {'version': 1, 'kind': 'quote', 'code': 'US.AAPL', 'price': '100.250', ...} = wire('100.250')
+E    +    and   datetime.timedelta(seconds=60) = timedelta(minutes=1)</failure></testcase><testcase classname="tests.gabfin.test_quote_stream" name="test_empty_reader_wakes_on_close_and_cancel_allows_another_reader" time="0.004" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_real_callback_path_emits_sanitized_quote_and_releases_only_own_subscription" time="0.003" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_worker_mailbox_coalesces_without_losing_a_newer_source_observation" time="0.003"><failure message="AssertionError: assert '99' == '100.25'&#10;  &#10;  - 100.25&#10;  + 99">tests\gabfin\test_futu_quote_callback.py:88: in test_worker_mailbox_coalesces_without_losing_a_newer_source_observation
+    assert box.take()['price'] == '100.25'
+E   AssertionError: assert '99' == '100.25'
+E     
+E     - 100.25
+E     + 99</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ambiguous_nonexistent_or_missing_source_time_is_not_guessed[2026-11-01-01:30:00]" time="0.002" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ambiguous_nonexistent_or_missing_source_time_is_not_guessed[2026-03-08-02:30:00]" time="0.002" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ambiguous_nonexistent_or_missing_source_time_is_not_guessed[2026-11-25-]" time="0.002" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ambiguous_nonexistent_or_missing_source_time_is_not_guessed[2026-11-25-10:00:00+00:00]" time="0.002" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_partial_subscription_failure_still_waits_and_cleans_up" time="0.002" /></testsuite></testsuites>

@@ -1,0 +1,10 @@
+{
+  "input_dates": [
+    "2026-11-25",
+    "2026-11-26"
+  ],
+  "retained_dates": [
+    "2026-11-25T00:00:00"
+  ],
+  "source_backend_unchanged": true
+}

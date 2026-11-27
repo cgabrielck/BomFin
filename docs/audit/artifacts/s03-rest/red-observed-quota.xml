@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="2.221" timestamp="2026-11-26T03:21:32.456025+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_capabilities_use_observed_quota_without_upgrading_session_or_realtime" time="1.421"><failure message="TypeError: FutuQuoteAdapter.__init__() got an unexpected keyword argument '_metadata_worker'">tests\gabfin\test_futu_quote_adapter.py:461: in test_capabilities_use_observed_quota_without_upgrading_session_or_realtime
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:451: in scenario
+    adapter = FutuQuoteAdapter(InstrumentCatalog([equity()]), AAPL,
+E   TypeError: FutuQuoteAdapter.__init__() got an unexpected keyword argument '_metadata_worker'</failure></testcase></testsuite></testsuites>

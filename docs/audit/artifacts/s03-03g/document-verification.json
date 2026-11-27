@@ -1,0 +1,16 @@
+{
+  "local_links_verified": true,
+  "memory_lines": {
+    "docs/memory/tasks.md": 19,
+    "docs/memory/execution.md": 21,
+    "docs/memory/progress.md": 61,
+    "docs/memory/issues.md": 18,
+    "docs/memory/architecture.md": 71,
+    "docs/audit/s03-03g-stream-2026-11-26.md": 94,
+    "docs/audit/feed-entitlements.md": 81,
+    "docs/tickets/s03-stream/issues/01-equity-callback-cache.md": 32
+  },
+  "latest_progress_entries": 10,
+  "checkpoint_matches_source": true,
+  "completed_ticket": true
+}

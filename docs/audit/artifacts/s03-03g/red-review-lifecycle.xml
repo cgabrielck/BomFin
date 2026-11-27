@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="30" time="8.810" timestamp="2026-11-26T02:26:18.860563+08:00" hostname="DESKTOP-BTBR5SC"><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_adapter_delivers_callback_while_worker_is_still_running_then_closes" time="5.419" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_close_before_subscribe_is_terminal" time="0.007" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_cancel_waiting_consumer_waits_for_worker_cleanup" time="0.147" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_bad_or_failed_worker_is_reaped_and_reports_only_fixed_error[print('raw private SDK failure',flush=True)]" time="0.130" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_bad_or_failed_worker_is_reaped_and_reports_only_fixed_error[print(json.dumps(dict(version=2,kind='ready')),flush=True)]" time="0.138" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_bad_or_failed_worker_is_reaped_and_reports_only_fixed_error[print('x'*5000,flush=True)]" time="0.125" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_bad_or_failed_worker_is_reaped_and_reports_only_fixed_error[raise RuntimeError('private SDK error')]" time="0.131" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_incomplete_cleanup_stays_visible_and_cannot_claim_success" time="0.139" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_foreign_instrument_and_non_quote_channel_never_start_worker[key0]" time="0.007" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_foreign_instrument_and_non_quote_channel_never_start_worker[key1]" time="0.007" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_parallel_subscribers_share_the_same_pending_acknowledgement" time="0.144"><failure message="assert not True">tests\gabfin\test_futu_quote_adapter.py:157: in test_parallel_subscribers_share_the_same_pending_acknowledgement
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:156: in scenario
+    assert not premature
+E   assert not True</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_rejecting_an_extra_reader_does_not_close_the_authorized_reader" time="0.137"><failure message="assert False">tests\gabfin\test_futu_quote_adapter.py:182: in test_rejecting_an_extra_reader_does_not_close_the_authorized_reader
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:181: in scenario
+    assert healthy
+E   assert False</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_non_string_decimal_on_private_ipc_is_rejected[123]" time="0.139"><failure message="AssertionError: assert QuoteMarketEvent(schema_version='1.0', event_id=UUID('211a50a9-d667-54f5-aaf8-4481081b3ada'), instrument_id=UUID('1111...titlements(status=&lt;EntitlementStatus.UNKNOWN: 'unknown'&gt;, checked_at=None, capability_snapshot_id=None)), kind='quote') is None&#10;[+2 more lines; full report in element text]">tests\gabfin\test_futu_quote_adapter.py:205: in test_non_string_decimal_on_private_ipc_is_rejected
+    asyncio.run(scenario())
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:195: in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\runners.py:118: in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\.tools\python\cpython-3.12.16-windows-x86_64-none\Lib\asyncio\base_events.py:691: in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+tests\gabfin\test_futu_quote_adapter.py:203: in scenario
+    assert adapter.snapshot() is None
+E   AssertionError: assert QuoteMarketEvent(schema_version='1.0', event_id=UUID('211a50a9-d667-54f5-aaf8-4481081b3ada'), instrument_id=UUID('1111...titlements(status=&lt;EntitlementStatus.UNKNOWN: 'unknown'&gt;, checked_at=None, capability_snapshot_id=None)), kind='quote') is None
+E    +  where QuoteMarketEvent(schema_version='1.0', event_id=UUID('211a50a9-d667-54f5-aaf8-4481081b3ada'), instrument_id=UUID('1111...titlements(status=&lt;EntitlementStatus.UNKNOWN: 'unknown'&gt;, checked_at=None, capability_snapshot_id=None)), kind='quote') = snapshot()
+E    +    where snapshot = &lt;gabfin.providers.futu.adapter.FutuQuoteAdapter object at 0x000002CF2FF433B0&gt;.snapshot</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_non_string_decimal_on_private_ipc_is_rejected[1.25]" time="0.145" /><testcase classname="tests.gabfin.test_futu_quote_adapter" name="test_non_string_decimal_on_private_ipc_is_rejected[True]" time="0.156" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_real_callback_path_emits_sanitized_quote_and_releases_only_own_subscription" time="0.007" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_worker_mailbox_coalesces_without_losing_a_newer_source_observation" time="0.041" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ambiguous_nonexistent_or_missing_source_time_is_not_guessed[2026-11-01-01:30:00]" time="0.005" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ambiguous_nonexistent_or_missing_source_time_is_not_guessed[2026-03-08-02:30:00]" time="0.005" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ambiguous_nonexistent_or_missing_source_time_is_not_guessed[2026-11-25-]" time="0.005" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ambiguous_nonexistent_or_missing_source_time_is_not_guessed[2026-11-25-10:00:00+00:00]" time="0.005" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_partial_subscription_failure_still_waits_and_cleans_up" time="0.004" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_cleanup_and_preflight_failures_are_explicit_and_do_not_unsubscribe_foreign_state[unsubscribe]" time="0.005" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_cleanup_and_preflight_failures_are_explicit_and_do_not_unsubscribe_foreign_state[verify]" time="0.005" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_cleanup_and_preflight_failures_are_explicit_and_do_not_unsubscribe_foreign_state[close]" time="0.006" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_cleanup_and_preflight_failures_are_explicit_and_do_not_unsubscribe_foreign_state[setup]" time="0.005" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_cleanup_and_preflight_failures_are_explicit_and_do_not_unsubscribe_foreign_state[existing]" time="0.004" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_ipc_failure_during_ready_still_releases_subscription_and_closes" time="0.006" /><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_cancel_before_subscription_never_allocates_or_waits_minimum_hold[before_preflight]" time="0.006"><failure message="assert 61.0 == 0&#10; +  where 61.0 = &lt;test_futu_quote_callback.Clock object at 0x000002CF2FFFA660&gt;.value">tests\gabfin\test_futu_quote_callback.py:203: in test_cancel_before_subscription_never_allocates_or_waits_minimum_hold
+    assert clock.value == 0
+E   assert 61.0 == 0
+E    +  where 61.0 = &lt;test_futu_quote_callback.Clock object at 0x000002CF2FFFA660&gt;.value</failure></testcase><testcase classname="tests.gabfin.test_futu_quote_callback" name="test_cancel_before_subscription_never_allocates_or_waits_minimum_hold[after_preflight]" time="0.005"><failure message="assert 61.0 == 0&#10; +  where 61.0 = &lt;test_futu_quote_callback.Clock object at 0x000002CF2FFF9D00&gt;.value">tests\gabfin\test_futu_quote_callback.py:203: in test_cancel_before_subscription_never_allocates_or_waits_minimum_hold
+    assert clock.value == 0
+E   assert 61.0 == 0
+E    +  where 61.0 = &lt;test_futu_quote_callback.Clock object at 0x000002CF2FFF9D00&gt;.value</failure></testcase></testsuite></testsuites>
