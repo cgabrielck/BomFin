@@ -7,10 +7,13 @@
   2026-11-27 起使用者指定只改 Downloads 內；舊 Desktop checkout 不再作工作位置。
   同日起原始碼由 `.worktrees/gabfin-s01` 提升至 repo 根目錄，路徑引用已改為根層相對路徑。
 - Branch: `codex/s01-source-baseline`（GitHub 對應 `cgabrielck/BomFin` 的 `gabriel-dev`）。
-- Current HEAD: `cd59fca1`（`Wire the analysis planes into the production path`）。
-  已提交：`c870c16b` tape → `278daf4f` Alpaca adapter → `b20a5d93` 指標引擎
-  → `1cbee09e` FRED 宏觀 → `5c49495a` WU-7+WU-9 → `9e7d109b` 交接卡
-  → `cd59fca1` 分析平面生產接線。
+- Current HEAD: `8cd7449`（`Rebase the repository on the current architecture`）。
+  2026-11-27 原始碼由 `.worktrees/gabfin-s01` 提升至 repo 根目錄；legacy
+  `backend/`、`web/` 舊前端、30 個 legacy 文件與 139 個 legacy 測試已移除，
+  歷史保留在 BomFin 的 `legacy-full` 分支。根層重建後驗證：
+  **1099 pytest passed**（tests/gabfin + tests/providers）、`npm run typecheck`
+  與 `npm run build` 乾淨、**50 Playwright passed**。
+  新增依賴宣告：`pyarrow`（tape）與 `jsonschema`（schema artifact 測試）。
 - 前端交接狀態：`docs/handover/HANDOVER.md` 的 `stage: ready-for-ui`，
   任務卡 `docs/handover/ui-tasks/WU-9-ui.md`。Gemini 4 Carbon 可開始。
   **後端此時不可動 `apps/desk-web/src/**`。**
