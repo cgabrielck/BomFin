@@ -192,6 +192,12 @@ def write_partitions(
     The caller writes the returned manifest; the manifest is written last so
     an interrupted write leaves the previous manifest describing the
     previous state.
+
+    The returned partitions cover the whole series, not only the months
+    this call wrote. A month that was written earlier stays indexed, so
+    reading the result never silently loses history that is still on
+    disk. Without this, a second write in a later month would leave the
+    earlier month orphaned on disk and unreadable.
     """
     if now.tzinfo is None:
         raise ValueError('A tape write needs an aware clock')
@@ -205,21 +211,75 @@ def write_partitions(
     for row in kept:
         by_month.setdefault(row['event_at'].strftime('%Y-%m'), []).append(row)
 
-    partitions: list[TapePartition] = []
+    written: list[TapePartition] = []
     for month in sorted(by_month):
         month_rows = by_month[month]
         path = _partition_path(root, series, month_rows[0]['event_at'])
         merged = _merge_existing(path, month_rows)
         table = _rows_to_table(merged)
         digest = _write_table(path, table)
-        partitions.append(_partition_from(path, root, table, digest))
+        written.append(_partition_from(path, root, table, digest))
 
+    partitions = _combine_with_stored(root, series, written)
     stored = _series_from_partitions(series, partitions)
     return TapeWriteResult(
         series=stored,
         partitions=tuple(partitions),
         dropped_outside_retention=dropped,
     )
+
+
+def _combine_with_stored(
+    root: Path, series: TapeSeries, written: list[TapePartition]
+) -> list[TapePartition]:
+    """The written partitions plus the ones already stored for this series.
+
+    A partition file on disk that this call did not touch is still part
+    of the series. The manifest is the index of the tape, so the index
+    must name every file that holds the series' rows.
+    """
+    existing = _stored_partitions(root, series)
+    combined = {partition.path: partition for partition in existing}
+    for partition in written:
+        combined[partition.path] = partition
+    return [combined[path] for path in sorted(combined)]
+
+
+def _stored_partitions(root: Path, series: TapeSeries) -> list[TapePartition]:
+    """The partitions of this series that are already on disk.
+
+    The manifest is preferred, because it is the durable index. A
+    partition file with no manifest entry is still read back: the data
+    is real, and refusing it would lose history.
+    """
+    directory = series_directory(root, series)
+    if not directory.exists():
+        return []
+    try:
+        from gabfin.storage.manifest import read_manifest
+
+        manifest = read_manifest(manifest_path(root, series))
+    except (FileNotFoundError, ValueError):
+        manifest = None
+    known = {
+        partition.path: partition
+        for partition in (manifest.partitions if manifest is not None else ())
+    }
+    found: list[TapePartition] = []
+    for path in sorted(directory.glob('*.parquet')):
+        relative = path.relative_to(root).as_posix()
+        if relative in known:
+            found.append(known[relative])
+            continue
+        table = pq.read_table(path)
+        found.append(_partition_from(path, root, table, _digest(path)))
+    return found
+
+
+def _digest(path: Path) -> str:
+    """The checksum of a stored partition."""
+    return sha256(path.read_bytes()).hexdigest()
+
 
 
 def _series_from_partitions(
