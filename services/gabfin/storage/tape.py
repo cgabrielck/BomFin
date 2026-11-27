@@ -332,6 +332,52 @@ def read_partitions(
     )
 
 
+def read_rows(
+    root: Path,
+    series: TapeSeries,
+    start: datetime | None = None,
+    end: datetime | None = None,
+    *,
+    manifest: TapeManifest | None = None,
+) -> list[dict]:
+    """Read the stored rows themselves, not just their count.
+
+    `read_partitions` answers "how much history is there"; this answers
+    "what is in it". A caller that computes on history needs the rows,
+    and must not have to re-implement the retention and ordering rules
+    to get them.
+    """
+    if manifest is None:
+        from gabfin.storage.manifest import read_manifest
+
+        manifest = read_manifest(manifest_path(root, series))
+    if not manifest.complete:
+        raise ValueError('An incomplete tape manifest must not be read as history')
+    if manifest.series.symbol != series.symbol or (
+        manifest.series.timeframe != series.timeframe
+    ):
+        raise ValueError('The manifest does not describe this series')
+
+    floor = _retention_floor(manifest.series, manifest.written_at)
+    rows: list[dict] = []
+    for partition in manifest.partitions:
+        path = root / partition.path
+        if not path.exists():
+            raise FileNotFoundError(f'Tape partition is missing: {partition.path}')
+        conditions = []
+        if start is not None:
+            conditions.append(('event_at', '>=', start))
+        if end is not None:
+            conditions.append(('event_at', '<=', end))
+        table = pq.read_table(path, filters=conditions or None)
+        for row in _table_to_rows(table):
+            if floor is not None and row['event_at'] < floor:
+                continue
+            rows.append(row)
+    rows.sort(key=lambda row: row['event_at'])
+    return rows
+
+
 def merge_manifest(old: TapeManifest, new: TapeManifest) -> TapeManifest:
     """Combine two manifests for the same series.
 

@@ -39,6 +39,13 @@ class ExactTlsOrigin:
 
 def create_market_app(store, *, allowed_origin, gateway, static_dir: Path | None = None,
                       analysis=None):
+    """The browser app: pairing, market, and the analysis routes.
+
+    `analysis` is optional so that a deployment without a tape or a FRED
+    key still serves the market routes. When it is absent the analysis
+    routes are not mounted, and the browser gets a 404 rather than a
+    route that answers with an empty series.
+    """
     app = create_app(store, allowed_origin=allowed_origin)
     app.add_middleware(ExactTlsOrigin, origin=allowed_origin)
 

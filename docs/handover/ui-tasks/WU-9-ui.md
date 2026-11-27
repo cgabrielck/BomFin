@@ -11,6 +11,37 @@
 - 後端 commit：`5c49495a`（WU-7 provider routing + WU-9 analysis planes）
 - 分支：`codex/s01-source-baseline`
 - Checkout：`C:/Users/001/Downloads/GabFin-ai-trade/.worktrees/gabfin-s01`
+- 後端補充（同一階段，尚未 commit）：分析平面的**生產接線**與 e2e 覆蓋。
+  Carbon 若在 `stage` 顯示 `ready-for-ui` 時看到工作樹有未提交變更，那是這一輪補充。
+
+## 後端已就緒、Carbon 可直接對接的事實
+
+這三點是 Carbon 動手前必須知道的，否則會把「後端沒接好」誤判成「前端寫錯」。
+
+1. **三個端點在真實 server 上可用**。`tests/e2e/analysis.spec.ts`（新增，後端提供）
+   已對真實 private-TLS fixture 驗證 6 項全過。Carbon 可直接 `fetch` 真端點，
+   不必先攔截 mock。
+2. **API 呼叫必須帶 `Origin` 標頭**。`validate_request` 要求 origin 與
+   `allowed_origin` 精確相等，缺少時回 **401**（不是 403、不是 CORS 錯誤）。
+   瀏覽器內 `fetch` 會自動帶，`page.request.get` 不會——這是後端既有的一致性要求，
+   不是缺陷。
+3. **查詢字串帶憑證 → 401**。`/v1/*` 的 `_guarded_query` 會擋下
+   `token`／`csrf`／`session`／`authorization`／`api_key` 等名稱，回 401。
+   正常查詢參數（`instrument_id`、`timeframe`、`indicator`、`series_id`、`as_of`、`limit`）不受影響。
+
+## 錯誤形狀（Carbon 的元件需要分辨）
+
+| 狀態 | 觸發 | `detail` |
+|---|---|---|
+| 400 | 非法 timeframe／未知 indicator／非法 limit | `Invalid indicator request` |
+| 401 | 無 session、origin 不符、查詢字串含憑證 | `Unauthorized` |
+| 403 | session 無 `read_market` scope | `Market access denied` |
+| 404 | 該標的沒有可算的 tape 序列／venue 未知；宏觀序列不存在 | `Indicator series not found`／`Macro series not found` |
+| 503 | 平面本身不可用（上游故障） | `Indicator plane unavailable`／`Macro plane unavailable` |
+
+**404 是「沒有序列」，503 是「壞了」**。兩者的前端文案必須不同：404 顯示
+「此標的尚無可計算的歷史序列」，503 顯示「指標服務暫時不可用」。
+
 
 ## 改動範圍
 
@@ -85,11 +116,26 @@ features/feed/FeedCapabilityBadges.tsx
 回應 `MacroResponse`：`points: MacroPoint[]`，每個含 `series_id`、`observation_date`、
 `release_date`、`value`（字串）、`units`、`frequency`。
 
+**`series_id` 必須是內建序列 id**。後端只認 `services/gabfin/providers/fred/series.py`
+裡的固定集合（`DGS2`、`DGS10`、`T10Y2Y`、`DFEDTARU`、`DFEDTARL`、`SOFR`、
+`CPIAUCSL`、`PCEPILFE`、`UNRATE`、`PAYEMS`、`NFCI`、`BAMLH0A0HYM2` 等）。
+傳未建 series id 回 **404**，不是空陣列。省略 `series_id` 則回傳全部內建序列。
+
+**每個內建序列最多回一點**：後端對每個序列只取 `as_of` 當時最新且已發布的那一筆。
+`release_date <= as_of` 的過濾在後端完成，前端不得自行放寬。
+
 ### `/v1/capabilities`
 
 回應 `CapabilitiesResponse`：`sources: FeedCapabilities[]`，每個含
 `source`、`venue_coverage`、`realtime`、`delay_minutes`、`tradable_for_entry`、
 `depth_levels`、`fee_class`、`unavailable_reason`、`latency_label`、`checked_at`。
+
+**`sources` 只包含實際量測過的來源**。沒被探測過的 feed 不會出現——
+「不知道」與「已知沒問題」不可長得一樣。
+
+**後端保證的約束**（可依賴，但前端仍應防守顯示）：
+`realtime === false` 時 `tradable_for_entry` 必定為 `false`；`tradable_for_entry === true`
+時 `realtime` 必定為 `true` 且 `delay_minutes` 為 `None`。這是後端 validator 強制的不變量。
 
 ## 驗收條件
 
@@ -133,6 +179,22 @@ features/feed/FeedCapabilityBadges.tsx
   `tradable_for_entry === false` 的警示出現、能力標示顯示 `unavailable_reason`。
 - 測試需要攔截 `/v1/*` 回應。既有 e2e 已有攔截行情端的先例，沿用同一手法。
 - 跑 `npm run typecheck` 必須通過。
+
+**後端已提供的 e2e 覆蓋**（Carbon 不可修改，可直接依賴）：
+`tests/e2e/analysis.spec.ts` 對三個端點的 6 項斷言已全過。若 Carbon 的 UI 測試
+需要不同的 fixture 形狀，在自己的新檔案裡建立，不要改那一支。
+
+## 已知的後端限制（Carbon 必須據此設計 UI）
+
+1. **`/v1/indicators` 目前在生產上是 404，不是空序列**。後端已把 tape 接進指標平面，
+   但 tape 內必須先有對應 symbol／timeframe 的已寫入序列。空序列回 404
+   `Indicator series not found`。
+2. **指標只支援 `source_coverage` 為 `sip`／`iex`／`futu_nasdaq_totalview`／`futu_arca` 的序列**。
+   未知 venue 拒絕計算（404）。前端顯示 `source_coverage` 時不必自己判斷合法性。
+3. **`IndicatorResponse.series` 可能是空陣列，同時 `statuses` 非空**。這是
+   「歷史不足」的正常結果，不是錯誤。前端要同時處理兩者。
+4. **時間框架字串格式**：`1min`、`5min`、`1hour`、`1day`（`count` + 單位，無空格）。
+   後端解析失敗回 400。
 
 ## 完成後
 

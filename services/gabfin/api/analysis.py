@@ -120,7 +120,14 @@ def analysis_router(store, *, allowed_origin, indicators, macro, capabilities):
             reason = getattr(error, 'reason', None)
             if reason == 'unknown_indicator':
                 raise HTTPException(400, 'Invalid indicator request') from None
+            if reason == 'invalid_limit':
+                raise HTTPException(400, 'Invalid indicator request') from None
             if reason == 'insufficient_history':
+                raise HTTPException(404, 'Indicator series not found') from None
+            if reason == 'unknown_source_coverage':
+                # The stored history does not name a venue the contract
+                # accepts, so no indicator can be computed from it. This is
+                # a missing series, not an outage.
                 raise HTTPException(404, 'Indicator series not found') from None
             raise HTTPException(503, 'Indicator plane unavailable') from None
         return response

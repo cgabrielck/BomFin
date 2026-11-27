@@ -221,6 +221,41 @@ def test_indicator_route_reports_an_unavailable_plane_as_503(tmp_path):
         assert 'upstream' not in response.text
 
 
+def test_indicator_route_maps_an_unknown_venue_to_404(tmp_path):
+    from gabfin.analysis.plane import AnalysisUnavailable
+    app, store = build(tmp_path, indicators=StubIndicators(
+        error=AnalysisUnavailable('unknown_source_coverage')))
+    with TestClient(app, base_url=ORIGIN) as test_client:
+        headers = paired(test_client, store)
+        response = test_client.get('/v1/indicators',
+                                   params={'instrument_id': INSTRUMENT, 'timeframe': '1day'},
+                                   headers=headers)
+        assert response.status_code == 404
+        assert response.json()['detail'] == 'Indicator series not found'
+
+
+def test_the_analysis_routes_are_absent_when_no_planes_are_configured(tmp_path):
+    """A deployment without a tape or a FRED key serves market routes only."""
+    from gabfin.api.app import create_market_app
+    from gabfin.api.market_gateway import MarketGateway
+    from gabfin.contracts.subscriptions import SubscriptionKey
+
+    store = SessionStore(tmp_path / 'sessions.sqlite', owner_id=uuid4(),
+                         session_seconds=60, pairing_seconds=30, max_failures=5)
+    key = SubscriptionKey(instrument_id=UUID(INSTRUMENT), channel='quote', timeframe=None)
+
+    async def connect(ids):
+        raise RuntimeError('no market connection in an analysis test')
+
+    gateway = MarketGateway(connect, registered_keys=[key], source='test-feed')
+    app = create_market_app(store, allowed_origin=ORIGIN, gateway=gateway)
+    with TestClient(app, base_url=ORIGIN) as test_client:
+        headers = paired(test_client, store)
+        for path in ('/v1/indicators', '/v1/macro', '/v1/capabilities'):
+            response = test_client.get(path, headers=headers)
+            assert response.status_code == 404
+
+
 def test_macro_route_filters_by_the_requested_date(client):
     test_client, store = client
     headers = paired(test_client, store)

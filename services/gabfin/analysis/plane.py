@@ -113,15 +113,29 @@ class IndicatorPlane:
     same values, and the values say which source coverage they came
     from. A caller cannot ask for an indicator without also seeing the
     provenance that makes it interpretable.
+
+    The coverage may be fixed or resolved per request. A resolved
+    coverage is what the tape needs: each stored series names its own
+    venue, and a series whose venue is not one the contract accepts is
+    refused rather than labelled with a guess.
     """
 
-    def __init__(self, bars: BarSource, *, source_coverage: SourceCoverage,
+    def __init__(self, bars: BarSource, *, source_coverage: SourceCoverage | None = None,
+                 coverage_resolver: Callable[[UUID, Timeframe], SourceCoverage] | None = None,
                  computed_by: ComputedBy = 'local',
                  clock: Callable[[], datetime] | None = None):
+        if source_coverage is None and coverage_resolver is None:
+            raise ValueError('An indicator plane needs a coverage or a resolver')
         self._bars = bars
         self._source_coverage = source_coverage
+        self._coverage_resolver = coverage_resolver
         self._computed_by = computed_by
         self._clock = clock or (lambda: datetime.now(timezone.utc))
+
+    def _coverage(self, instrument_id: UUID, timeframe: Timeframe) -> SourceCoverage:
+        if self._coverage_resolver is not None:
+            return self._coverage_resolver(instrument_id, timeframe)
+        return self._source_coverage
 
     def series(self, instrument_id: UUID, timeframe: Timeframe, *,
                indicators: Iterable[str] | None = None,
@@ -136,7 +150,11 @@ class IndicatorPlane:
         bars = tuple(self._bars.bars(instrument_id, timeframe))
         if not bars:
             raise AnalysisUnavailable('insufficient_history', 'no stored bars')
-        engine = IndicatorEngine(instrument_id, timeframe, self._source_coverage)
+        coverage = self._coverage(instrument_id, timeframe)
+        if coverage == 'unknown':
+            # An indicator without a venue is not comparable with anything.
+            raise AnalysisUnavailable('unknown_source_coverage')
+        engine = IndicatorEngine(instrument_id, timeframe, coverage)
         state = engine.seed([])
         grouped: dict[str, list[IndicatorPoint]] = defaultdict(list)
         for bar in bars:
@@ -151,7 +169,7 @@ class IndicatorPlane:
             if found:
                 series.append(IndicatorSeries(
                     instrument_id=instrument_id, indicator=name, params=params,
-                    timeframe=timeframe, source_coverage=self._source_coverage,
+                    timeframe=timeframe, source_coverage=coverage,
                     points=tuple(found[-limit:])))
             else:
                 statuses.append(IndicatorStatus(
@@ -160,7 +178,7 @@ class IndicatorPlane:
                     required_bars=REQUIRED_BARS.get(name, 1), observed_bars=len(bars)))
         return IndicatorResponse(
             schema_version='1.0', instrument_id=instrument_id, timeframe=timeframe,
-            source_coverage=self._source_coverage, computed_by=self._computed_by,
+            source_coverage=coverage, computed_by=self._computed_by,
             series=tuple(series), statuses=tuple(statuses))
 
 

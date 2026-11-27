@@ -36,6 +36,64 @@ IDS = {'AAPL':UUID('11111111-1111-4111-8111-111111111111'),
        'NVDA':UUID('33333333-3333-4333-8333-333333333333')}
 
 
+def analysis_planes(now):
+    """Deterministic analysis planes for the browser tests.
+
+    The fixture owns the truth here: the indicator plane computes from
+    a fixed run of bars, the macro plane returns observations with the
+    release dates they really have, and the capability plane reports the
+    fixture feed exactly as it is. Nothing reaches the network.
+    """
+    from decimal import Decimal
+
+    from gabfin.analysis.plane import CapabilityPlane, IndicatorPlane, MacroPlane
+    from gabfin.contracts.market import Timeframe, TimeUnit
+    from gabfin.contracts.subscriptions import FeedCapabilities
+    from gabfin.indicators.inputs import PriceBar
+
+    timeframe = Timeframe(count=1, unit=TimeUnit.TRADING_DAY)
+
+    class FixtureBars:
+        def bars(self, instrument_id, requested):
+            if requested != timeframe:
+                return ()
+            start = datetime(2026, 1, 1, tzinfo=timezone.utc)
+            result = []
+            for index in range(40):
+                close = Decimal('100') + Decimal((index * 7) % 23) - Decimal(11)
+                result.append(PriceBar(
+                    event_at=start + timedelta(days=index),
+                    open=close - Decimal('0.10'),
+                    high=close + Decimal('1.50'),
+                    low=close - Decimal('1.25'),
+                    close=close,
+                    volume=Decimal(1000 + index * 37),
+                ))
+            return tuple(result)
+
+    class FixtureMacro:
+        def observations(self, series_id):
+            return [
+                {'date': '2026-01-02', 'value': '4.00', 'realtime_start': '2026-01-02'},
+                {'date': '2026-02-02', 'value': '4.15', 'realtime_start': '2026-02-02'},
+            ]
+
+    def capabilities():
+        return (FeedCapabilities(
+            schema_version='1.0', source='fixture', asset_classes=('equity',),
+            sessions=('regular',), latency_label='delayed', max_subscriptions=None,
+            history_limits=(), checked_at=now(), permission_errors=(), sequence_rules=(),
+            venue_coverage='sip', realtime=False, delay_minutes=15,
+            tradable_for_entry=False, depth_levels=None, fee_class='none',
+            unavailable_reason=None),)
+
+    return {
+        'indicators': IndicatorPlane(FixtureBars(), source_coverage='sip'),
+        'macro': MacroPlane(FixtureMacro(), clock=now),
+        'capabilities': CapabilityPlane(capabilities),
+    }
+
+
 def emit(value):
     print(json.dumps(value), flush=True)
 
@@ -91,7 +149,8 @@ async def run(args, folder):
         registered_keys=keys,source='fixture')
     listener=socket.socket();listener.bind(('127.0.0.1',0))
     origin=f'https://127.0.0.1:{listener.getsockname()[1]}'
-    app=create_market_app(store,allowed_origin=origin,gateway=gateway,static_dir=args.dist)
+    app=create_market_app(store,allowed_origin=origin,gateway=gateway,static_dir=args.dist,
+        analysis=analysis_planes(now))
     server=uvicorn.Server(uvicorn.Config(app,host='127.0.0.1',log_config=None,access_log=False,
         log_level='critical',proxy_headers=False,ssl_certfile=str(folder/'cert.pem'),
         ssl_keyfile=str(folder/'key.pem'),ws_max_size=16384,limit_concurrency=32))

@@ -42,6 +42,8 @@ stage: `ready-for-ui`
 - 後端 commit：`5c49495a`（WU-7 provider routing + WU-9 analysis planes）
 - 分支：`codex/s01-source-baseline`
 - Checkout：`C:/Users/001/Downloads/GabFin-ai-trade/.worktrees/gabfin-s01`
+- 後端補充（本階段，commit 尚未建立）：分析平面的**生產接線**（tape → 指標平面）
+  與 `tests/e2e/analysis.spec.ts`（三個端點 6 項斷言，全過）。
 
 ### Contract delta
 
@@ -54,9 +56,14 @@ stage: `ready-for-ui`
 - `MacroPoint` → 新增（WU-3 已有）→ `generated.ts` 的 `MacroPoint`
 - `FeedCapabilities` → 新增能力欄位：`venue_coverage`、`realtime`、`delay_minutes`、`tradable_for_entry`、`depth_levels`、`fee_class`、`unavailable_reason` → `generated.ts` 的 `FeedCapabilities`
 
+**本輪補充沒有改動任何合約**，因此 `schemas/gabfin-1.0.json` 與
+`generated.ts` 都沒有變動，Carbon 不需要重新產生契約。
+
 ### UI task
 
 - `ui-tasks/WU-9-ui.md`：指標疊圖、宏觀面板、來源能力標示。Carbon 可開始。
+- 該任務卡已補上：錯誤形狀對照表、宏觀序列 id 白名單、`Origin` 標頭要求、
+  已知後端限制。前端實作前請讀。
 
 ### Forbidden edits
 
@@ -64,6 +71,9 @@ stage: `ready-for-ui`
 
 ### Open risks
 
+- **生產端點的 tape 尚未寫入**：`/v1/indicators` 已在生產路徑接上 tape，但 tape 內
+  尚無實際寫入的序列，因此真實環境會回 **404**（不是空序列）。這是資料狀態，
+  不是接線缺陷。Carbon 的 UI 必須把 404 呈現為「尚無可計算的歷史序列」。
 - **Futu BBO 暫緩**：使用者於 2026-11-27 決定暫不做 bid/ask。SDK 原始碼證實 QUOTE 推送本身不含 bid/ask（`parse_pb_BasicQot` 只回傳 `last_price` 等），`get_market_snapshot` 才有 `ask_price/bid_price`，擺盤則是另一種 frame。前端**不可**假造 bid/ask 顯示。
 - **期權 OPRA 缺權限**：Futu 免費層無 OPRA 期權 LV1 權限，期權報價應顯示為「無即時期權權限」，不可顯示假價。
 - **indicative 報價**：Alpaca indicative 報價必須標示為不可作為進場依據。
@@ -78,6 +88,7 @@ stage: `ready-for-ui`
 前端登報的後端需求。格式：需求 → 為何需要 → 影響。
 
 - （無）
+
 
 ### Next
 

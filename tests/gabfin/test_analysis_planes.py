@@ -234,3 +234,27 @@ def test_a_realtime_feed_must_not_carry_a_measured_delay():
     with pytest.raises(ValueError):
         capabilities('futu', latency_label='realtime', realtime=True, delay_minutes=15,
                      tradable_for_entry=True)
+
+
+def test_an_indicator_plane_needs_a_coverage_or_a_resolver():
+    with pytest.raises(ValueError):
+        IndicatorPlane(StubBars(bars()))
+
+
+def test_a_resolved_coverage_is_used_for_the_whole_series():
+    plane = IndicatorPlane(
+        StubBars(bars()),
+        coverage_resolver=lambda instrument_id, timeframe: 'iex')
+    response = plane.series(INSTRUMENT, TIMEFRAME, indicators=['sma'])
+    assert response.source_coverage == 'iex'
+    assert response.series[0].source_coverage == 'iex'
+    assert response.series[0].points[0].source_coverage == 'iex'
+
+
+def test_an_unknown_coverage_refuses_to_compute():
+    plane = IndicatorPlane(
+        StubBars(bars()),
+        coverage_resolver=lambda instrument_id, timeframe: 'unknown')
+    with pytest.raises(AnalysisUnavailable) as error:
+        plane.series(INSTRUMENT, TIMEFRAME)
+    assert error.value.reason == 'unknown_source_coverage'
