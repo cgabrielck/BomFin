@@ -186,6 +186,23 @@ def test_sequence_gap_requests_new_full_snapshot_instead_of_forwarding_bad_updat
         assert len(connections) == 2 and all(connection.closed for connection in connections)
 
 
+@pytest.mark.parametrize('operation', ['remaining', 'check_csrf'])
+def test_session_read_rejects_revocation_between_validation_and_second_read(tmp_path, monkeypatch, operation):
+    _, store, _, _ = setup(tmp_path)
+    token, _ = store.issue_session(store.create_pairing())
+    original = store.resolve
+    def resolve_then_revoke(value):
+        principal = original(value)
+        store.revoke(value)
+        return principal
+    monkeypatch.setattr(store, 'resolve', resolve_then_revoke)
+    with pytest.raises(PermissionError):
+        if operation == 'remaining':
+            store.remaining(token)
+        else:
+            store.check_csrf(token, 'synthetic-nonce')
+
+
 @pytest.mark.parametrize('action', ['expire','logout','write'])
 def test_quiet_websocket_expires_revokes_or_refuses_writes(tmp_path, action):
     app, store, clock, connections = setup(tmp_path)

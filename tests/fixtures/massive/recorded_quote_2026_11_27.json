@@ -1,0 +1,8 @@
+{
+  "recorded_at": "2026-11-27T09:01:35.630Z",
+  "provenance": "Live single-connection Q.MSFT subscription while Q.AAPL was active; only quote market fields retained.",
+  "events": [
+    {"ev": "Q", "sym": "MSFT", "bp": 500.91, "ap": 501.55, "t": 1795770093151, "q": 115993, "pt": 1795770093150},
+    {"ev": "Q", "sym": "MSFT", "bp": 500.91, "ap": 501.55, "t": 1795770093151, "q": 115996, "pt": 1795770093151}
+  ]
+}

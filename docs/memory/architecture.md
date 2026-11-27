@@ -1,5 +1,11 @@
 # Architecture
 
+- Current Massive runtime: `providers/massive/ws.py` owns the sole wire reader and bounded
+  frame dispatch; `MassiveQuoteAdapter` implements ManagedFeedAdapter; FeedSupervisor owns
+  retry after verified cleanup. `scripts/desk-server.py` and `market/host.py` use Massive.
+  REST/history/options use a shared client limiter. Runtime scope and unverified gates:
+  [execution checkpoint](execution.md).
+
 - Canonical design: [requirements and architecture](../superpowers/specs/2026-11-25-gabfin-system-design.md).
 - Tasks and migration: [upgrade plan](../superpowers/plans/2026-11-25-gabfin-upgrade-plan.md).
 - Status: new architecture has primitive/intent, market, research and order/policy contracts;
@@ -7,7 +13,7 @@
   Legacy source is isolated locally; location and revision are in [execution.md](execution.md).
 - Current source structure and development commands: [module inventory](../audit/module-inventory.md).
   It distinguishes FastAPI-served static UI, React/Vite source and Streamlit lab.
-- Direction: new React/PWA frontend; isolated market, research and execution
+- Direction: new React desktop-web frontend (no iPhone/PWA); isolated market, research and execution
   processes; explicit contracts; deterministic risk and ledger; bounded research
   harness. Exact provider/engine choices have validation gates in the plan.
 - Do not apply old ADRs as product constraints. Do not restore rejected
@@ -93,6 +99,23 @@
   concrete sources (tape bars, FRED observations, measured feeds) and the one
   place that decides which source is which; the tape is keyed by vendor symbol,
   so a resolver maps the canonical instrument id onto the stored series.
+- S4 research: `research/capture.py` freezes local tape/indicators and explicit released observations;
+  `store.py` owns SQLite snapshot/evidence hashes and checks; `tools.py` exposes only frozen read-only data.
+  `service.py` wires per-run LangGraph and durable audit-before-return; `model.py` selects an HTTPS
+  OpenAI-compatible provider via process `LLM_*` settings. CLI: `python -m gabfin.research --help`.
+  Coverage/missing-data/provider verification boundaries: [session09](../superpowers/logs/2026-11-27-session-09.md).
+- S5 research API: `api/research.py` exposes the browser's research job routes behind the
+  same session/origin/capability authority as the market and analysis routes.
+  `research/jobs.py` owns the durable job queue (SQLite `research_jobs` table beside the
+  snapshots), the bounded queue, the per-job deadline and the background runner.
+  `create_market_app(..., research={'jobs': ...})` mounts it; the app's lifespan cancels
+  the background jobs on shutdown. The client never names the snapshot or the cutoff:
+  the server injects the capture at its own UTC cutoff. A snapshot is described, never
+  quoted, because it may carry an account balance.
+  Browser entry: `features/research/ResearchCenter.tsx` plus `useResearchView.ts` and
+  `shared/transport/research.ts`; graph results retain a `reports` wrapper.
+  Local launcher: `scripts/start-desk.ps1`; `-Offline` avoids a provider connection,
+  `-Runtime` isolates sessions/jobs, and `runtime/owner-id` preserves report ownership.
 - Frontend/backend handover is file-based: `docs/handover/HANDOVER.md` is the
   only state file, `docs/handover/ui-contract.md` is the API contract the
   browser may rely on, and `docs/handover/ui-tasks/WU-<n>-ui.md` is one task

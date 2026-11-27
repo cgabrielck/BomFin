@@ -7,6 +7,7 @@ import { useMarketSubscription } from './useMarketSubscription';
 import ChartPanel from '../chart/ChartPanel';
 import MacroPanel from '../macro/MacroPanel';
 import FeedCapabilityBadges from '../feed/FeedCapabilityBadges';
+import ResearchCenter from '../research/ResearchCenter';
 
 interface Props {
   symbol: string;
@@ -62,9 +63,10 @@ export default function StockDetail({
         </button>
       </div>
     );
-  const point = market.snapshot?.quotes.find(
+  const quote = market.snapshot?.quotes.find(
     (event) => event.instrument_id === candidate.id,
-  )?.payload.last;
+  )?.payload;
+  const point = quote?.last;
   const hiddenData =
     market.demo && (scenario === 'missing' || scenario === 'empty');
   const price = hiddenData ? '—' : (point?.price ?? '—');
@@ -116,7 +118,22 @@ export default function StockDetail({
               </h2>
               <div className="price">
                 <span data-testid="last-price">{price}</span>{' '}
-                <small>USD · {market.demo ? '示範價' : '來源報價'}</small>
+                <small>USD · {market.demo ? '示範成交價' : '最近成交價'}</small>
+              </div>
+              <div className="bbo-quotes" aria-label="最佳買賣報價">
+                {(['bid', 'ask'] as const).map(side => {
+                  const value = hiddenData ? null : quote?.[side];
+                  return (
+                    <div className="bbo-side" key={side}>
+                      <div>{side === 'bid' ? '買價 BID' : '賣價 ASK'} · USD</div>
+                      <strong data-testid={`${side}-price`}>{value?.price ?? '—'}</strong>
+                      <p className="tiny" data-testid={`${side}-source`}>
+                        {ageLabel(value?.event_at, now)}<br />
+                        來源時間：{value?.event_at ?? '未知'}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             <span className="pill amber">即時權益未驗證</span>
@@ -127,20 +144,20 @@ export default function StockDetail({
             </p>
           )}
           {market.error && (
-            <div role="alert" className="state-banner">
+            <div role="alert" className="state-banner" data-testid="market-error">
               {market.error.message}；沒有套用其他股票的價格。
             </div>
           )}
-          {!hiddenData && point && (
+          {!hiddenData && quote && (
             <p className="tiny" data-testid="market-source">
               來源：
               {market.demo
                 ? '本機人工樣本'
                 : market.snapshot?.health.source} ·{' '}
-              {ageLabel(point.event_at, now)}
+              {point ? ageLabel(point.event_at, now) : '無最近成交價'}
               <br />
-              來源時間：{point.event_at ?? '未知'} ·
-              BBO／權益未知，不可作入場依據。
+              成交來源時間：{point?.event_at ?? '未知'} ·
+              買賣報價與成交價分開顯示；即時權益未驗證，不可作入場依據。
             </p>
           )}
           {!market.demo && (
@@ -231,6 +248,21 @@ export default function StockDetail({
           <button className="text-button" onClick={() => planned('研究聊天')}>
             詢問這份觀點 ↗
           </button>
+          {/*
+            The real research entry. It uses the same shared component the
+            research centre uses, so a reader sees the same report, the
+            same snapshot metadata and the same audit verdicts wherever
+            they open it.
+          */}
+          <details className="research-entry" data-testid="research-entry">
+            <summary>發起研究 · {symbol}</summary>
+            <ResearchCenter
+              instrumentId={candidate.id}
+              symbol={symbol}
+              demo={market.demo}
+              compact
+            />
+          </details>
         </aside>
       </div>
     </section>

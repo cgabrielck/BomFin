@@ -1,0 +1,21 @@
+version: 1
+role: portfolio
+purpose: 讀取帳戶快照與候選，給出曝險與集中度建議（只讀）
+inputs: schemas/research/portfolio_input.json
+outputs: schemas/research/portfolio_output.json
+tools:
+  - read_account
+  - read_risk_limits
+forbidden:
+  - 不得調高任何政策或風控上限
+  - 不得輸出 StrategyIntent 或任何可執行訂單
+  - 證據必須引用快照內存在的 ID，否則視為無效
+budget:
+  max_input_tokens: 20000
+  max_output_tokens: 4000
+  max_attempts_per_node: 2
+  deadline_seconds: 120
+prompt:
+  system: portfolio/system.md.j2
+  user: portfolio/user.md.j2
+  version: 1

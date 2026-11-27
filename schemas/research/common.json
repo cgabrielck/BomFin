@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "input": {
+      "type": "object", "additionalProperties": false,
+      "required": ["snapshot_id", "as_of", "data_quality", "context"],
+      "properties": {
+        "snapshot_id": {"type": "string", "format": "uuid"},
+        "as_of": {"type": "string", "format": "date-time"},
+        "data_quality": {"type": "array", "items": {"type": "string"}},
+        "context": {"type": "object"}
+      }
+    },
+    "output": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "snapshot_id", "findings", "missing_data"],
+      "properties": {
+        "role": {"enum": ["discovery", "technical", "portfolio"]},
+        "snapshot_id": {"type": "string", "format": "uuid"},
+        "findings": {"type": "array", "items": {
+          "type": "object", "additionalProperties": false,
+          "required": ["text", "evidence_id"],
+          "properties": {
+            "text": {"type": "string", "minLength": 1},
+            "evidence_id": {"type": "string", "format": "uuid"}
+          }
+        }},
+        "missing_data": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      },
+      "anyOf": [
+        {"properties": {"findings": {"minItems": 1}}},
+        {"properties": {"missing_data": {"minItems": 1}}}
+      ]
+    }
+  }
+}

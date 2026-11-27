@@ -9,6 +9,27 @@ def validate_request(store,token,*,origin,allowed_origin,write,query,csrf):
     if write:store.check_csrf(token,csrf)
     return principal
 
+
+def read_origin(request_origin, allowed_origin):
+    """The origin a read-only request may be served under.
+
+    A browser does not send an `Origin` header on a same-origin GET, and
+    `Origin` is a forbidden header name, so a script cannot add one. A
+    read that refuses a request for a header the browser is unable to
+    send is unreachable from the browser, not secure.
+
+    The absence of the header is therefore treated as "same origin as
+    the server's own allowed origin". A request that *does* carry an
+    `Origin` must match it exactly: a cross-origin caller states where
+    it came from, and a mismatch is refused rather than assumed away.
+
+    This is only sound because the transport layer has already proved
+    the request arrived over TLS on the allowed host. `Origin` is not
+    the identity; the session cookie and the capability scope are.
+    """
+    return request_origin or allowed_origin
+
+
 import asyncio
 from starlette.websockets import WebSocketDisconnect
 from fastapi import FastAPI,Request,WebSocket,HTTPException
@@ -22,7 +43,7 @@ def create_app(store,*,allowed_origin):
     if parsed.scheme!='https' or not parsed.netloc or parsed.path or parsed.query or parsed.fragment:raise ValueError('Exact HTTPS origin required')
     app=FastAPI(docs_url=None,redoc_url=None,openapi_url=None)
     def guard(request,write=False):
-        try:return validate_request(store,request.cookies.get('gabfin_session'),origin=(request.headers.get('origin') or (allowed_origin if not write else None)),allowed_origin=allowed_origin,write=write,query=dict(request.query_params),csrf=request.headers.get('x-csrf-token'))
+        try:return validate_request(store,request.cookies.get('gabfin_session'),origin=read_origin(request.headers.get('origin'),allowed_origin) if not write else request.headers.get('origin'),allowed_origin=allowed_origin,write=write,query=dict(request.query_params),csrf=request.headers.get('x-csrf-token'))
         except PermissionError:raise HTTPException(401,'Unauthorized') from None
     @app.post('/pair')
     def pair(body:PairingInput,request:Request):

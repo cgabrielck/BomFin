@@ -28,6 +28,14 @@ KNOWN_COVERAGES: frozenset[str] = frozenset({
     'iex', 'sip', 'futu_nasdaq_totalview', 'futu_arca',
 })
 
+#: The sources that are not tied to a named venue. Massive history is
+#: consolidated vendor data with no venue behind it, so a Massive series
+#: may not claim one of the known venues: doing so would let a series that
+#: was never tied to a venue be read as one, and the indicator plane would
+#: label the result with that venue. A Massive series may say `unknown`,
+#: or any other label that names no venue.
+UNVENUED_SOURCES: frozenset[str] = frozenset({'massive'})
+
 
 class TapeBarSource(BarSource):
     """Stored bars for one instrument, read from the tape.
@@ -60,12 +68,50 @@ class TapeBarSource(BarSource):
         from gabfin.storage.manifest import read_manifest
         from gabfin.storage.tape import manifest_path
 
-        return read_manifest(manifest_path(self._root, self._series(timeframe)))
+        manifest = read_manifest(manifest_path(self._root, self._series(timeframe)))
+        if self._source is not None and manifest.series.source != self._source:
+            raise ValueError('Tape source does not match requested source')
+        return manifest
+
+    def _check_coverage(self, coverage: str):
+        """Refuse a named venue on a series that has none.
+
+        A Massive series has no venue behind it. If its manifest says `sip`,
+        the series would be read as a named-venue series and the indicator
+        plane would label the result with that venue, which is exactly the
+        claim Massive data cannot support. A label that names no venue,
+        `unknown` included, is honest and is allowed.
+        """
+        if self._source in UNVENUED_SOURCES and coverage in KNOWN_COVERAGES:
+            raise ValueError(
+                f'Tape source {self._source} may not claim the venue {coverage}')
+
+    def _refuse_inconsistent_partitions(self, manifest, timeframe: Timeframe):
+        """Refuse a tape whose files and index disagree.
+
+        The manifest is the index of the tape. If the files on disk and the
+        index name different partitions, the tape has two stories about
+        what it holds. Reading around the difference would silently drop a
+        month of history, and a later import could re-bless the values
+        that were never committed to the index. The reader refuses instead.
+        """
+        from gabfin.storage.tape import manifest_partition_paths, stored_partition_paths
+
+        on_disk = stored_partition_paths(self._root, self._series(timeframe))
+        if on_disk != manifest_partition_paths(manifest):
+            raise ValueError('Tape partitions do not match the manifest')
 
     def bars(self, instrument_id: UUID, timeframe: Timeframe) -> Sequence[PriceBar]:
         from gabfin.storage.tape import read_rows
 
-        rows = read_rows(self._root, self._series(timeframe))
+        manifest = self._manifest(timeframe)
+        from hashlib import sha256
+        for partition in manifest.partitions:
+            if sha256((self._root / partition.path).read_bytes()).hexdigest() != partition.sha256:
+                raise ValueError('Tape partition checksum mismatch')
+        self._refuse_inconsistent_partitions(manifest, timeframe)
+        self._check_coverage(manifest.series.venue_coverage)
+        rows = read_rows(self._root, self._series(timeframe), manifest=manifest)
         return tuple(
             PriceBar(
                 event_at=row['event_at'],
@@ -87,6 +133,7 @@ class TapeBarSource(BarSource):
         """
         try:
             manifest = self._manifest(timeframe)
+            self._check_coverage(manifest.series.venue_coverage)
         except (FileNotFoundError, ValueError):
             return 'unknown'
         recorded = manifest.series.venue_coverage

@@ -1,0 +1,14 @@
+快照 ID：{{ snapshot_id }}
+資料截止時間：{{ as_of }}
+數據質量：{{ data_quality }}
+
+帳戶快照（只讀）：
+- 權益：{{ account.equity }}（evidence_id: {{ account.evidence_id }}）
+- 持倉數：{{ account.position_count }}
+- 單一標的最大權重：{{ account.max_weight }}
+
+風控上限（只讀，不可修改）：
+- 單筆風險上限：{{ limits.per_trade_risk }}
+- 日虧損上限：{{ limits.daily_loss }}
+
+請依上述資料給出曝險與集中度建議，並引用 evidence_id。

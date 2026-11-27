@@ -47,6 +47,71 @@ class ExternalFeed:
         self.result = dict(cleanup='unsubscribed', closed=True, errors=[])
 
 
+def test_supervisor_persists_before_publishing_and_survives_recapture(tmp_path):
+    from gabfin.storage.events import EventLedger
+    async def scenario():
+        ledger = EventLedger(tmp_path / 'events.sqlite')
+        market = coordinator()
+        original = observation('100')
+        class Feed(ExternalFeed):
+            async def events(self):
+                yield original
+                yield original
+        supervisor = FeedSupervisor(market, lambda: Feed(0),
+            [SubscriptionKey(instrument_id=ID, channel='quote', timeframe=None)],
+            heartbeat_timeout=120, retry_delay=.01, backfill_timeout=2, event_sink=ledger.append)
+        await supervisor.run(asyncio.Event(), max_attempts=1)
+        assert ledger.read(original.event_id) == original
+        assert market.snapshot().quotes[0].event_id == original.event_id
+    asyncio.run(scenario())
+
+
+def test_stop_during_storage_does_not_publish_or_block_feed_cleanup():
+    import threading
+    async def scenario():
+        entered = asyncio.Event()
+        release = threading.Event()
+        loop = asyncio.get_running_loop()
+        def sink(event):
+            loop.call_soon_threadsafe(entered.set)
+            assert release.wait(3)
+        market = coordinator()
+        feed = ExternalFeed(0)
+        stop = asyncio.Event()
+        supervisor = FeedSupervisor(market, lambda: feed,
+            [SubscriptionKey(instrument_id=ID, channel='quote', timeframe=None)],
+            heartbeat_timeout=120, retry_delay=.01, backfill_timeout=2, event_sink=sink)
+        task = asyncio.create_task(supervisor.run(stop))
+        try:
+            await asyncio.wait_for(entered.wait(), 1)
+            stop.set()
+            await asyncio.wait_for(task, 1)
+            assert feed.closed
+            assert not market.snapshot().quotes
+            assert market.snapshot().health.gap_pending
+        finally:
+            release.set()
+            await asyncio.gather(task, return_exceptions=True)
+    asyncio.run(scenario())
+
+
+def test_supervisor_storage_failure_does_not_publish_and_closes_feed():
+    async def scenario():
+        market = coordinator()
+        feed = ExternalFeed(0)
+        def fail(event):
+            raise OSError('disk unavailable')
+        supervisor = FeedSupervisor(market, lambda: feed,
+            [SubscriptionKey(instrument_id=ID, channel='quote', timeframe=None)],
+            heartbeat_timeout=120, retry_delay=.01, backfill_timeout=2, event_sink=fail)
+        with pytest.raises(RuntimeError, match='exhausted'):
+            await supervisor.run(asyncio.Event(), max_attempts=1)
+        assert not market.snapshot().quotes
+        assert market.snapshot().health.gap_pending
+        assert feed.closed
+    asyncio.run(scenario())
+
+
 def test_two_feed_lifecycles_recover_without_mixing_sessions_or_losing_cleanup():
     async def scenario():
         market = coordinator()

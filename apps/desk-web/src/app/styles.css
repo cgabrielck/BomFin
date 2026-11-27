@@ -1114,3 +1114,187 @@ dialog p {
   line-height: 1.8;
   color: var(--red);
 }
+/* Research centre */
+.research-center {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 22px;
+  max-width: 1100px;
+  /* The panel is often narrower than its content would like. It must
+     shrink with its column rather than push the page sideways. */
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.research-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.research-head .eyebrow {
+  margin-bottom: 6px;
+}
+.research-head h3 {
+  font-size: 18px;
+}
+.research-launch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+}
+.research-launch label {
+  font-size: 11px;
+  color: var(--muted);
+}
+.research-launch select {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 12px;
+  background: white;
+  min-height: 44px;
+  /* A long role label must not widen the column it sits in. */
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 180px;
+}
+.research-launch .tiny {
+  flex-basis: 100%;
+  margin: 0;
+}
+.research-jobs {
+  margin: 20px 0 0;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.research-jobs h4 {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+.research-job-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.research-job-list .text-button {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 11px;
+  font-size: 11px;
+}
+.research-report {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.research-report-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.research-snapshot {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
+  gap: 12px 20px;
+  background: #f8faf9;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  min-width: 0;
+}
+.research-snapshot code {
+  display: block;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  margin-top: 4px;
+}
+.research-role {
+  margin-top: 18px;
+}
+.research-role h4 {
+  font-size: 12px;
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+.research-findings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.research-findings li {
+  border-left: 2px solid var(--soft);
+  padding-left: 12px;
+}
+.research-finding-text {
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 0 0 6px;
+}
+.research-missing,
+.research-checks,
+.research-raw {
+  margin-top: 14px;
+  font-size: 11px;
+  line-height: 1.8;
+}
+.research-missing summary,
+.research-checks summary,
+.research-raw summary {
+  min-height: 44px;
+  color: var(--green);
+  padding: 9px 0;
+}
+.research-checks ul,
+.research-missing ul {
+  padding-left: 18px;
+  margin: 6px 0 0;
+}
+.research-raw pre {
+  background: #f8faf9;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 12px;
+  overflow-x: auto;
+  font-size: 10px;
+  line-height: 1.6;
+  max-height: 420px;
+  max-width: 100%;
+  min-width: 0;
+}
+.research-disclaimer {
+  margin: 22px 0 0;
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+.research-entry {
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+  padding-top: 13px;
+  font-size: 11px;
+}
+.research-entry > summary {
+  min-height: 44px;
+  color: var(--green);
+  padding: 9px 0;
+  font-weight: 600;
+}
+.research-entry .research-center {
+  padding: 16px;
+  margin-top: 8px;
+  border-radius: 8px;
+}

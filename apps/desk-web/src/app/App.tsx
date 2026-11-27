@@ -1,11 +1,24 @@
-import { lazy, Suspense, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import HomePage from '../features/market/HomePage';
+import { findCandidate } from '../features/market/demo-catalog';
 import type { Scenario } from '../features/market/demo-catalog';
 import { PlannedDialog } from '../shared/ui/PlannedDialog';
 import { useRoute } from './useRoute';
 import { PairingPanel, SourceControl, useServerSession } from './ServerSession';
 
 const StockDetail = lazy(() => import('../features/market/StockDetail'));
+const ResearchCenter = lazy(() => import('../features/research/ResearchCenter'));
+const CandidateWorkspace = lazy(() => import('../features/market/CandidateWorkspace'));
+
+/**
+ * The desk's own tabs.
+ *
+ * These live beside the route rather than inside it: `useRoute` owns
+ * the instrument, and the research centre is a workspace that can be
+ * opened on its own or next to a stock. Putting it in the hash would
+ * make every existing route assertion depend on a new URL shape.
+ */
+type Workspace = 'overview' | 'research' | 'stock';
 const scenarioMessages: Record<Scenario, string> = {
   sample: '',
   offline: '離線情境：保留最後示範資料並標記為舊價；沒有新的市場資料。',
@@ -21,7 +34,18 @@ export default function App() {
   const [scenario, setScenario] = useState<Scenario>('sample');
   const [watch, setWatch] = useState<Set<string>>(() => new Set());
   const [planned, setPlanned] = useState<string | null>(null);
+  // The research centre is a local tab, so opening it never changes the
+  // hash and never invalidates the instrument the reader already chose.
+  const [tab, setTab] = useState<Workspace>('overview');
+  const [listSelection, setListSelection] = useState<{ id: string; symbol: string } | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  // A route change made from elsewhere — a deep link, or the home page's
+  // stock cards — brings the stock workspace back with it. The research
+  // tab is never overridden this way, because it never changes the hash.
+  useEffect(() => {
+    setTab(symbol ? 'stock' : 'overview');
+    setListSelection(null);
+  }, [symbol]);
   const toggleWatch = (value: string) =>
     setWatch((previous) => {
       const next = new Set(previous);
@@ -72,20 +96,36 @@ export default function App() {
           <nav className="nav-group">
             <div className="nav-label">你的工作區</div>
             <button
-              className={`nav-button ${!symbol ? 'active' : ''}`}
-              aria-current={!symbol ? 'page' : undefined}
-              onClick={() => navigate(null)}
+              className={`nav-button ${tab === 'overview' ? 'active' : ''}`}
+              aria-current={tab === 'overview' ? 'page' : undefined}
+              data-testid="nav-overview"
+              onClick={() => {
+                setTab('overview');
+                navigate(null);
+              }}
             >
               ◈　機會總覽
             </button>
             <button
-              className={`nav-button ${symbol ? 'active' : ''}`}
-              aria-current={symbol ? 'page' : undefined}
-              onClick={() => navigate(symbol ?? 'AAPL')}
+              className={`nav-button ${tab === 'stock' ? 'active' : ''}`}
+              aria-current={tab === 'stock' ? 'page' : undefined}
+              data-testid="nav-stock"
+              onClick={() => {
+                setTab('stock');
+                navigate(symbol ?? 'AAPL');
+              }}
             >
               ⌁　股票詳情
             </button>
-            {['研究中心', '投資組合', '期權研究'].map((name) => (
+            <button
+              className={`nav-button ${tab === 'research' ? 'active' : ''}`}
+              aria-current={tab === 'research' ? 'page' : undefined}
+              data-testid="nav-research"
+              onClick={() => setTab('research')}
+            >
+              ◎　研究中心
+            </button>
+            {['投資組合', '期權研究'].map((name) => (
               <button
                 key={name}
                 className="nav-button"
@@ -107,7 +147,6 @@ export default function App() {
         </aside>
         <div className="workspace">
           <header className="topbar">
-            <div className="mobile-brand">gabfin.</div>
             <div className="search">
               <span aria-hidden="true">⌕</span>
               <input
@@ -118,13 +157,22 @@ export default function App() {
                 placeholder="搜尋股票，例如 AAPL、MSFT…"
                 onChange={(event) => {
                   setSearch(event.target.value);
-                  if (symbol) navigate(null);
+                  if (symbol) {
+                    setTab('overview');
+                    navigate(null);
+                  }
                 }}
               />
             </div>
             <div className="top-meta">
               <span className="pill">PAPER · 未啟動</span>
-              <button className="text-button" onClick={() => navigate(null)}>
+              <button
+                className="text-button"
+                onClick={() => {
+                  setTab('overview');
+                  navigate(null);
+                }}
+              >
                 回首頁
               </button>
             </div>
@@ -152,7 +200,15 @@ export default function App() {
                 {scenarioMessages[scenario]}
               </div>
             )}
-            {symbol ? (
+            {tab === 'research' ? (
+              <Suspense fallback={<p role="status">載入研究中心…</p>}>
+                <ResearchCenter
+                  demo={demo}
+                  instrumentId={listSelection?.id ?? findCandidate(symbol ?? '')?.id ?? null}
+                  symbol={listSelection?.symbol ?? symbol}
+                />
+              </Suspense>
+            ) : symbol && tab === 'stock' ? (
               <Suspense fallback={<p role="status">載入股票工作區…</p>}>
                 <StockDetail
                   key={symbol}
@@ -163,6 +219,13 @@ export default function App() {
                   navigate={navigate}
                   planned={setPlanned}
                 />
+              </Suspense>
+            ) : !demo ? (
+              <Suspense fallback={<p role="status">載入候選工作區…</p>}>
+                <CandidateWorkspace key={session.status} paired={session.status === 'paired'} openResearch={(id, selectedSymbol) => {
+                  setListSelection({ id, symbol: selectedSymbol });
+                  setTab('research');
+                }} />
               </Suspense>
             ) : (
               <HomePage
@@ -184,28 +247,6 @@ export default function App() {
               </span>
             </footer>
           </main>
-          <nav className="mobile-nav" aria-label="手機導航">
-            <button
-              aria-current={!symbol ? 'page' : undefined}
-              onClick={() => navigate(null)}
-            >
-              機會總覽
-            </button>
-            <button
-              onClick={() => {
-                navigate(null);
-                requestAnimationFrame(() => searchRef.current?.focus());
-              }}
-            >
-              搜尋股票
-            </button>
-            <button
-              aria-current={symbol ? 'page' : undefined}
-              onClick={() => navigate(symbol ?? 'AAPL')}
-            >
-              股票詳情
-            </button>
-          </nav>
         </div>
       </div>
       <PlannedDialog name={planned} onClose={() => setPlanned(null)} />

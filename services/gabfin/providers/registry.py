@@ -26,7 +26,6 @@ from types import MappingProxyType
 from typing import Callable, Mapping
 
 from gabfin.contracts.market import AssetClass
-from gabfin.providers.alpaca.symbols import is_option as alpaca_is_option
 from gabfin.providers.futu.symbols_wire import us_equity_symbol
 
 
@@ -45,8 +44,8 @@ class SourceProfile:
     #: one whose prefix is unknown is `vendor_symbol_invalid`.
     known_market_prefixes: tuple[str, ...]
     #: Whether the source's symbols carry the market themselves. Futu's
-    #: `US.AAPL` does; Alpaca's bare `AAPL` does not, and a dotted
-    #: Alpaca ticker (`BRK.B`) is a ticker, not a market.
+    #: `US.AAPL` does; Massive's bare `AAPL` does not, and a dotted
+    #: Massive ticker (`BRK.B`) is a ticker, not a market.
     symbol_carries_market: bool
     #: Whether an equity symbol is acceptable to this source.
     accepts_equity: Callable[[str], bool]
@@ -135,6 +134,8 @@ class ProviderRegistry:
         return profile
 
     def profile(self, source: str) -> SourceProfile:
+        if source == 'alpaca':
+            raise NotImplementedError('Alpaca market data is deprecated; use Massive')
         try:
             return self._profiles[source]
         except KeyError:
@@ -162,8 +163,8 @@ class ProviderRegistry:
 #: serve.
 _FUTU_OPTION = re.compile(r'US\.[A-Za-z0-9]+[0-9]{6}[CP][0-9]+')
 
-#: Alpaca names US equities with the bare ticker.
-_ALPACA_EQUITY = re.compile(r'[A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*')
+#: Massive names US equities with the bare ticker.
+_MASSIVE_EQUITY = re.compile(r'[A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*')
 
 
 FUTU_PROFILE = SourceProfile(
@@ -178,18 +179,18 @@ FUTU_PROFILE = SourceProfile(
     maximum_pools=('equity',),
 )
 
-ALPACA_PROFILE = SourceProfile(
-    source='alpaca',
-    namespace='alpaca',
+MASSIVE_PROFILE = SourceProfile(
+    source='massive',
+    namespace='massive',
     markets=('US',),
     known_market_prefixes=(),
     symbol_carries_market=False,
-    accepts_equity=lambda symbol: bool(_ALPACA_EQUITY.fullmatch(symbol)),
-    accepts_option=alpaca_is_option,
+    accepts_equity=lambda symbol: bool(_MASSIVE_EQUITY.fullmatch(symbol)),
+    accepts_option=lambda symbol: bool(re.fullmatch(r'O:[A-Z0-9]+[0-9]{6}[CP][0-9]{8}', symbol)),
     pools={AssetClass.EQUITY: 'equity'},
 )
 
 
 def default_registry() -> ProviderRegistry:
     """The registry of the sources this build knows about."""
-    return ProviderRegistry([FUTU_PROFILE, ALPACA_PROFILE])
+    return ProviderRegistry([FUTU_PROFILE, MASSIVE_PROFILE])

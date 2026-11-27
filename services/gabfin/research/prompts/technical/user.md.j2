@@ -1,0 +1,15 @@
+快照 ID：{{ snapshot_id }}
+資料截止時間：{{ as_of }}
+數據質量：{{ data_quality }}
+
+上游 bars 引用：
+{% for bar in bars %}
+- [{{ bar.evidence_id }}] {{ bar.symbol }} {{ bar.timeframe }} 收盤 {{ bar.close }}（coverage: {{ bar.coverage }}）
+{% endfor %}
+
+指標（來自 compute_indicators）：
+{% for ind in indicators %}
+- {{ ind.name }} = {{ ind.value }}（evidence_id: {{ ind.evidence_id }}）
+{% endfor %}
+
+請產出技術面結論、失效條件與時間尺度。

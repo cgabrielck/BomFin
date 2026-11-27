@@ -392,6 +392,27 @@ def read_partitions(
     )
 
 
+def stored_partition_paths(root: Path, series: TapeSeries) -> set[str]:
+    """The partition files this series has on disk, as relative paths.
+
+    This is the tape's own state, independent of the manifest. Comparing
+    it with the manifest's partition list answers one question: does the
+    index describe every file that holds this series' rows?
+    """
+    directory = series_directory(root, series)
+    if not directory.exists():
+        return set()
+    return {
+        path.relative_to(root).as_posix()
+        for path in directory.glob('*.parquet')
+    }
+
+
+def manifest_partition_paths(manifest: TapeManifest) -> set[str]:
+    """The partition files the manifest names."""
+    return {partition.path for partition in manifest.partitions}
+
+
 def read_rows(
     root: Path,
     series: TapeSeries,
@@ -399,6 +420,7 @@ def read_rows(
     end: datetime | None = None,
     *,
     manifest: TapeManifest | None = None,
+    apply_retention: bool = True,
 ) -> list[dict]:
     """Read the stored rows themselves, not just their count.
 
@@ -406,6 +428,12 @@ def read_rows(
     "what is in it". A caller that computes on history needs the rows,
     and must not have to re-implement the retention and ordering rules
     to get them.
+
+    `apply_retention=False` returns every stored row, including the ones
+    the retention window would drop. A caller that compares stored values
+    against a revision needs all of them: a bar the window hides is still
+    a bar, and comparing against the visible subset alone would let a
+    changed value through unnoticed.
     """
     if manifest is None:
         from gabfin.storage.manifest import read_manifest
@@ -418,7 +446,7 @@ def read_rows(
     ):
         raise ValueError('The manifest does not describe this series')
 
-    floor = _retention_floor(manifest.series, manifest.written_at)
+    floor = _retention_floor(manifest.series, manifest.written_at) if apply_retention else None
     rows: list[dict] = []
     for partition in manifest.partitions:
         path = root / partition.path

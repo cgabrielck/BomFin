@@ -13,6 +13,10 @@ dependencies = ["pydantic==2.14.4", "fastapi==0.165.0", "tzdata==2026.6; sys_pla
 calendar = ["exchange-calendars==4.13.3"]
 web = ["uvicorn==0.54.0", "websockets==17.4"]
 tape = ["pyarrow>=17.0.0"]
+research = ["PyYAML==6.0.4", "Jinja2==3.1.6", "jsonschema==4.26.0", "langgraph==1.2.24"]
+
+[tool.setuptools.package-data]
+"gabfin.research" = ["prompts/*/*.j2"]
 
 [tool.setuptools.packages.find]
 where = ["services"]

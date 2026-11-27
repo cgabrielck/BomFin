@@ -15,7 +15,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import ValidationError
 
-from gabfin.api.auth import validate_request
+from gabfin.api.auth import read_origin, validate_request
 from gabfin.api.capabilities import authorize, require_scope
 from gabfin.contracts.analysis import (
     CapabilitiesResponse,
@@ -90,7 +90,8 @@ def analysis_router(store, *, allowed_origin, indicators, macro, capabilities):
         token = request.cookies.get('gabfin_session')
         try:
             return validate_request(
-                store, token, origin=request.headers.get('origin'),
+                store, token,
+                origin=read_origin(request.headers.get('origin'), allowed_origin),
                 allowed_origin=allowed_origin, write=False,
                 query=_guarded_query(request.query_params), csrf=None)
         except PermissionError:

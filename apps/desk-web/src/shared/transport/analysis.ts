@@ -54,11 +54,9 @@ export class AnalysisMissing extends Error {
 /**
  * The request was refused.
  *
- * A browser cannot send the `Origin` header the session guard requires,
- * so an analysis GET made from the desk is refused even with a valid
- * session. That is a backend limitation, not a logout: the market view
- * keeps working and this error says only that the analysis surface is
- * out of reach.
+ * A refusal means the session authority rejected the request. The
+ * market view keeps working and this error says only that the analysis
+ * surface is out of reach.
  */
 export class AnalysisRefused extends Error {
   readonly status: number;
@@ -105,7 +103,7 @@ async function get<T>(
     headers: { Accept: 'application/json' },
   });
   if (response.status === 401)
-    throw new AnalysisRefused('分析請求被拒絕（工作台未送出有效的 Origin 標頭）', 401);
+    throw new AnalysisRefused('分析請求被拒絕（工作台登入狀態可能已失效）', 401);
   if (response.status === 403)
     throw new AnalysisUnavailable('此身分沒有行情讀取權限', 403);
   if (response.status === 404)

@@ -1,0 +1,22 @@
+version: 1
+role: discovery
+purpose: 從授權來源找出候選股票，並寫下每檔的納入理由
+inputs: schemas/research/discovery_input.json
+outputs: schemas/research/discovery_output.json
+tools:
+  - resolve_symbols
+  - read_observations
+  - read_massive_snapshot
+forbidden:
+  - 不得讀取憑證或環境變數
+  - 不得輸出 StrategyIntent 或任何可執行訂單
+  - 不得自行新增快照外的股票代碼
+budget:
+  max_input_tokens: 20000
+  max_output_tokens: 4000
+  max_attempts_per_node: 2
+  deadline_seconds: 120
+prompt:
+  system: discovery/system.md.j2
+  user: discovery/user.md.j2
+  version: 1

@@ -37,12 +37,12 @@
   recorded measurements did not match the artifacts and named the wrong
   environment. Evidence and the corrected figures are in the
   [04e acceptance report](../audit/s04-core-acceptance.md).
-- `tests/gabfin/test_market_api.py::test_quiet_websocket_expires_revokes_or_refuses_writes`
-  failed once during a WU-1 full regression with close code 1011 instead of
-  1008, then passed in isolation and on the next full run. It is a timing
-  flake in the existing websocket test, not a WU-1 defect; the Alpaca
-  adapter touches no websocket path. Watch it if the full run goes red
-  again.
+- BUG-011 logout WebSocket 1011 instead of 1008 was a session-store race:
+  revocation between resolve and the second SELECT left a missing row indexed
+  as a tuple. `remaining` and `check_csrf` now raise PermissionError on missing
+  rows. Deterministic RED/GREEN tests, full pytest1212 and TLS4 passed;
+  independent follow-up review passed (130 focused combination tests). [session05](../superpowers/logs/2026-11-27-session-05.md)
+  owns evidence; earlier claims of a test-only flake are superseded.
 - The Alpaca token bucket initially recomputed its wait inside a loop. After a
   sleep the refilled token count landed a rounding error short of the target,
   so the loop asked for more and never converged: one test ran for over eight
@@ -97,4 +97,38 @@
   in Playwright, `curl`) is refused with 401 unless it states the origin.
   This is the existing session policy, not a defect, but it surprised the
   e2e work and will surprise anything calling the API directly.
+- `tests/gabfin/test_feed_runner.py::test_timeout_kills_and_reaps` intermittently
+  fails on Windows with `PermissionError: [WinError 32]` from `shutil.rmtree` on a
+  pytest temp directory. Observed once during the S5 research API work (2026-11-27);
+  the same file passes in isolation and in repeated full runs. It is a temp-directory
+  cleanup race between the killed child process and the fixture, not a product
+  defect, and it is unrelated to the research routes.
+- The research centre's DOM contract is not uniform across its two hosts, and a
+  test that guesses it fails for reasons that are not defects (confirmed 2026-11-27
+  during the S6 research acceptance run):
+  `research-start` is rendered but `disabled` when the stack is unconfigured, not
+  hidden; `research-raw` exists only in the full research tab because the stock
+  detail entry mounts the centre with `compact`; `research-data-quality` renders
+  only when `data_quality` is non-empty; and `research-report` also renders for a
+  failed job, where the failure shows as the `research-failed` banner with no role
+  result, snapshot, evidence or verdict. The assertions in
+  `tests/e2e/research-flow.spec.ts` encode these facts.
+- `App.tsx` switches to the stock workspace from a `useEffect` on the selected
+  symbol, so a pick is not immediately visible in the DOM. An e2e test that clicks
+  a candidate and then looks for the stock detail has to wait for the workspace
+  to appear; asserting on the symbol alone races the tab swap.
+- A `git stash` round trip on this checkout silently rewrote
+  `apps/desk-web/src/app/styles.css` as UTF-16 (BOM `FF FE`). Vite then refused
+  to build with `stream did not contain valid UTF-8`, and the restored file had
+  lost the colleague's `@media (max-width: 760px)` rules, which left a 4px
+  horizontal overflow at a 390px viewport. Fixed 2026-11-27 by decoding the file
+  back to UTF-8 and re-applying the colleague's CSS exactly, with the research
+  styles added on top as pure insertions. Verify the encoding of a file restored
+  from a stash before trusting its content, and check `scrollWidth` against the
+  viewport width at 390px after any stylesheet change.
+- The Playwright `webServer` (a Vite dev server on port 19045) can die during a
+  long combined run; the symptoms are `net::ERR_CONNECTION_REFUSED` on
+  `page.goto` across several unrelated suites, not a real assertion failure. The
+  same tests pass in isolation in seconds. Run the suites in smaller batches and
+  kill any process still listening on 19045 before a rerun.
 

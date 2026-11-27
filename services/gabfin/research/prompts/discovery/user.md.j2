@@ -1,0 +1,10 @@
+快照 ID：{{ snapshot_id }}
+資料截止時間：{{ as_of }}
+數據質量：{{ data_quality }}
+
+上游 observations：
+{% for obs in observations %}
+- [{{ obs.evidence_id }}] {{ obs.text }}
+{% endfor %}
+
+請依 observations 找出候選股票，並為每檔寫納入理由與引用的 evidence_id。

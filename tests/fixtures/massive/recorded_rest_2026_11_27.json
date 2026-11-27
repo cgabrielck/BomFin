@@ -1,0 +1,14 @@
+{
+  "recorded_at": "2026-11-27T08:58:29Z",
+  "provenance": "Live proxy response; only market fields retained. Endpoints, credentials, license identity and pagination URLs omitted.",
+  "history": {"results": [
+    {"o": 347.87, "h": 352.6, "l": 345.442189, "c": 349.08, "v": 58588703.300041, "t": 1795410000000},
+    {"o": 348.06, "h": 354.4, "l": 345.88, "c": 354.07, "v": 41270446.945827, "t": 1795496400000},
+    {"o": 353.475, "h": 356.75, "l": 345.13, "c": 355.58, "v": 54285255.388427, "t": 1795582800000}
+  ]},
+  "options": {"results": [
+    {"details": {"contract_type": "call", "exercise_style": "american", "expiration_date": "2026-11-27", "shares_per_contract": 100, "strike_price": 110, "ticker": "O:AAPL261127C00110000"},
+     "greeks": {"delta": 0.9903021294707716, "gamma": 0.00012581338992260303, "theta": -3.987972398244001, "vega": 0.004136250093580696},
+     "implied_volatility": 13.486260664462186}
+  ]}
+}

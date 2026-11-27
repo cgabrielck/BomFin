@@ -1,5 +1,37 @@
 # Recent progress
 
+## 2026-11-27 — S5 桌面研究中心前端完成（未提交）
+
+- 只改 `apps/desk-web/src/**`，新增 `tests/e2e/research-ui.spec.ts`；未动后端／scripts／docs／他人 fixture。
+- 新增三个文件：`shared/transport/research.ts`（全部业务请求集中于此）、
+  `features/research/useResearchView.ts`（轮询 + abort + 竞态防护）、
+  `features/research/ResearchCenter.tsx`（共享组件，full-tab 与 compact 同源）。
+- `App.tsx` 用局部 `tab` 状态加「研究中心」导航，不动 `useRoute` hash 契约；
+  `StockDetail.tsx` 以 `<details data-testid="research-entry">` 挂同一个共享组件。
+- 界面覆盖未配置／任务失败／审查拒收／缺证据／503／401 过期／demo 未接 AI，
+  以及快照 metadata、evidence ids、结构化审查校验与可折叠原始报告；
+  旁注明示研究不下单。
+- API 字段已与同事后端 `services/gabfin/api/research.py` 逐字段核对一致。
+- TDD 先 RED（8 fail）后 GREEN；验证：**12 passed**（research-ui）、
+  **23 passed**（secure-market＋analysis-ui）、**10 passed**（chart）、
+  **7 passed**（market）、**11 passed**（同事 research-flow）；build 与 tsc 干净。
+- 修复 stash 往返造成的同事 `styles.css` UTF-16 损坏与 390px 窄屏横向溢出，
+  已转回 UTF-8 并完整还原同事 CSS。详见 [execution](execution.md)。
+
+## 2026-11-27 — S5/S6 研究端到端驗收完成（未提交）
+
+- 新增 4 個檔案，未改既有 fixture：`tests/e2e/fixtures/research-server.py`、
+  `tests/e2e/fixtures/research.ts`、`tests/e2e/research-flow.spec.ts`、
+  `playwright.research.config.ts`。
+- fixture 走真實 TLS（OpenSSL 自簽）、真實 `create_market_app(research={'jobs': jobs})`、
+  真實 `ResearchStore`／`SnapshotCapture`／`ResearchService`／LangGraph runtime／harness；
+  唯一替換件是本地 `FixtureModel`（從渲染 prompt 讀真實 evidence_id，無網路、無 .env）。
+- 三個 profile：`configured`（成功）／`unconfigured`（無 model，POST 503）／
+  `no-history`（tape 未寫過該序列，job 真實 failed，`error=CaptureError`）。
+- 端口由 OS 分配，不占 19045，與並行 UI 同事的 vite dev server 無衝突。
+- 驗證：**Playwright 11 passed**（連續多輪全綠），秘密掃描 1012 路徑 0 命中。
+  詳細介面形狀、UI 契約與已知競態見 [execution](execution.md) 與 [issues](issues.md)。
+
 ## 2026-11-27 — 分析平面的生產接線完成（提交 `cd59fca1`）
 
 - **發現的實際阻塞**：`create_market_app(analysis=None)` 預設不掛載分析路由，

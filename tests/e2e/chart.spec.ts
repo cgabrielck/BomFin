@@ -125,7 +125,7 @@ test('demo chart draws sourced candles, supports zoom, and leaves missing bars e
     ),
   ).toBe(false);
   await page.screenshot({
-    path: testInfo.outputPath('chart-mobile.png'),
+    path: testInfo.outputPath('chart-desktop.png'),
     fullPage: true,
   });
   expect(errors).toEqual([]);

@@ -7,7 +7,7 @@ async function save(name:string,value:unknown){await mkdir(folder,{recursive:tru
 
 test('keyboard dialog escape restores focus and search remains usable',async({page})=>{
   await page.goto('/');
-  const research=page.getByRole('button',{name:/研究中心/});await research.focus();await page.keyboard.press('Enter');
+  const research=page.getByRole('button',{name:/期權研究/});await research.focus();await page.keyboard.press('Enter');
   await expect(page.getByRole('dialog')).toBeVisible();await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).not.toBeVisible();await expect(research).toBeFocused();
   await page.getByRole('searchbox').focus();await page.keyboard.type('MSFT');

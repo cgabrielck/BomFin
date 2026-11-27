@@ -31,8 +31,9 @@ class SessionStore:
         finally:connection.close()
     def remaining(self,token):
         self.resolve(token)
-        with self.connect() as c:expiry=c.execute("SELECT expires FROM sessions WHERE hash=?",(digest(token),)).fetchone()[0]
-        return max(0,expiry-self.now())
+        with self.connect() as c:row=c.execute("SELECT expires FROM sessions WHERE hash=?",(digest(token),)).fetchone()
+        if row is None:raise PermissionError('Unauthorized')
+        return max(0,row[0]-self.now())
     def now(self):
         t=self.clock()
         if t.tzinfo is None:raise ValueError('Aware clock required')
@@ -60,7 +61,7 @@ class SessionStore:
     def check_csrf(self,token,csrf):
         self.resolve(token)
         with self.connect() as c:row=c.execute('SELECT csrf FROM sessions WHERE hash=?',(digest(token),)).fetchone()
-        if not csrf or not secrets.compare_digest(row[0],digest(csrf)):raise PermissionError('Forbidden')
+        if row is None or not csrf or not secrets.compare_digest(row[0],digest(csrf)):raise PermissionError('Forbidden')
     def revoke(self,token):
         with self.connect() as c:c.execute('DELETE FROM sessions WHERE hash=?',(digest(token),))
 

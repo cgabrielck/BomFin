@@ -15,6 +15,7 @@ from gabfin.analysis.runtime import InstrumentResolver, TapeHistory, indicator_p
 from gabfin.analysis.sources import TapeBarSource
 from gabfin.contracts.market import Timeframe, TimeUnit
 from gabfin.contracts.subscriptions import FeedCapabilities
+from gabfin.storage.tape import new_series, write_partitions
 
 NOW = datetime(2026, 3, 2, 21, 0, tzinfo=timezone.utc)
 TIMEFRAME = Timeframe(count=1, unit=TimeUnit.TRADING_DAY)
@@ -83,7 +84,7 @@ def test_a_missing_series_raises_rather_than_returning_nothing(tmp_path):
 
 
 def test_the_indicator_plane_computes_from_the_tape(tmp_path):
-    write_tape(tmp_path, symbol='US.AAPL', count=40, venue='sip')
+    write_tape(tmp_path, symbol='US.AAPL', count=40, venue='sip', source='futu')
 
     class Catalog:
         def get(self, instrument_id):
@@ -99,7 +100,7 @@ def test_the_indicator_plane_computes_from_the_tape(tmp_path):
 
 
 def test_the_indicator_plane_refuses_a_series_with_an_unknown_venue(tmp_path):
-    write_tape(tmp_path, symbol='US.AAPL', count=40, venue='something-else')
+    write_tape(tmp_path, symbol='US.AAPL', count=40, venue='something-else', source='futu')
 
     class Catalog:
         def get(self, instrument_id):
@@ -135,3 +136,58 @@ def test_the_resolver_refuses_an_instrument_with_no_symbol_in_the_namespace(tmp_
     resolver = InstrumentResolver(Catalog())
     with pytest.raises(KeyError):
         resolver.symbol_of(INSTRUMENT)
+
+
+def test_the_tape_bar_source_refuses_a_partition_the_manifest_does_not_list(tmp_path):
+    """An unlisted partition is history the index does not describe.
+
+    Reading around it would silently drop a month of history, and a
+    later import could re-bless the values nobody committed. The reader
+    refuses the disagreement instead.
+    """
+    from datetime import timedelta
+    write_tape(tmp_path, count=10)
+    series = new_series('AAPL', {'count': 1, 'unit': 'trading_day'}, source='fixture',
+                         venue_coverage='sip', adjustment='unadjusted', retention='rolling_2y')
+    write_partitions(tmp_path, series, [dict(
+        event_at=datetime(2026, 2, 15, tzinfo=timezone.utc),
+        open=Decimal('1'), high=Decimal('2'), low=Decimal('1'), close=Decimal('2'),
+        volume=Decimal('10'))], now=datetime(2026, 2, 20, tzinfo=timezone.utc))
+
+    source = TapeBarSource(tmp_path, symbol='AAPL', source='fixture')
+    with pytest.raises(ValueError, match='partition'):
+        source.bars(INSTRUMENT, TIMEFRAME)
+
+
+def test_the_tape_bar_source_refuses_a_massive_series_claiming_a_venue(tmp_path):
+    """Massive history is not tied to a venue, so it cannot report one.
+
+    A manifest that claims `sip` for a Massive series would let a series
+    that was never tied to a named venue be read as if it were, and the
+    indicator plane would label the result with that venue.
+    """
+    write_tape(tmp_path, count=10, venue='sip', source='massive')
+    source = TapeBarSource(tmp_path, symbol='AAPL', source='massive')
+    with pytest.raises(ValueError, match='venue'):
+        source.bars(INSTRUMENT, TIMEFRAME)
+    assert source.coverage_of(TIMEFRAME) == 'unknown'
+
+
+def test_the_tape_bar_source_accepts_a_massive_series_with_unknown_coverage(tmp_path):
+    write_tape(tmp_path, count=10, venue='unknown', source='massive')
+    source = TapeBarSource(tmp_path, symbol='AAPL', source='massive')
+    assert len(source.bars(INSTRUMENT, TIMEFRAME)) == 10
+    assert source.coverage_of(TIMEFRAME) == 'unknown'
+
+
+def test_the_tape_bar_source_accepts_a_massive_series_with_an_unnamed_vendor(tmp_path):
+    """A label that names no venue is honest, so it is read.
+
+    `massive-vendor` says the data came from a vendor without naming a
+    venue. Refusing it would refuse an honest series; only a claim on a
+    known venue is a fake.
+    """
+    write_tape(tmp_path, count=10, venue='massive-vendor', source='massive')
+    source = TapeBarSource(tmp_path, symbol='AAPL', source='massive')
+    assert len(source.bars(INSTRUMENT, TIMEFRAME)) == 10
+    assert source.coverage_of(TIMEFRAME) == 'unknown'

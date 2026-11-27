@@ -1,4 +1,5 @@
 """Compose the existing pairing/session app with read-only market routes."""
+from contextlib import asynccontextmanager
 from urllib.parse import urlsplit
 from pathlib import Path
 
@@ -8,6 +9,7 @@ from starlette.staticfiles import StaticFiles
 from gabfin.api.auth import create_app
 from gabfin.api.market import market_router
 from gabfin.api.analysis import analysis_router
+from gabfin.api.research import research_router
 
 
 class ExactTlsOrigin:
@@ -38,13 +40,22 @@ class ExactTlsOrigin:
 
 
 def create_market_app(store, *, allowed_origin, gateway, static_dir: Path | None = None,
-                      analysis=None):
-    """The browser app: pairing, market, and the analysis routes.
+                      analysis=None, research=None, universe=None):
+    """The browser app: pairing, market, analysis and research routes.
 
     `analysis` is optional so that a deployment without a tape or a FRED
     key still serves the market routes. When it is absent the analysis
     routes are not mounted, and the browser gets a 404 rather than a
     route that answers with an empty series.
+
+    `research` is optional for the same reason: a deployment with no
+    configured research model still serves the market routes. It holds
+    `{'jobs': ResearchJobs(...)}`, the one injected object the research
+    routes need.
+
+    A research job runs in the background, so the app stops them when
+    it shuts down. The handler is registered here rather than in the
+    launcher, so every way of building the app gets the same teardown.
     """
     app = create_app(store, allowed_origin=allowed_origin)
     app.add_middleware(ExactTlsOrigin, origin=allowed_origin)
@@ -52,6 +63,39 @@ def create_market_app(store, *, allowed_origin, gateway, static_dir: Path | None
     app.include_router(market_router(store, allowed_origin=allowed_origin, gateway=gateway))
     if analysis is not None:
         app.include_router(analysis_router(store, allowed_origin=allowed_origin, **analysis))
+    if research is not None:
+        app.include_router(research_router(store, allowed_origin=allowed_origin, **research))
+        _stop_research_on_shutdown(app, research.get('jobs'))
+    if universe is not None:
+        from gabfin.api.universe import universe_router
+        app.include_router(universe_router(store, allowed_origin=allowed_origin, **universe))
     if static_dir is not None:
         app.mount('/', StaticFiles(directory=static_dir, html=True), name='desk')
     return app
+
+
+def _stop_research_on_shutdown(app, jobs) -> None:
+    """Cancel the background research jobs when the app stops.
+
+    A job that outlived the process would keep paying for model calls
+    that nobody is waiting for. The jobs object records the
+    cancellation itself, so the job ends as failed rather than as
+    queued forever.
+
+    The app's lifespan is extended rather than replaced: the pairing
+    and session app owns its own startup and shutdown, and this only
+    adds the research teardown to it.
+    """
+    if jobs is None:
+        return
+    existing = app.router.lifespan_context
+
+    @asynccontextmanager
+    async def lifespan(app):
+        async with existing(app) as state:
+            yield state
+        shutdown = getattr(jobs, 'shutdown', None)
+        if shutdown is not None:
+            await shutdown()
+
+    app.router.lifespan_context = lifespan

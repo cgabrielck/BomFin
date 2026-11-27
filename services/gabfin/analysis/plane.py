@@ -131,6 +131,9 @@ class IndicatorPlane:
         self._coverage_resolver = coverage_resolver
         self._computed_by = computed_by
         self._clock = clock or (lambda: datetime.now(timezone.utc))
+        from threading import Lock
+        self._indicator_lock = Lock()
+        self._indicator_cache = {}
 
     def _coverage(self, instrument_id: UUID, timeframe: Timeframe) -> SourceCoverage:
         if self._coverage_resolver is not None:
@@ -154,12 +157,26 @@ class IndicatorPlane:
         if coverage == 'unknown':
             # An indicator without a venue is not comparable with anything.
             raise AnalysisUnavailable('unknown_source_coverage')
-        engine = IndicatorEngine(instrument_id, timeframe, coverage)
-        state = engine.seed([])
-        grouped: dict[str, list[IndicatorPoint]] = defaultdict(list)
-        for bar in bars:
-            for point in engine.update(state, bar):
-                grouped[point.indicator].append(point)
+        key = (str(instrument_id), timeframe.count, timeframe.unit, coverage)
+        with self._indicator_lock:
+            cached = self._indicator_cache.get(key)
+            if cached is not None and bars[:len(cached[0])] == cached[0]:
+                previous, engine, state, grouped = cached
+                remaining = bars[len(previous):]
+            else:
+                engine = IndicatorEngine(instrument_id, timeframe, coverage)
+                state = engine.seed([])
+                grouped = defaultdict(list)
+                remaining = bars
+            # Drop before mutation: an exception must never retain partial state.
+            self._indicator_cache.pop(key, None)
+            for bar in remaining:
+                for point in engine.update(state, bar):
+                    grouped[point.indicator].append(point)
+            if len(self._indicator_cache) >= 16:
+                self._indicator_cache.pop(next(iter(self._indicator_cache)))
+            self._indicator_cache[key] = (bars, engine, state, grouped)
+            grouped = {name: tuple(points) for name, points in grouped.items()}
 
         series: list[IndicatorSeries] = []
         statuses: list[IndicatorStatus] = []

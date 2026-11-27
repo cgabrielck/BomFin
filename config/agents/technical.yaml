@@ -1,0 +1,22 @@
+version: 1
+role: technical
+purpose: 由 finalized bars 與指標產出技術面結論、失效條件與時間尺度
+inputs: schemas/research/technical_input.json
+outputs: schemas/research/technical_output.json
+tools:
+  - read_bars
+  - compute_indicators
+  - read_quote_snapshot
+forbidden:
+  - 不得輸出 StrategyIntent 或任何可執行訂單
+  - 不得以文字估算指標數值，數值必須來自 compute_indicators
+  - 證據必須引用快照內存在的 ID，否則視為無效
+budget:
+  max_input_tokens: 20000
+  max_output_tokens: 4000
+  max_attempts_per_node: 2
+  deadline_seconds: 120
+prompt:
+  system: technical/system.md.j2
+  user: technical/user.md.j2
+  version: 1

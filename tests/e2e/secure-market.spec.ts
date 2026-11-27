@@ -55,7 +55,7 @@ test('server mode requires pairing and receives private TLS market state', async
   });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({
-    path: testInfo.outputPath('market-mobile.png'),
+    path: testInfo.outputPath('market-desktop.png'),
     fullPage: true,
   });
   expect(
@@ -63,6 +63,57 @@ test('server mode requires pairing and receives private TLS market state', async
       () => document.documentElement.scrollWidth > innerWidth,
     ),
   ).toBe(false);
+});
+
+test('BBO-only quotes show independent bid and ask times, updates, missing sides and logout clearing', async ({ page, market }) => {
+  const bidAt = '2026-11-27T09:15:10.600Z';
+  const askAt = '2026-11-27T09:15:11.600Z';
+  let bidOnly = false;
+  const bbo = (event: any) => {
+    if (event?.kind !== 'quote') return;
+    const point = event.payload.last;
+    if (!point) return;
+    event.payload.bid = { ...point, event_at: bidAt };
+    event.payload.ask = bidOnly ? null : { ...point, price: '359.17', event_at: askAt };
+    event.payload.last = null;
+  };
+  await page.route('**/market/snapshot', async route => {
+    const response = await route.fetch();
+    const body = await response.json();
+    body.quotes?.forEach(bbo);
+    await route.fulfill({ response, json: body });
+  });
+  await page.routeWebSocket('**/market/stream', route => {
+    const server = route.connectToServer();
+    server.onMessage(message => {
+      const frame = JSON.parse(String(message));
+      if (frame.kind === 'snapshot') frame.payload.quotes.forEach(bbo);
+      if (frame.kind === 'update') bbo(frame.payload.event);
+      route.send(JSON.stringify(frame));
+    });
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(market.origin);
+  await page.getByRole('combobox', { name: '資料模式' }).selectOption('server');
+  const { code } = await market.command('pair');
+  await page.getByLabel('配對碼', { exact: true }).fill(String(code));
+  await page.getByRole('button', { name: '配對登入', exact: true }).click();
+  await page.getByRole('button', { name: 'AAPL ↗', exact: true }).click();
+  await expect(page.getByTestId('bid-price')).toHaveText('210.00');
+  await expect(page.getByTestId('ask-price')).toHaveText('359.17');
+  await expect(page.getByTestId('bid-source')).toContainText(bidAt);
+  await expect(page.getByTestId('ask-source')).toContainText(askAt);
+  await expect(page.getByTestId('last-price')).toHaveText('—');
+  await expect(page.getByTestId('market-source')).toContainText('fixture');
+  bidOnly = true;
+  await market.command('price', { symbol: 'AAPL', price: '359.00' });
+  await expect(page.getByTestId('bid-price')).toHaveText('359.00');
+  await expect(page.getByTestId('ask-price')).toHaveText('—');
+  await expect(page.getByTestId('ask-source')).toContainText('未知');
+  await page.getByRole('button', { name: '登出', exact: true }).click();
+  await expect(page.getByTestId('bid-price')).toHaveText('—');
+  await expect(page.getByTestId('ask-price')).toHaveText('—');
+  await expect(page.getByTestId('bid-source')).not.toContainText(bidAt);
 });
 
 test('logout clears the quote before network confirmation', async ({
@@ -203,7 +254,7 @@ test('canonical validation refuses a foreign instrument in an HTTP snapshot', as
   });
   await page.getByRole('button', { name: /^MSFT Microsoft/ }).click();
   await expect(page.getByTestId('last-price')).toHaveText('—');
-  await expect(page.getByRole('alert')).toContainText('行情股票或來源不一致');
+  await expect(page.getByTestId('market-error')).toContainText('行情股票或來源不一致');
 });
 
 for (const failure of ['snapshot_required', 'slow_consumer', 'sequence_hole']) {

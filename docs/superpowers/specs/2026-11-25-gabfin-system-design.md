@@ -6,7 +6,7 @@
 
 ## 1. 目標及決策標籤
 
-建立個人遠端交易工作台：電腦和 iPhone 可即時查看股票／期權、研究、策略與 paper 帳戶；股票策略可自動做多及做空；研究可持續提出有證據的改進。
+建立個人交易工作台（桌面網頁）：可即時查看股票／期權、研究、策略與 paper 帳戶；股票策略可自動做多及做空；研究可持續提出有證據的改進。
 
 - **U：使用者確認**。不可由工程師靜默更改。
 - **P：工程提案**。可以經證據修訂，必須同步文件與測試。
@@ -18,7 +18,7 @@
 | ID | 需求 |
 |---|---|
 | U01 | 第一版先供個人使用，可遠端存取；預留未來多人能力，不優先做收費系統。 |
-| U02 | 前端全面重寫，桌面與 iPhone 使用響應式網站／PWA；初期私人連線。 |
+| U02 | 前端全面重寫，僅桌面網頁（不含 iPhone App、PWA 及手機版面）；初期私人連線。 |
 | U03 | 美股股票與期權；股票包含自動 paper 做多／做空，期權第一版只做行情、期權鏈與研究。 |
 | U04 | 第一版同時具備日內及可持有數週的波段策略；已取消最多兩天與日內必須當天清倉的限制。 |
 | U05 | 股票 paper 支援盤前、正常時段、盤後；整夜 20:00–04:00 ET 不自動納入本次範圍。 |
@@ -30,14 +30,14 @@
 | U11 | 動態止損、動態倉位、可配置單筆計劃風險；不固定 1%；開始 paper 前批准具體設定。 |
 | U12 | 帳戶最大回撤驗收上限 40%；不是單筆止損幅度、盈利目標或損失保證。 |
 | U13 | App 聊天只可查帳戶、分析股票清單、啟動研究、產生交易方案；不得下單、取消、啟停交易或改風控。 |
-| U14 | iPhone 非聊天控制台可提供既定 paper 啟停、停止新增交易、取消委託；不提供提高風險上限。 |
+| U14 | 桌面控制台可提供既定 paper 啟停、停止新增交易、取消委託；不提供提高風險上限。 |
 | U15 | 行情過期停止相關新增入場；既有保護及對帳繼續。LLM 失效不停止不依賴該次 AI 的已批准規則策略。 |
-| U16 | 本機開發；所需運行時段保持主機開機、不睡眠，iPhone 作遠端端點。 |
+| U16 | 本機開發；所需運行時段保持主機開機、不睡眠。 |
 | U17 | 預算 HK$400／月；必要的即時期權資料可考慮再增加約 HK$100，具體方案與費用需核對。 |
 | U18 | 架構不以舊 repo、ADR、框架為既定約束；保留或替換由新需求、測試與整合成本決定。 |
 | U19 | 保留 REA=morluto/rea、ECC=affaan-m/ECC、ORCA=stablyai/orca 作評估；不採用 Claude-Mem。 |
 | U20 | 成功評估以樣本外、成本後收益及基準比較為主，同時顯示穩定性與風險，由使用者決定部署版本。 |
-| U21 | 中文彙報，產品桌面與手機優先繁體中文；技術識別字保留原文。 |
+| U21 | 中文彙報，產品以桌面繁體中文為主；技術識別字保留原文。 |
 | U22 | 研究首頁以主動發現機會為主；任意股票分析隨時可用；有持倉時重要風險及變化置頂。 |
 | U23 | 重點候選呈現 why-now、時間尺度、支持證據、反證、觀察／入場及失效條件、缺資料；允許沒有足夠優勢及不完整報告。 |
 | U24 | 在既有預算內廣泛初篩、集中深研；使用者點選股票及持倉重大變化優先，清楚區分初篩與已深入研究。 |
@@ -82,7 +82,6 @@ LEAN 作可信事件回測的首個比較候選；NautilusTrader 作備選，不
 
 ```mermaid
 flowchart TD
-    Phone[iPhone PWA] --> Auth[私人 HTTPS 與明確身份]
     Desktop[桌面 Web] --> Auth
     Auth --> API[FastAPI API 與事件 Gateway]
     Futu[OpenD / 授權行情] --> MD[行情程序：推送 補缺 正規化]
@@ -148,7 +147,7 @@ services/gabfin/
   experiments/         datasets、runners、metrics、promotion
   ops/                 health、metrics、supervisor、notifications
 tests/gabfin/          domain、integration、replay、fault、security
-tests/e2e/             desktop、mobile、chat、controls、chart
+tests/e2e/             desktop、chat、controls、chart
 config/                policy templates、feed capabilities，無秘密
 runtime/               本機資料，gitignored，不儲存憑證明文快照
 docs/superpowers/      設計與任務
@@ -170,7 +169,7 @@ docs/superpowers/      設計與任務
 | 社群 | 可選公開線索、Agent-Reach 補缺 | 不作硬事實；不可回測假裝當時已取得。 |
 | 帳戶／委託／成交 | 券商事件及 reconciliation，SQLite 保存證據 | 本地估值與券商帳本分開標示，不以 limit 冒充 fill。 |
 
-資料源的實際授權、配額、即時性是 G，不因手機 App 已有報價而推定 OpenAPI 同權。
+資料源的實際授權、配額、即時性是 G，不因既有報價來源而推定 OpenAPI 同權。
 Futu paper 不支援美股延長時段，故不作完整執行後端。Alpaca paper 可作另一帳戶，與行情來源分離；不同 feed 的價格差要可觀測，不能假裝同一本市場。
 
 ### 7.1 動態候選池
@@ -268,14 +267,13 @@ timeout／502 不等於拒單；禁止新 key 盲重試。部分成交後取消�
 kill／pause 語意分開：pause entries、cancel open、reduce exposure 是不同操作；停止新單不能關掉對帳及可用保護。
 延長時段不能假設 broker stop order 仍生效；逐 session 核對支援型別，server-side 條件保護受行情及主機可用性限制。介面必須分開標示券商已接受的保護單與本機監測條件。
 
-## 10. UI、PWA、聊天與身份
+## 10. UI、聊天與身份
 
 導航：工作台、行情／圖表、機會池、研究、期權、帳戶／委託、策略實驗、日誌、系統狀態。
-手機首屏：paper／連線／資料時間、曝險與損益、需處理事件、研究入口及明確控制區；圖表／期權鏈獨立頁。
+桌面首屏：paper／連線／資料時間、曝險與損益、需處理事件、研究入口及明確控制區；圖表／期權鏈獨立頁。
 所有金額／百分比有固定單位契約，不用數值大小猜百分比是否乘 100。
 資料先顯示有效快取並標 age，背景更新；meta/account/research 不阻塞整頁。大列表虛擬化，圖表增量 update，離頁取消訂閱。
-PWA cache 只存靜態殼及明確標時的唯讀資料；不快取 authenticated API 作離線真帳本，不重播離線操作。
-iPhone 鎖屏不影響後端；回到前景先重新驗證帳戶／委託與事件序號，不依賴瀏覽器背景 timer。
+不做 PWA、離線快取或手機版面；瀏覽器重新回到前景時，先重新驗證帳戶／委託與事件序號。
 
 ### 10.1 聊天 capability
 
@@ -315,7 +313,6 @@ Alpaca 官方完整行情 US$99／月超出目標；IBKR 須另有合資格帳�
 |---|---|
 | 本機快取讀 API | p95 ≤300ms；排除外部 provider，新舊都量測。 |
 | 桌面快取後切頁 | 可用內容 p95 ≤500ms。 |
-| iPhone 私網首屏 | 有效首屏 p95 ≤2s，記網絡條件。 |
 | quote 接收至 UI | p95 ≤1s；另外報 event→receive 延遲。 |
 | 下單前本地風控 | p95 ≤100ms，外部借券查詢獨立標示。 |
 | 保護循環 | 日內活躍時 scheduler lag p95 ≤1s；不含 broker 回應。 |
@@ -328,7 +325,7 @@ Alpaca 官方完整行情 US$99／月超出目標；IBKR 須另有合資格帳�
 
 - REA：按指定研究任務啟用；現成原始碼優先直接讀取，不為展示工具而做 native reverse engineering。
 - ECC：評估 review、eval、context 管理能力；不覆寫既有 AGENTS／config，不同時啟用互相衝突 hooks。
-- stablyai/orca：開發工作區、隔離 agent 任務及手機開發管理候選；不作交易 UI 的替代品。Windows、權限模式與資源成本先測。
+- stablyai/orca：開發工作區及隔離 agent 任務管理候選；不作交易 UI 的替代品。Windows、權限模式與資源成本先測。
 - 開發中的 Codex 子 Agent 與產品研究 Agent 是兩套生命週期、權限及預算，不共用券商秘密或聊天記憶。
 - Claude-Mem 已被使用者取消；先前可能留下 runtime／待完成安裝，未驗證清除，不能宣稱已卸載。後續清理應保留其他工具設定。
 
@@ -339,7 +336,7 @@ G2：OpenD 實際 quote／option 權益、盤前盤後及歷史粒度測試；�
 G3：paper account 及唯一 executor；正確借券、extended eligibility、重啟對帳。
 G4：已批准的數值風控配置；單筆／日虧／槓桿／曝險／runtime DD 明確。
 G5：候選引擎、模型 provider 及 CLI 自動化條款／成本測試；不能假設訂閱等於 API。
-G6：桌面及 iPhone 實機測試、私人 HTTPS、身份及聊天能力隔離。
+G6：桌面瀏覽器測試、私人 HTTPS、身份及聊天能力隔離。
 G7：無前視與一致成本的回測、成本後結果及 shadow／paper evidence；部署新策略需要批准。
 
 未決項由小型比較實驗處理，不再延長需求訪談。若需要新增購買、變更使用者需求或真倉，才帶具體結果請使用者決定。
@@ -367,6 +364,6 @@ G7：無前視與一致成本的回測、成本後結果及 shadow／paper evide
 17. [Qlib](https://github.com/microsoft/qlib)、[RD-Agent](https://github.com/microsoft/RD-Agent)、[TradingAgents](https://github.com/TauricResearch/TradingAgents)：後續研究比較候選，不預設全部採用。
 18. [Lightweight Charts](https://github.com/tradingview/lightweight-charts)、[TanStack Query](https://tanstack.com/query/latest/docs/framework/react/overview)
 19. [REA](https://github.com/morluto/rea)、[ECC](https://github.com/affaan-m/ECC)、[ORCA](https://github.com/stablyai/orca)
-20. [Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve)、[Apple Web App](https://support.apple.com/en-az/guide/iphone/iphea86e5236/26/ios/26)
+20. [Tailscale Serve](https://tailscale.com/docs/features/tailscale-serve)
 21. [vectorbt 授權](https://github.com/polakowo/vectorbt/blob/master/LICENSE.md)：含 Commons Clause，商用不得按無附加限制 Apache 處理。
 22. [OpenBB 官方維護狀態](https://github.com/OpenBB-finance)：當前公告 wind down，故只參考設計，不預設為新系統核心。

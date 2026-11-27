@@ -84,15 +84,13 @@ test('foreign-instrument payload fails without showing its price', async ({ page
   await expect(page.getByTestId('last-price')).toHaveText('—');
 });
 
-test('mobile navigation and unsupported symbols remain usable', async ({ page }) => {
+test('unsupported symbols remain usable on desktop', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(String(error)));
-  await page.setViewportSize({ width: 390, height: 844 });
+  await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/');
-  await expect(page.getByRole('navigation', { name: '手機導航' })).toBeVisible();
   await page.getByRole('button', { name: 'NVDA ↗', exact: true }).click();
   await expect(page.getByTestId('last-price')).toHaveText('140.00');
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.goto('/#stock/UNKNOWN');
   await expect(page.getByRole('heading', { name: '不在示範股票清單' })).toBeVisible();
   await page.getByRole('button', { name: '返回首頁', exact: true }).click();

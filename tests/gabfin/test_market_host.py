@@ -31,6 +31,36 @@ def test_market_host_owns_listener_and_feed_until_context_closes(tmp_path):
     asyncio.run(scenario())
 
 
+def test_host_stream_observation_is_durable_before_client_receives_it(tmp_path):
+    from gabfin.storage.events import EventLedger
+    async def scenario():
+        store = sessions(tmp_path)
+        token, _ = store.issue_service(actor_id=uuid4(), role='research', scope=['read_market'])
+        market = coordinator()
+        ledger = EventLedger(tmp_path / 'events.sqlite')
+        persisted = asyncio.Event()
+        loop = asyncio.get_running_loop()
+        def sink(event):
+            result = ledger.append(event)
+            loop.call_soon_threadsafe(persisted.set)
+            return result
+        feed = ExternalFeed(0)
+        async with serve_market(market, store, lambda: feed,
+            [SubscriptionKey(instrument_id=ID, channel='quote', timeframe=None)],
+            heartbeat_timeout=120, retry_delay=.01, backfill_timeout=2,
+            max_attempts=1, event_sink=sink) as address:
+            await asyncio.wait_for(persisted.wait(), 2)
+            client = await InternalMarketClient.connect(*address, token=token, instrument_ids=[ID])
+            try:
+                snapshot = await client.receive(timeout=2)
+                observation = snapshot.payload.quotes[0]
+                assert ledger.read(observation.event_id) == observation
+            finally:
+                await client.close()
+        assert feed.closed
+    asyncio.run(scenario())
+
+
 def test_supervisor_failure_closes_listener_and_wakes_foreground_host(tmp_path):
     async def scenario():
         class FailedCleanup(ExternalFeed):

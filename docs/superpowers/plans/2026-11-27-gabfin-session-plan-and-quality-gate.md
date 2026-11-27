@@ -188,7 +188,43 @@
 
 ---
 
-## 7. 下一步
+## S4 具体执行切片（2026-11-27 续作）
 
-1. 使用者确认旧文件清理范围（见回复中的选项）。
-2. S1 开始：清除 Alpaca 行情路径标记、建立 Massive 配置模型、创建 logs 目录。
+用户要求S3收尾后持续完成S4，授权开发/审查子代理，供应商依赖按可替换adapter接线。
+保持现有LangGraph/role cards/schema；不进入S5 API/UI范围，不提交混合脏树。
+
+- [ ] S3：独立聚焦审查现态；阻塞项RED→GREEN修复，记录最终结论。
+- [x] 快照/审计：`research/store.py`，SQLite不可变快照与有序CheckResult，重开/篡改/断引用/审计失败测试。
+- [x] 数据工具：`research/capture.py`从实际tape/本地指标/注入FRED与账户读源冻结截止时刻；unknown coverage保留拒算，release_date缺失拒绝；`tools.py`空参数只读当前快照。
+- [x] 运行接线：`service.py`加载已注册快照，为角色绑定工具，`nodes.py`每次校验持久化成功后才返回；越权/错误引用及磁盘失败测试。
+- [x] 供应商adapter：`model.py`显式LLM_*配置，OpenAI兼容HTTPS/工具回调/累计token；注入HTTP fixture验证，不假称真实LLM成功。
+- [x] CLI：`python -m gabfin.research` capture/run/checks；不自动加载.env，不打印凭证。
+- [ ] 验收：本地数据→快照→三角色→SQLite重开；聚焦与完整pytest、pip check/lint/secret扫描；一次独立权限/审计审查，修复阻塞项并更新memory。
+
+## S5/S6 执行切片（2026-11-27）
+
+用户授权连续完成并先交付本地可启动桌面，真实LLM验收推迟至明日；沿用既定规格，不再等待设计确认。基准582c0cb，feat/research-harness-langgraph；保留混合未提交修改。
+
+- [x] 研究任务API：新增api/research.py及research/jobs.py，create_market_app可选注入；服务端capture，SQLite持久任务和owner归属，START_RESEARCH/READ_REPORT、Origin/session/CSRF防护，容量/截止/重启状态测试先RED后GREEN。
+- [x] 桌面研究：shared/transport/research.ts、研究中心与股票入口；显示未配置、queued/running/completed/failed，结果及快照/证据/检查；轮询卸载和退出清理。新增research-ui.spec.ts先RED后GREEN，不改canonical契约。
+- [x] 启动接线：desk-server.py注册实际ResearchStore/configured_service与服务端tape capture，无模型时status明确未配置；不自动造账户或报告。聚焦launcher测试。
+- [x] S6整合：新增真实TLS fixture研究流程，实际路由→服务→冻结快照→模型fixture→SQLite审计→UI；typecheck/build先于Playwright，完整pytest、依赖/secret/diff检查。
+- [x] 新上下文集中审查权限/数据完整性与规格，修复阻塞项（独立初审已完成，原始复现与TLS全流程验证修复；最终补充回复状态见session10）；记录现场验收边界、启动命令和交付入口，更新受影响memory。无需提交混合脏树，无外部部署或交易。
+
+## 桌面下一阶段：有来源候选池与清单解析（用户已选择）
+
+沿用system-design U07/U08/U23与Task8，先交付来源可追溯的手动候选池和清单解析，不声称已购买或自动接入机构feed。复用EvidenceItem/CandidateObservation；服务端SQLite保存不可变观测，按available_at/observed_at/expires_at查询。任意清单逐项解析，未知/不支持/缺历史/模型未配置明确呈现；不按用户字符串直接编造Instrument身份或新增WS订阅。
+
+- [ ] 候选存储TDD：证据去重/修订、同ID冲突、未来证据不得进入过去、到期/排除、重开一致；独立universe模块。
+- [ ] 清单解析TDD：分隔符/去重/上限/非法ticker；注入服务端resolver逐项返回，未知不伪造。
+- [ ] 安全API：可选universe注入create_market_app，沿用会话/Origin/CSRF/能力；GET候选、POST解析，来源时间与证据可查。
+- [ ] 桌面：server首页使用候选API，demo保留显式示例；分析清单表单展示逐项结果与缺数据原因，已注册标的复用研究入口。
+- [ ] 启动接线/聚焦Python与Playwright/typecheck/build；完整验收边界、来源接入缺口和memory更新。
+
+## 7. 当前交付与后续验收
+
+- S1–S4历史证据见session01–09；S5/S6结果、独立审查与本地启动步骤由[session10](../logs/2026-11-27-session-10.md)拥有。
+- 当前新版桌面：`https://127.0.0.1:19444/`（离线行情），保留既有19443服务；无外部部署或交易。
+- 用户决定真实LLM供应商与token成本现场验收延至明日配置；本轮采用明确标示的fixture模型。
+- G2仍未放行；真实账户、paper执行与依赖漏洞数据库审计不以本轮测试替代。
+- 旧文件清理未获得删除范围确认，未删除。

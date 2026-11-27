@@ -12,11 +12,12 @@ from gabfin.protocols import ManagedFeedAdapter
 
 class FeedSupervisor:
     def __init__(self, market, factory, keys, *, heartbeat_timeout, retry_delay, backfill_timeout,
-                 cleanup_timeout=130):
+                 cleanup_timeout=130, event_sink=None):
         for value in (heartbeat_timeout, retry_delay, backfill_timeout, cleanup_timeout):
             if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
                 raise ValueError('Finite positive lifecycle limits required')
         self.market, self._factory = market, factory
+        self._event_sink = event_sink
         self._keys = tuple(key.model_copy(deep=True) for key in keys)
         if not self._keys:
             raise ValueError('Explicit subscriptions required')
@@ -32,6 +33,8 @@ class FeedSupervisor:
 
     async def _collect(self, feed):
         async for event in feed.events():
+            if self._event_sink is not None:
+                await asyncio.to_thread(self._event_sink, event)
             self.market.apply(event)
             if event.kind == 'quote':
                 self._cycle_quotes[event.instrument_id] = event.model_copy(deep=True)

@@ -53,6 +53,34 @@ class StubBars:
         return self._rows
 
 
+def test_indicator_plane_continues_cached_history_and_rebuilds_corrections(monkeypatch):
+    from gabfin.indicators.engine import IndicatorEngine
+    source = StubBars(bars(45))
+    plane = IndicatorPlane(source, source_coverage='sip')
+    calls = []
+    update = IndicatorEngine.update
+    def counted(self, state, bar):
+        calls.append(bar.event_at)
+        return update(self, state, bar)
+    monkeypatch.setattr(IndicatorEngine, 'update', counted)
+    plane.series(INSTRUMENT, TIMEFRAME)
+    assert len(calls) == 45
+    plane.series(INSTRUMENT, TIMEFRAME)
+    assert len(calls) == 45
+    source._rows = (*source._rows, bars(1, start=NOW)[0])
+    incremental = plane.series(INSTRUMENT, TIMEFRAME)
+    assert len(calls) == 46
+    fresh = IndicatorPlane(source, source_coverage='sip').series(INSTRUMENT, TIMEFRAME)
+    def values(response):
+        return {series.indicator: tuple(point.value for point in series.points) for series in response.series}
+    assert values(incremental) == values(fresh)
+    changed = list(source._rows)
+    changed[10] = bars(1, start=changed[10].event_at)[0]
+    source._rows = tuple(changed)
+    corrected = plane.series(INSTRUMENT, TIMEFRAME)
+    assert values(corrected) == values(IndicatorPlane(source, source_coverage='sip').series(INSTRUMENT, TIMEFRAME))
+
+
 def test_indicator_plane_reports_every_canonical_indicator_with_provenance():
     source = StubBars(bars())
     plane = IndicatorPlane(source, source_coverage='sip')

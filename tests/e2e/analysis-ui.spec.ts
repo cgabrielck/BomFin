@@ -328,17 +328,15 @@ test('the demo desk shows sample states rather than sample numbers', async ({
   await expect(page.getByTestId('macro-row-DGS10')).toHaveCount(0);
 });
 
-test('a browser cannot reach the analysis endpoints, and the desk says so', async ({
+test('a browser reaches the analysis endpoints on a same-origin GET', async ({
   page,
   market,
 }) => {
-  // The session guard requires an exact `Origin` header. A same-origin
-  // GET does not carry one, and a script may not set it. So the
-  // analysis endpoints are out of reach from the browser while they are
-  // reachable from a server-side client.
-  //
-  // This test pins that limitation. When the backend relaxes the
-  // requirement, this test fails and says the limitation is gone.
+  // A same-origin GET carries no `Origin` header, and `Origin` is a
+  // forbidden header name, so a script cannot add one. The session
+  // authority treats the missing header as "same origin as this
+  // server", which is sound because the transport already proved the
+  // request arrived over TLS on the allowed host.
   await paired(page, market);
   const fromBrowser = await page.evaluate(async () => {
     const response = await fetch('/v1/capabilities', {
@@ -352,8 +350,20 @@ test('a browser cannot reach the analysis endpoints, and the desk says so', asyn
     { headers: { Origin: market.origin } },
   );
   expect(fromClient.status()).toBe(200);
-  expect(fromBrowser).toBe(401);
-  // The desk reports the refusal without signing the reader out.
-  await expect(page.getByTestId('capabilities-refused')).toBeVisible();
+  expect(fromBrowser).toBe(200);
+  // The desk reads the real capabilities instead of reporting a refusal.
+  await expect(page.getByTestId('capabilities-refused')).toHaveCount(0);
+  await expect(page.getByTestId('capability-fixture')).toBeVisible();
+  // The market view is unaffected either way.
   await expect(page.getByTestId('last-price')).toHaveText('210.00');
+});
+
+test('a cross-origin analysis request is refused', async ({ page, market }) => {
+  // A stated origin that is not this server's own is refused, even
+  // though the session is valid.
+  await paired(page, market);
+  const response = await page.request.get(`${market.origin}/v1/capabilities`, {
+    headers: { Origin: 'https://evil.test' },
+  });
+  expect(response.status()).toBe(401);
 });
